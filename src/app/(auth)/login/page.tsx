@@ -5,7 +5,8 @@ import { GitHubLogin } from '@/components/SocialLoginButton/GitHubLogin';
 import { auth, signIn } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { executeAction } from '@/lib/executeActions';
+import { AuthError } from 'next-auth';
+import LoginError from '@/components/LoginError/LoginError';
 
 const Page = async () => {
     const session = await auth();
@@ -14,16 +15,21 @@ const Page = async () => {
      return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <div className="p-6 bg-transparent border border-gray-300 rounded-xl shadow-lg text-center w-96">
-            <FontAwesomeIcon icon={faClipboardCheck} className="text-blue-500 w-8 h-8 text-4xl mb-2" />
+              <div className='flex items-center justify-center'>
+                <FontAwesomeIcon icon={faClipboardCheck} className="text-blue-500 w-8 h-8 text-4xl mb-2" />
+              </div>
             <h1 className="text-2xl font-bold mb-4">Task Tracker</h1>
             <form className="space-y-4"
-                action={async (formData:FormData) => {
-                    "use server";
-                    await executeAction({
-                        actionFn: async () => {
-                            await signIn("credentials", formData)
-                        }
-                    })
+                action={async (formData) => {
+                    "use server"
+                    try {
+                      await signIn("credentials", formData)
+                    } catch (error) {
+                      if (error instanceof AuthError) {
+                        return redirect(`/login?error=${error.type}`)
+                      }
+                      throw error
+                    }
                   }}
             >
                 <input
@@ -57,6 +63,7 @@ const Page = async () => {
             <div className='my-4' />
             <GitHubLogin />
             </div>
+            <LoginError />
         </div>
         );
     }

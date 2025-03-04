@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth, { CredentialsSignin } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./prisma"
 import Google from "next-auth/providers/google"
@@ -10,6 +10,9 @@ import { v4 as uuid } from "uuid";
 import { encode as defaultEncode } from "next-auth/jwt";
 
 const adapter = PrismaAdapter(prisma);
+class InvalidLoginError extends CredentialsSignin {
+  code = "Invalid username or password"
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter,
@@ -30,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if(passwordMatch){
         return user;
       }
-      throw new Error('Invalid credentials');
+      throw new InvalidLoginError()
     }
   })],
   callbacks: {
@@ -67,6 +70,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages:{
     signIn: '/login',
-    error: '/login?error=true',
+    error: '/login',
   }
 })
