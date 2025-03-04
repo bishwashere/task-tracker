@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?         @unique
+  username      String?         @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
+ 
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+}
+
+// model User {
+//   id                String    @id @default(auto()) @map("_id") @db.ObjectId
+//   username          String    @unique
+//   email             String    @unique
+//   password          String
+//   points            Int       @default(0)
+//   // organizations     Organization[] 
+//   // assignedSubTasks  SubTask[]
+//}
+
+// model Organization {
+//   id       String    @id @default(auto()) @map("_id") @db.ObjectId
+//   name     String
+//   admin    User      @relation(fields: [adminId], references: [id])
+//   adminId  String    @db.ObjectId
+//   projects Project[]
+// }
+
+// model Project {
+//   id              String    @id @default(auto()) @map("_id") @db.ObjectId
+//   name            String
+//   organization    Organization   @relation(fields: [organizationId], references: [id])
+//   organizationId  String    @db.ObjectId
+//   tasks           Task[]
+// }
+
+
+// model Task {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   project   Project  @relation(fields: [projectId], references: [id])
+//   projectId Int
+//   subtasks  Subtask[]
+// }
+
+// model Subtask {
+//   id             Int      @id @default(autoincrement())
+//   name           String
+//   task           Task     @relation(fields: [taskId], references: [id])
+//   taskId         Int
+//   assignedUser   User?    @relation(fields: [assignedUserId], references: [id])
+//   assignedUserId Int?
+//   dueDate        DateTime?
+//   points         Float    @default(10)
+//   status         String   @default("pending")
+//   priority       Int      @default(0)
+//   tags           SubtaskTag[]
+//   comments       Comment[]
+// }
+
+// model SubtaskTag {
+//   id         Int      @id @default(autoincrement())
+//   task       Task     @relation(fields: [taskId], references: [id])
+//   taskId     Int
+//   subtask    Subtask  @relation(fields: [subtaskId], references: [id])
+//   subtaskId  Int
+//   user       User     @relation(fields: [userId], references: [id])
+//   userId     Int
+//   tagName    String
+//   tagColor   String
+//   createdAt  DateTime @default(now())
+
+//   @@unique([taskId, subtaskId, userId]) // Ensure a unique tag for a user, task, and subtask
+// }
+
+// model Comment {
+//   id         Int      @id @default(autoincrement())
+//   subtask    Subtask  @relation(fields: [subtaskId], references: [id])
+//   subtaskId  Int
+//   user       User     @relation(fields: [userId], references: [id])
+//   userId     Int
+//   comment    String
+//   createdAt  DateTime @default(now())
+// }
