@@ -1,12 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
-import { GoogleLogin } from '@/components/SocialLoginButton/GoogleLogin';
-import { GitHubLogin } from '@/components/SocialLoginButton/GitHubLogin';
+import { GoogleLogin } from '@/components/LoginButton/GoogleLogin';
+import { GitHubLogin } from '@/components/LoginButton/GitHubLogin';
 import { auth, signIn } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AuthError } from 'next-auth';
 import LoginError from '@/components/LoginError/LoginError';
+import LoginButton from '@/components/LoginButton/LoginButton';
 
 const Page = async () => {
     const session = await auth();
@@ -50,12 +51,7 @@ const Page = async () => {
                 // onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                 />
-                <button
-                type="submit"
-                className="w-full text-blue-500 border border-blue-500 bg-white py-2 rounded-lg hover:bg-blue-500 hover:text-white transition"
-                >
-                Login
-                </button>
+                <LoginButton/>
             </form>
                 <p className='mt-3 text-sm ml-2'>New user? <Link href="/register" className='font-bold'>Create an Account</Link></p>
             <hr className='border border-gray-300 my-6' />
@@ -67,5 +63,4 @@ const Page = async () => {
         </div>
         );
     }
-
-export default Page;
+    export default Page;

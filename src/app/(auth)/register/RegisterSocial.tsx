@@ -1,5 +1,5 @@
-import { GitHubLogin } from "@/components/SocialLoginButton/GitHubLogin"
-import { GoogleLogin } from "@/components/SocialLoginButton/GoogleLogin"
+import { GitHubLogin } from "@/components/LoginButton/GitHubLogin"
+import { GoogleLogin } from "@/components/LoginButton/GoogleLogin"
 
 const RegisterSocial = () => {
     return(

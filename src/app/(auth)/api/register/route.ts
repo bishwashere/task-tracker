@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (existingUser) {
       return NextResponse.json('User already exists.', {status: 400,});
     }
-    const existingUsername = await prisma.user.findUnique({ where: { username: String(username) } });
+    const existingUsername = await prisma.user.findFirst({ where: { username: String(username) } });
     if (existingUsername) {
       return NextResponse.json('Username already Taken! Try different username.', {status: 400,});
     }
