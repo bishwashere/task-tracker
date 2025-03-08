@@ -19,7 +19,7 @@ export const saveComment = async (subtaskId: string, projectId: string, userComm
 
         // Check if the user is an admin in the organization
         const userOrg = project.organization.members.find(
-            (member: any) => member.userId === userId
+            (member) => member.userId === userId
         );
         if (!userOrg) {
             return { success: false, message: "Permission denied" };

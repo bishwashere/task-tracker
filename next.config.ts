@@ -12,12 +12,12 @@ const nextConfig: NextConfig = {
   },
   webpack(config) {
     config.resolve.fallback = {
-
       // if you miss it, all the other options in fallback, specified
       // by next.js will be dropped.
       ...config.resolve.fallback,  
-
-      fs: false, // the solution
+      fs: false,
+      async_hooks: false,
+      child_process: false,
     };
     
     return config;

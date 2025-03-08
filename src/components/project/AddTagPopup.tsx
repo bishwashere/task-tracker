@@ -1,7 +1,7 @@
 import { IoMdClose } from "react-icons/io"
 import Modal from "../Modal/Modal"
 import FormSubmitButton from "../common/FormSubmitButton"
-import { saveTask, saveTaskTag } from "@/actions/task"
+import { saveTaskTag } from "@/actions/task"
 import toast from "react-hot-toast"
 import { SubtaskType, TaskType } from "@/types/organization"
 import { useState } from "react"

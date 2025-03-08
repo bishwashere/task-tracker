@@ -18,7 +18,7 @@ export default async function Page({
 
   const projectInfo = await getProjectById(id);
   if(projectInfo.success){
-    return <Project session={session} project={projectInfo.project  as unknown as ProjectType} />
+    return <Project project={projectInfo.project  as unknown as ProjectType} />
   }
   else {
     return(

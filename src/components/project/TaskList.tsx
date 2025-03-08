@@ -1,21 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SubTaskView } from '@/components/project/SubTaskView';
 import { TaskType } from '@/types/organization';
 import { User } from '@/types/user';
-import { Session } from 'next-auth';
 import AddSubtask from './AddSubtaskPopup';
 
 export const TaskList = ({
   tasks,
   users,
-  session,
   role,
   projectId,
   setTasks,
 }:{
   tasks: TaskType[];
   users: User[];
-  session: Session;
   role: 'admin' | 'member';
   projectId: string;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>

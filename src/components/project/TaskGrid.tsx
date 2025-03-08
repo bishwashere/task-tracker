@@ -1,6 +1,6 @@
 import { SubtaskType, TaskType } from '@/types/organization';
 import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AddSubtask from './AddSubtaskPopup';
 import toast from 'react-hot-toast';
 import { togglePriority } from '@/actions/task';

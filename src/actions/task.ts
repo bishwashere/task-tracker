@@ -21,7 +21,7 @@ export const saveTask = async (projectId: string, taskTitle: string) => {
 
         // Check if the user is an admin in the organization
         const userOrg = project.organization.members.find(
-            (member: any) => member.userId === userId
+            (member) => member.userId === userId
         );
 
         if (!userOrg || userOrg.role !== "ADMIN") {
@@ -64,7 +64,7 @@ export const saveSubTask = async (taskId: string, projectId: string, subTaskName
 
         // Check if the user is an admin in the organization
         const userOrg = project.organization.members.find(
-            (member: any) => member.userId === userId
+            (member) => member.userId === userId
         );
 
         if (!userOrg || userOrg.role !== "ADMIN") {
@@ -141,7 +141,7 @@ export const togglePriority = async (subtaskId: string, projectId: string, prior
 
         // Check if the user is an admin in the organization
         const userOrg = project.organization.members.find(
-            (member: any) => member.userId === userId
+            (member) => member.userId === userId
         );
 
         if (!userOrg || userOrg.role !== "ADMIN") {
@@ -190,7 +190,7 @@ export const updateSubtaskStatus = async (subtaskId: string, projectId: string, 
         const updatedSubtask = await prisma.subtask.update({
             where: { id: subtaskId },
             data: {
-                status: "done",
+                status: status,
             },
         });
 
@@ -219,7 +219,7 @@ export const assignUserToSubtask = async (subtaskId: string, projectId: string, 
 
         // Check if the user is an admin in the organization
         const userOrg = project.organization.members.find(
-            (member: any) => member.userId === userId
+            (member) => member.userId === userId
         );
 
         if (!userOrg || userOrg.role !== "ADMIN") {

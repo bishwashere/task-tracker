@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import RegisterCreds from './RegisterCreds';

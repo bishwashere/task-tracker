@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 const LoginError = () => {
     const searchParams = useSearchParams();
-    const error = searchParams.get('error');
+    const error = searchParams?.get('error');
 
     useEffect(() => {
         if (error) {

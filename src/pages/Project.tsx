@@ -11,11 +11,10 @@ import { fetchProjectData } from "@/data/task";
 import { ProjectType, TaskType } from "@/types/organization";
 import { User } from "@/types/user";
 import { calculateProgressWithStats } from "@/utils/progressUtils";
-import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const Project = ({ session, project }: { session: Session; project: ProjectType }) => {
+const Project = ({ project }: { project: ProjectType }) => {
 
   const [initialLoading, setInitialLoading] = useState(true)
   const [members, setMembers] = useState<User[]>([]);
@@ -42,7 +41,8 @@ const Project = ({ session, project }: { session: Session; project: ProjectType 
     setInitialLoading(false)
   }
   useEffect(() => {
-    fetchtasksWithSubTasks()
+    fetchtasksWithSubTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const stats = calculateProgressWithStats(tasks);
@@ -152,7 +152,6 @@ const Project = ({ session, project }: { session: Session; project: ProjectType 
               }))}
               setTasks={setTasks}
               users={members}
-              session={session}
               projectId={project.id}
               role={currentUserRole}
             />

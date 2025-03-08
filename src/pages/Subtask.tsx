@@ -28,6 +28,7 @@ const Subtask = ({ subtaskId }: { subtaskId: string;  }) => {
     }
     useEffect(()=>{
         fetchSubtaskAndComment();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
     const submitComment = async (subtaskId:string, projectId:string) => {
