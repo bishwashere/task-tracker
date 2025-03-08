@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
+    
     "db:update": "prisma db push && prisma generate"
   },
   "dependencies": {
