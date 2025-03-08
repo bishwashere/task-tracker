@@ -7,8 +7,8 @@ const SignOut = () => {
 
   return (
     <div className="flex justify-center">
-      <button className=" bg-red-800 text-white" onClick={handleSignOut}>
-        Sign Out
+      <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onClick={handleSignOut}>
+        Logout
       </button>
     </div>
   );

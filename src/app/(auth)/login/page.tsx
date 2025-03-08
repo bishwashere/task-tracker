@@ -34,10 +34,10 @@ const Page = async () => {
                   }}
             >
                 <input
-                type="text"
-                placeholder="Username"
-                id="username"
-                name="username"
+                type="email"
+                placeholder="Email"
+                id="email"
+                name="email"
                 // value={username}
                 // onChange={(e) => setUsername(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"

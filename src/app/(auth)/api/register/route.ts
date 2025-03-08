@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
-    const { username, email, password } = await req.json();
+    const { name, email, password } = await req.json();
 
-    console.log(username, email, password);
-    if (!username || !email || !password) {
+    console.log(name, email, password);
+    if (!name || !email || !password) {
       return NextResponse.json('All fields are required !', {status: 400,});
     }
 
@@ -18,16 +18,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (existingUser) {
       return NextResponse.json('User already exists.', {status: 400,});
     }
-    const existingUsername = await prisma.user.findFirst({ where: { username: String(username) } });
-    if (existingUsername) {
-      return NextResponse.json('Username already Taken! Try different username.', {status: 400,});
-    }
 
     const hashedPassword = await hash(password, 10);
 
     await prisma.user.create({
       data: {
-        username: username,
+        name: name,
         email: email,
         password: hashedPassword,
       },

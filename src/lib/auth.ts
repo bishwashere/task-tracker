@@ -1,3 +1,4 @@
+"use server";
 import NextAuth, { CredentialsSignin } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./prisma"
@@ -5,9 +6,7 @@ import Google from "next-auth/providers/google"
 import GitHub from "next-auth/providers/github"
 import Credentials from "next-auth/providers/credentials"
 import { schema } from "./schema"
-import bcrypt, { hash } from "bcryptjs"
-import { v4 as uuid } from "uuid";
-import { encode as defaultEncode } from "next-auth/jwt";
+import bcrypt from "bcryptjs"
 
 const adapter = PrismaAdapter(prisma);
 class InvalidLoginError extends CredentialsSignin {
@@ -18,7 +17,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter,
   providers: [Google, GitHub, Credentials({
     credentials: {
-      username: {},
+      email: {},
       password: {}
     },
     authorize: async (credentials) => {
@@ -26,48 +25,69 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       
       const user = await prisma.user.findFirst({
         where: {
-          username: validatedCredentials.username,
+          email: validatedCredentials.email,
         }
       });
       const passwordMatch = await bcrypt.compare(validatedCredentials.password, user?.password || "");
       if(passwordMatch){
-        return user;
+        return {id: user?.id, name: user?.name, email: user?.email, image: user?.image};;
       }
       throw new InvalidLoginError()
     }
   })],
+  session: {strategy: "jwt"},
   callbacks: {
-    async jwt({ token, account }) {
-      if (account?.type === "credentials") {
-        token.credentials = true;;
+    async session({ session, token }) {
+      return{
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub
+        }
       }
-      return token;
     }
   },
-  jwt: {
-    encode: async function (params) {
-      if (params.token?.credentials) {
-        const sessionToken = uuid();
+  // callbacks: {
+  //   async jwt({ token, account, user }) {
+  //     // if (account?.type === "credentials") {
+  //     //   token.credentials = true;
+  //     // }
+  //     if(user){
+  //       token.id = user.id;
+  //     }
+  //     return token;
+  //   },
+  //   async session({ session, token }) {
+  //     if(session.user){
+  //       session.user.id = token.id as string;
+  //     }
+  //     return session;
+  //   }
+  // },
+  // jwt: {
+  //   encode: async function (params) {
+  //     if (params.token?.credentials) {
+  //       const sessionToken = uuid();
 
-        if (!params.token.sub) {
-          throw new Error("No user ID found in token");
-        }
+  //       if (!params.token.sub) {
+  //         throw new Error("No user ID found in token");
+  //       }
 
-        const createdSession = await adapter?.createSession?.({
-          sessionToken: sessionToken,
-          userId: params.token.sub,
-          expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-        });
+  //       const createdSession = await adapter?.createSession?.({
+  //         sessionToken: sessionToken,
+  //         userId: params.token.sub,
+  //         expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+  //       });
 
-        if (!createdSession) {
-          throw new Error("Failed to create session");
-        }
+  //       if (!createdSession) {
+  //         throw new Error("Failed to create session");
+  //       }
 
-        return sessionToken;
-      }
-      return defaultEncode(params);
-    },
-  },
+  //       return sessionToken;
+  //     }
+  //     return defaultEncode(params);
+  //   },
+  // },
   pages:{
     signIn: '/login',
     error: '/login',

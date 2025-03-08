@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 
 const RegisterCreds = ({ children }: { children: React.ReactNode }) => {
-    const [username, setUsername] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,7 +22,7 @@ const RegisterCreds = ({ children }: { children: React.ReactNode }) => {
             return;
         }
         setLoading(true);
-        const postData = axios.post('/api/register', { username: username, email: email, password: password })
+        const postData = axios.post('/api/register', { name: name, email: email, password: password })
             .then((res) => {
                 toast.success('User Regisgered! Please login to continue');
                 router.push('/login');
@@ -41,12 +41,12 @@ const RegisterCreds = ({ children }: { children: React.ReactNode }) => {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     type="text"
-                    placeholder="Username"
-                    name="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Full Name"
+                    name="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-
+                    required
                 />
                 <input
                     type="email"

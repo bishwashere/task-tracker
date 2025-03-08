@@ -1,20 +1,13 @@
-import { SignOut } from "@/components/SignOut/SignOut";
+"use server";
 import { auth } from "@/lib/auth";
+import Dashboard from "@/pages/Dashboard";
 import { redirect } from "next/navigation";
 
-const Page = async () => {
-
-    const session = await auth();
-    if(!session) redirect('/login')
-
+export default async function Page() {
+    const session = await auth()
+    if (!session) redirect('/login')
+   
     return (
-        <div>
-            <h1>
-                Dashboard
-            </h1>
-            <SignOut />
-        </div>
+      <Dashboard session={session}/>
     )
-}
-
-export default Page;
+  }
