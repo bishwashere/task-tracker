@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
     
     return config;
   },
+  transpilePackages: ['next-auth']
 };
 
 export default nextConfig;
