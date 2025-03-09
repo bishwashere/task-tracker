@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { isUserValid } from "./isUserValid";
 
-export const addProject = async (organizationId: string, projectName: string) => {
+export const addProject = async (organizationId: string, projectName: string, projectDescription: string) => {
     const userId = await isUserValid();
     if (!userId) {
         return { success: false, message: "Unauthorized !" };
@@ -25,6 +25,7 @@ export const addProject = async (organizationId: string, projectName: string) =>
         const project = await prisma.project.create({
             data: {
                 name: projectName,
+                description: projectDescription,
                 organizationId,
             },
         });

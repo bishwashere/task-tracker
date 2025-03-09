@@ -26,21 +26,18 @@ export default function Home() {
 
   // Handle keyboard navigation
   useEffect(() => {
-    interface HandleKeyDownEvent extends KeyboardEvent {
-      key: string;
-    }
-
-    const handleKeyDown = (e: HandleKeyDownEvent) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === "ArrowRight") {
-      setActivePhoto((prev) => (prev + 1) % photos.length);
-      setIsPaused(true); // Pause on manual interaction
+        setActivePhoto((prev) => (prev + 1) % photos.length);
+        setIsPaused(true); // Pause on manual interaction
       } else if (e.key === "ArrowLeft") {
-      setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
-      setIsPaused(true); // Pause on manual interaction
+        setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
+        setIsPaused(true); // Pause on manual interaction
       } else if (isExpanded && e.key === "Escape") {
-      setIsExpanded(false); // Close expanded view with Escape
+        setIsExpanded(false); // Close expanded view with Escape
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isExpanded, photos.length]);
@@ -52,8 +49,8 @@ export default function Home() {
   };
 
   // Handle click on expanded image for navigation
-  const handleExpandedClick = (e: React.MouseEvent<HTMLImageElement>) => {
-    const rect = (e.target as HTMLImageElement).getBoundingClientRect();
+  const handleExpandedClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const halfWidth = rect.width / 2;
 
@@ -67,6 +64,7 @@ export default function Home() {
       setIsPaused(true);
     }
   };
+
 
   // Close expanded view
   const handleCloseExpanded = () => {
@@ -125,9 +123,8 @@ export default function Home() {
                 {photos.map((_, index) => (
                   <div
                     key={index}
-                    className={`w-2 h-2 rounded-full ${
-                      activePhoto === index ? "bg-blue-500" : "bg-blue-200"
-                    }`}
+                    className={`w-2 h-2 rounded-full ${activePhoto === index ? "bg-blue-500" : "bg-blue-200"
+                      }`}
                   />
                 ))}
               </div>

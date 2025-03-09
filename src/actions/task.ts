@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isUserValid } from "./isUserValid";
 import { revalidatePath } from "next/cache";
 
-export const saveTask = async (projectId: string, taskTitle: string) => {
+export const saveTask = async (projectId: string, taskTitle: string, taskDescription: string) => {
     const userId = await isUserValid();
     if (!userId) {
         return { success: false, message: "Unauthorized !" };
@@ -32,6 +32,7 @@ export const saveTask = async (projectId: string, taskTitle: string) => {
         const task = await prisma.task.create({
             data: {
                 name: taskTitle,
+                description: taskDescription,
                 projectId,
             },
             include: {
@@ -162,31 +163,86 @@ export const togglePriority = async (subtaskId: string, projectId: string, prior
     }
 };
 
-export const updateSubtaskStatus = async (subtaskId: string, projectId: string, status: string) => {
+export const updateSubtaskStatus = async (subtaskId: string, status: string) => {
     const userId = await isUserValid();
     if (!userId) {
         return { success: false, message: "Unauthorized !" };
     }
     try {
-        // Fetch project and organization
-        const project = await prisma.project.findUnique({
-            where: { id: projectId },
-            include: { organization: { include: { members: true } } },
+        // Fetch the subtask along with its related task and organization
+        const subtask = await prisma.subtask.findUnique({
+            where: { id: subtaskId },
+            include: {
+                task: {
+                    select: {
+                        project: {
+                            select: {
+                                organization: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        members: {
+                                            select: {
+                                                userId: true,
+                                                role: true,
+                                            },
+                                        },
+                                    },
+                                },
+                                id: true,
+                                name: true,
+                            },
+                        },
+                        name: true,
+                    },
+                },
+                comments: {
+                    select: {
+                        user: {
+                            select: {
+                                name: true,
+                                email: true,
+                            }
+                        },
+                        comment: true,
+                        createdAt: true,
+                    }
+                },
+            },
         });
 
-        if (!project) {
-            return { success: false, message: "Project not found" };
+        // Check if the subtask exists
+        if (!subtask) {
+            return { success: false, error: 'No Subtask found!' };
         }
-
-        // // Check if the user is an admin in the organization
-        // const userOrg = project.organization.members.find(
-        //     (member: any) => member.userId === userId
-        // );
-
-        // if (!userOrg || userOrg.role !== "ADMIN") {
-        //     return { success: false, message: "Permission denied" };
-        // }
-
+        // Get organization and members
+        const organization = subtask.task?.project?.organization;
+        if (!organization) {
+            return { success: false, message: "Organization not found" };
+        }
+        // Fetch organization members
+        const isAdmin = organization.members.some(
+            (member) => member.userId === userId && member.role === 'ADMIN'
+        );
+        const isAssignedUser = subtask.assignedUserId === userId;
+        // Check if the user is authorized
+        if (!(isAdmin || isAssignedUser)) {
+            return { success: false, message: "Forbidden: You do not have permission to view this subtask" };
+        }
+        await prisma.pointsEarned.create({
+            data: {
+                userId,
+                organizationId: subtask.task.project.id,
+                organizationName: subtask.task.project.organization.name,
+                projectId: subtask.task.project.id,
+                projectName: subtask.task.project.name,
+                taskId: subtask.taskId,
+                taskName: subtask.task.name,
+                subtaskId: subtaskId,
+                subtaskName: subtask.name,
+                points: subtask.points
+            }
+        })
         const updatedSubtask = await prisma.subtask.update({
             where: { id: subtaskId },
             data: {

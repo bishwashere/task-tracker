@@ -46,44 +46,37 @@ export const fetchSubtaskData = async (subtaskId: string) => {
                         createdAt: true,
                     }
                 },
+                assignedUser: {
+                    select: {
+                        name: true,
+                    }
+                },
             },
         });
+
         // Check if the subtask exists
         if (!subtask) {
-            return { success: false, error: 'No Subtask !' };
+            return { success: false, error: 'No Subtask found!' };
         }
-
-        let userName = null;
-        //fetch assigned user name
-        if(subtask.assignedUserId){
-            userName = await prisma.user.findUnique({
-                where: { id: subtask.assignedUserId },
-                select: {
-                    name: true,
-                }
-            });
-        }
-
         // Get organization and members
         const organization = subtask.task?.project?.organization;
         if (!organization) {
-            return {success:false, message:"Organization not found"};
+            return { success: false, message: "Organization not found" };
         }
-
-        // Check if the user is an admin or a member of the organization
-        const isAuthorized = organization.members.some(
-            (member) => member.userId === userId && (member.role === 'ADMIN' || member.role === 'MEMBER')
+        // Fetch organization members
+        const isAdmin = organization.members.some(
+            (member) => member.userId === userId && member.role === 'ADMIN'
         );
-
-        if (!isAuthorized) {
-            return {success:false, message:"Forbidden: You do not have permission to view this subtask"};
+        const isAssignedUser = subtask.assignedUserId === userId;
+        // Check if the user is authorized
+        if (!(isAdmin || isAssignedUser)) {
+            return { success: false, message: "Forbidden: You do not have permission to view this subtask" };
         }
 
         return {
             success: true,
             subtask,
             comments: subtask.comments,
-            assignedUser: userName
         };
     } catch (error) {
         console.error("Error fetching project data:", error);

@@ -23,8 +23,8 @@ export default async function Page({
   else {
     return(
       <div className="w-screen h-screen flex flex-col items-center justify-center gap-3">
-        <p className="text-3xl font-semibold">Something went wrong :(</p>
-        <p className="text-xl font-semibold">Try again !</p>
+        <p className="text-3xl font-semibold">Access Denied :(</p>
+        <p className="text-xl font-semibold mt-2">Contact organization admin !</p>
         <Link href="/dashboard" className="text-white text-lg bg-blue-600 px-4 py-2 rounded-xl mt-10">Go to Dashboard</Link>
       </div>
     )

@@ -103,10 +103,10 @@ const ProfileMenu = ({ showSettings, session, selectedOrganization, fetchOrganiz
                         name="newOrganizationName"
                         id="newOrganizationName"
                         defaultValue={selectedOrganization?.name}
-                        className="w-[95%] md:w-[80%] px-2 py-1 mx-2 my-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-[95%] md:w-[80%] px-2 py-1 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                         required
                     />
-                    <FormSubmitButton className="w-fit px-4 py-1 bg-green-600 text-white rounded-lg cursor-pointer">
+                    <FormSubmitButton className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 mr-2">
                         Change
                     </FormSubmitButton>
                 </form>
@@ -118,10 +118,10 @@ const ProfileMenu = ({ showSettings, session, selectedOrganization, fetchOrganiz
                         placeholder="Enter member email"
                         name="memberEmail"
                         id="memberEmail"
-                        className="w-[95%] md:w-[80%] px-2 py-1 mx-2 my-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-[95%] md:w-[80%] px-2 py-1 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                         required
                     />
-                    <FormSubmitButton className="w-fit px-4 py-1 bg-green-600 text-white rounded-lg cursor-pointer">
+                    <FormSubmitButton className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 mr-2">
                         Add
                     </FormSubmitButton>
                 </form>

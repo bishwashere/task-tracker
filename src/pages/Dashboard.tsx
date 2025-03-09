@@ -64,7 +64,7 @@ const Dashboard = ({ session }: { session: Session }) => {
     }
     const addOrganizationProject = async (formData: FormData) => {
         if (selectedOrganization) {
-            const result = await addProject(selectedOrganization.id, formData.get('projectTitle') as string)
+            const result = await addProject(selectedOrganization.id, formData.get('projectTitle') as string, formData.get('projectDescription') as string)
             if (result.success) {
                 toast.success(result.message);
                 // fetchOrganizations();
@@ -92,8 +92,9 @@ const Dashboard = ({ session }: { session: Session }) => {
                 <div className="flex items-center space-x-4">
 
                     {/* Add Organization */}
-                    <button onClick={() => setAddOrganizationModalIsOpen(true)}>
+                    <button className="tooltip" onClick={() => setAddOrganizationModalIsOpen(true)}>
                         <IoIosAddCircleOutline className="text-3xl cursor-pointer opacity-90 hover:opacity-100" />
+                        <p className="tooltiptext">Add Organization</p>
                     </button>
                     <Modal modalIsOpen={addOrganizationModalIsOpen} setModalIsOpen={setAddOrganizationModalIsOpen} className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10">
                         <div className="w-full flex justify-between">
@@ -109,15 +110,15 @@ const Dashboard = ({ session }: { session: Session }) => {
                                 placeholder="Organization Name"
                                 name="organizationName"
                                 id="organizationName"
-                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                                 required
                             />
                             {/* <hr className='border border-gray-300 my-6' /> */}
                             <div className="flex mt-6">
-                                <FormSubmitButton className="w-fit px-4 py-2 bg-green-600 text-white rounded-lg cursor-pointer">
+                                <FormSubmitButton className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
                                     Save
                                 </FormSubmitButton>
-                                <button className="w-fit px-4 py-2 bg-red-600 text-white rounded-lg ml-4 cursor-pointer" onClick={() => setAddOrganizationModalIsOpen(false)}>Cancel</button>
+                                <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={() => setAddOrganizationModalIsOpen(false)}>Cancel</button>
                             </div>
                         </form>
                     </Modal>
@@ -164,15 +165,22 @@ const Dashboard = ({ session }: { session: Session }) => {
                                 placeholder="Project Title"
                                 name="projectTitle"
                                 id="projectTitle"
-                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                                 required
+                            />
+                            <input
+                                type="text"
+                                placeholder="Project Description"
+                                name="projectDescription"
+                                id="projectDescription"
+                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                             />
                             {/* <hr className='border border-gray-300 my-6' /> */}
                             <div className="flex mt-5">
-                                <FormSubmitButton className="w-fit px-4 py-2 bg-green-600 text-white rounded-lg cursor-pointer">
+                                <FormSubmitButton className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
                                     Add
                                 </FormSubmitButton>
-                                <button className="w-fit px-4 py-2 bg-red-600 text-white rounded-lg ml-4 cursor-pointer" onClick={() => setAddProjectModalIsOpen(false)}>Cancel</button>
+                                <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={() => setAddProjectModalIsOpen(false)}>Cancel</button>
                             </div>
                         </form>
                     </Modal>

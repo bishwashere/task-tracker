@@ -14,6 +14,7 @@ import { calculateProgressWithStats } from "@/utils/progressUtils";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { MdEditSquare } from "react-icons/md";
 
 const Project = ({ session, project }: { session: Session, project: ProjectType }) => {
 
@@ -22,9 +23,11 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [currentUserRole, setCurrentUserRole] = useState<'admin' | 'member'>('member')
   const [viewMode, setViewMode] = useState('list'); // Default view state
+  const [editMode, setEditMode] = useState(false);
 
   const [subtaskFilter, setSubtaskFilter] = useState<'all' | 'pending' | 'done'>('all');
   const [showSubtasks, setShowSubtasks] = useState(true)
+  const [pointsEarned, setPointsEarned] = useState<number>(0)
 
   const [addTaskModalOpen, setaddTaskModalOpen] = useState(false)
 
@@ -32,8 +35,10 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
   const fetchtasksWithSubTasks = async () => {
     const res = await fetchProjectData(project.id);
     if (res.success) {
+      // console.log(res.pointsEarned)
       setTasks(res.tasks as unknown as TaskType[]);
       setCurrentUserRole(res.role as 'admin' | 'member')
+      setPointsEarned(res.pointsEarned as number)
       if (res.members)
         setMembers(res.members as User[])
     } else {
@@ -65,7 +70,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           subtasks: filteredSubtasks,
         };
       })
-    // .filter((task) => Array.isArray(task.subtasks) && task.subtasks.length > 0);
+      .filter((task) => subtaskFilter === "all" || task.subtasks.length > 0);
     // console.log('Filtered Tasks:', filteredTasks);
     return filteredTasks;
   };
@@ -78,7 +83,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader session={session} projectName={project.name} />
+        <ProjectHeader session={session} projectName={project.name} points={pointsEarned} showPoints={true} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
@@ -86,10 +91,18 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
             {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
           </p>
         </div>
+        <div className="flex justify-end mt-3">
+          {currentUserRole === "admin" &&
+            <div className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2" onClick={() => setaddTaskModalOpen(true)}>
+              Add a new task
+              <button className="bg-gray-500 text-white w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 z-10">+</button>
+            </div>
+          }
+          <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
+        </div>
         <div className="mt-10 flex flex-row items-center justify-center gap-1">
           <p>No task found.</p>
-          <button className="text-blue-500 font-semibold cursor-pointer" onClick={() => setaddTaskModalOpen(true)}>Add a new task</button></div>
-        <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
+        </div>
       </div>
     </>
   )
@@ -98,7 +111,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader session={session} projectName={project.name} />
+        <ProjectHeader session={session} projectName={project.name} points={pointsEarned} showPoints={true} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
@@ -130,9 +143,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           </button>
         </div>
 
-        <div className="flex flex-col gap-2 mb-6">
-          <p className="cursor-pointer text-blue-500 hover:underline w-fit" onClick={() => setaddTaskModalOpen(true)}>Add a new task</p>
-          <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
+        <div className="mb-6 flex flex-row justify-between">
           <p
             className="cursor-pointer text-blue-500 hover:underline w-fit"
             onClick={() => setShowSubtasks(!showSubtasks)}
@@ -141,8 +152,25 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           </p>
         </div>
 
-        <ViewToggle onChange={(mode: string) => setViewMode(mode)} />
+        <div className="flex flex-row items-center justify-end gap-4 -mt-5">
+          {/* Toggle edit Mode */}
+          {currentUserRole === "admin" &&
+            <button onClick={() => setEditMode(!editMode)}>
+              <MdEditSquare className={`${editMode ? 'text-red-600' : 'text-blue-600'} text-2xl`} />
+            </button>
+          }
+          <ViewToggle onChange={(mode: string) => setViewMode(mode)} />
+        </div>
 
+        <div className="flex justify-end -mt-3">
+          {currentUserRole === "admin" && editMode &&
+            <div className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2" onClick={() => setaddTaskModalOpen(true)}>
+              Add task
+              <button className="bg-gray-500 text-white w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 z-10">+</button>
+            </div>
+          }
+          <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
+        </div>
         {!tasks.length && <p>No tasks Found</p>}
         {viewMode === 'list' ? (
           <>
@@ -155,6 +183,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
               users={members}
               projectId={project.id}
               role={currentUserRole}
+              editMode={editMode}
             />
           </>
         ) : (

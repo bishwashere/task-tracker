@@ -21,6 +21,7 @@ export type UserOrganization = {
 export type ProjectType = {
   id: string;
   name: string;
+  description?: string;
   organizationId: string;
   organization: Organization;
   tasks: TaskType[];
@@ -30,6 +31,7 @@ export type ProjectType = {
 export type TaskType = {
   id: string;
   name: string;
+  description: string;
   projectId: string;
   project: ProjectType;
   subtasks: SubtaskType[];
@@ -58,4 +60,17 @@ export type CommentType = {
   user: User;
   comment: string;
   createdAt: Date;
+};
+export type PointsEarnedType = {
+  id: string;
+  userId: string;
+  subtaskId: string;
+  subtaskName: string;
+  organizationId: string;
+  organizationName: string;
+  projectId: string;
+  projectName: string;
+  taskId: string;
+  taskName: string;
+  points: number;
 };

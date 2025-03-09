@@ -5,6 +5,7 @@ import { User } from '@/types/user';
 import AddTagPopup from './AddTagPopup';
 import { assignUserToSubtask, togglePriority, updateSubtaskStatus } from '@/actions/task';
 import toast from 'react-hot-toast';
+import { useConfirmModal } from '../Modal/useConfirmModal';
 
 export const SubTaskView = ({
   subtask,
@@ -12,7 +13,8 @@ export const SubTaskView = ({
   role,
   users,
   projectId,
-  setTasks
+  setTasks,
+  editMode
 }: {
   subtask: SubtaskType;
   taskId: string;
@@ -20,10 +22,12 @@ export const SubTaskView = ({
   users: User[];
   projectId: string;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  editMode: boolean;
 }) => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const { confirmAction, ConfirmationModal } = useConfirmModal();
 
   const priorityToggle = async () => {
     setLoading(true);
@@ -49,10 +53,10 @@ export const SubTaskView = ({
   }
 
   const markAsDone = async (subtaskId: string) => {
-    const confirmed = confirm('Are you sure you want to mark this subtask as done?');
+    const confirmed = await confirmAction('Are you sure you want to mark this subtask as done?');
     if (!confirmed) return;
     setLoading(true);
-    const res = await updateSubtaskStatus(subtaskId, projectId, 'done');
+    const res = await updateSubtaskStatus(subtaskId, 'done');
     if (res.success) {
       const updatedSubtask = res.updatedSubtask as SubtaskType;
       setTasks((prevTasks) =>
@@ -68,13 +72,13 @@ export const SubTaskView = ({
         )
       );
     } else {
-      toast.error(res.message)
+      toast.error(res.message || 'An error occurred')
     }
     setLoading(false);
   };
 
   const assignUser = async (subtaskId: string, userId: string) => {
-    const confirmed = confirm('Are you sure you want to assign this user to the subtask?');
+    const confirmed = await confirmAction('Are you sure you want to assign this user to the subtask?');
     if (!confirmed) return;
     const res = await assignUserToSubtask(subtaskId, projectId, userId);
     if (res.success) {
@@ -97,6 +101,34 @@ export const SubTaskView = ({
     }
   };
 
+  const dueRemaining = (dueDate: Date) => {
+    const currentDate = new Date();
+    const dueDateObj = new Date(dueDate);
+    currentDate.setHours(0, 0, 0, 0);
+    dueDateObj.setHours(0, 0, 0, 0);
+    const timeDiff = dueDateObj.getTime() - currentDate.getTime();
+    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    if (dayDiff === 0) {
+      return "Today";
+    } else if (dayDiff === 1) {
+      return "1 day";
+    } else if (dayDiff === 2) {
+      return "2 days";
+    } else if (dayDiff === 3) {
+      return "3 days";
+    } else if (dayDiff < 0) {
+      return "Past due";
+    } else {
+      const options: Intl.DateTimeFormatOptions = {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      };
+      return dueDateObj.toLocaleDateString('en-US', options);
+    }
+  };
+
+
   return (
     <div
       key={subtask.id}
@@ -116,8 +148,8 @@ export const SubTaskView = ({
             {subtask.name}
           </span>
         </h4>
-        <p className="text-sm">{subtask.status} • {subtask.points} points</p>
-        {role === 'admin' && (
+        <p className="text-sm">{subtask.status} • {!editMode ? subtask.assignedUserId ? `${subtask.assignedUser?.name} • ` : "Unassigned • " : ""}{subtask.points} points {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}</p>
+        {role === 'admin' && editMode && (
           <select
             value={subtask.assignedUserId || ''}
             onChange={(e) => assignUser(subtask.id, e.target.value)}
@@ -165,6 +197,7 @@ export const SubTaskView = ({
           </button>
         )}
       </div>
+      <ConfirmationModal />
     </div>
   );
 };
