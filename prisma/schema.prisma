@@ -64,6 +64,7 @@ model User {
   organizations    UserOrganization[]
   assignedSubtasks Subtask[]          @relation("AssignedSubtasks")
   Comment          Comment[]
+  points           PointsEarned[]
 }
 
 model Organization {
@@ -91,20 +92,39 @@ enum OrganizationRole {
   MEMBER
 }
 
+model PointsEarned {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtaskId         String   @db.ObjectId
+  subtaskName       String
+  organizationId    String   @db.ObjectId
+  organizationName  String
+  projectId         String   @db.ObjectId
+  projectName       String
+  taskId            String   @db.ObjectId
+  taskName          String
+  points            Float    @default(0)
+
+  @@unique([userId, subtaskId])
+}
+
 model Project {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   name           String
+  description    String?
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String       @db.ObjectId
   tasks          Task[]
 }
 
 model Task {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String    @db.ObjectId
-  subtasks  Subtask[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String    @db.ObjectId
+  subtasks    Subtask[]
 }
 
 model Subtask {

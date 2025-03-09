@@ -10,19 +10,21 @@ export const TaskList = ({
   role,
   projectId,
   setTasks,
+  editMode,
 }:{
   tasks: TaskType[];
   users: User[];
   role: 'admin' | 'member';
   projectId: string;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>
+  editMode: boolean;
 }) => {
 
   return (
     <div>
       {tasks.map((task) => (
         <div key={task.id} className="mb-6 p-4 rounded hover:bg-gray-50 border border-gray-200 relative">
-          {role === 'admin' && (
+          {role === 'admin' && editMode && (
             <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} />
           )}
           <h3 className="text-xl font-bold mb-4">{task.name}</h3>
@@ -36,6 +38,7 @@ export const TaskList = ({
                 users={users}
                 projectId={projectId}
                 setTasks={setTasks}
+                editMode={editMode}
               />
             ))}
           </div>

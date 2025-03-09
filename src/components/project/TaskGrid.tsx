@@ -41,15 +41,15 @@ export const TaskGrid = ({ tasks, setTasks, projectId, role }: { tasks: TaskType
           <div className="flex justify-between items-start gap-4">
             <h3
               className="text-lg font-bold cursor-pointer flex-1"
-              onClick={() =>
-                router.push(`/${role === 'admin' ? 'admin' : 'user'}/subtasks/${task.id}`)
-              }
+              // onClick={() =>
+              //   router.push(`/${role === 'admin' ? 'admin' : 'user'}/subtasks/${task.id}`)
+              // }
             >
               {task.name}
             </h3>
 
             {role === 'admin' && (
-              <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} />
+              <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} showText={false} />
             )}
           </div>
 
@@ -65,7 +65,7 @@ export const TaskGrid = ({ tasks, setTasks, projectId, role }: { tasks: TaskType
                 <span
                   className="cursor-pointer"
                   onClick={() =>
-                    router.push(`/${role === 'admin' ? 'admin' : 'user'}/subtasks/${subtask.id}`)
+                    router.push(`/project/subtask/${subtask.id}`)
                   }
                 >
                   {subtask.name}

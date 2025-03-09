@@ -102,7 +102,7 @@ export const addUserToOrganization = async (organizationId: string, userEmail: s
       where: { email: userEmail },
     });
     if (!userToAdd) {
-      return { success: false, message: "User not found." };
+      return { success: false, message: "User not registered!" };
     }
     // Check if the user is already in the organization
     const existingMembership = await prisma.userOrganization.findFirst({

@@ -6,7 +6,7 @@ import toast from "react-hot-toast"
 import { useState } from "react"
 import { SubtaskType, TaskType } from "@/types/organization"
 
-const AddSubtask = ({ setTasks, taskId, projectId }: { setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; taskId: string; projectId: string;}) => {
+const AddSubtask = ({ setTasks, taskId, projectId, showText=true }: { setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; taskId: string; projectId: string; showText?: boolean}) => {
 
     const [modalIsOpen, setModalIsOpen] = useState(false)
 
@@ -32,12 +32,14 @@ const AddSubtask = ({ setTasks, taskId, projectId }: { setTasks: React.Dispatch<
     }
     return (
         <>
-        <button
-            className="absolute top-2 right-2 bg-gray-500 text-white w-8 h-8 flex items-center justify-center rounded hover:bg-gray-600 z-10"
-            onClick={() => setModalIsOpen(true)}
-        >
-            +
-        </button>
+        <div className="absolute top-2 right-2 flex flex-row items-center gap-2" onClick={() => setModalIsOpen(true)}>
+            {showText && <p className="text-blue-600">Add Subtask</p>}
+            <button
+                className="bg-gray-500 text-white w-8 h-8 flex items-center justify-center rounded hover:bg-gray-600 z-10"
+            >
+                +
+            </button>
+        </div>
         <Modal modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} className="w-[100%] md:w-96 px-10 py-10">
             <div className="w-full flex justify-between">
                 <h3 className="text-2xl font-semibold">Add Subtask</h3>

@@ -22,7 +22,7 @@ export const ViewToggle = ({ onChange }: {onChange: (mode: string) => void;}) =>
   }, [viewMode, onChange]);
 
   return (
-    <div className="flex justify-end items-center space-x-4 mb-6">
+    <div className="flex justify-end items-center space-x-4">
       <button onClick={() => toggleViewMode('list')} title="List View">
         <ListIcon className={`w-6 h-6 ${viewMode === 'list' ? 'text-blue-500' : 'text-gray-400'}`} />
       </button>

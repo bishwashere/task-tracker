@@ -32,7 +32,7 @@ export default function Modal({ modalIsOpen, setModalIsOpen, children, className
     if (!modalIsOpen) return null;
     if (modalIsOpen)
         return (
-            <div className="fixed inset-0 overflow-y-auto h-full w-full flex items-center justify-center backdrop:blur-2xl transition-opacity duration-300 z-[99999]" style={{backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(1.5px)'}}>
+            <div className="fixed inset-0 overflow-y-auto h-full w-full flex items-center justify-center backdrop:blur-2xl transition-opacity duration-300 z-[999]" style={{backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(1.5px)'}}>
                 <div ref={modalRef} className={`shadow-lg rounded-xl bg-white min-w-96 max-w-[90vw] opacity-100 ${className}`}>
                     {children}
                 </div>

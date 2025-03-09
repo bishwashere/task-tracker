@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export const fetchProjectData = async (projectId: string) => {
     const userId = await isUserValid();
     if (!userId) {
-        return {success:false, error: 'Unauthorized !' };
+        return { success: false, error: 'Unauthorized !' };
     }
     try {
         //Get the organization ID from the project ID
@@ -43,7 +43,15 @@ export const fetchProjectData = async (projectId: string) => {
             tasksWithSubtasks = await prisma.task.findMany({
                 where: { projectId: projectId },
                 include: {
-                    subtasks: true,
+                    subtasks: {
+                        include: {
+                            assignedUser: {
+                                select: {
+                                    name: true,
+                                }
+                            },
+                        }
+                    },
                 },
             });
 
@@ -60,11 +68,20 @@ export const fetchProjectData = async (projectId: string) => {
                 },
             });
 
+            //Fetch points for that project
+            const pointsData = await prisma.pointsEarned.findMany({
+                where: {
+                    projectId: projectId,
+                    userId: userId
+                }
+            })
+            const pointsEarned = pointsData.reduce((total, data) => total + data.points, 0);
             return {
                 success: true,
                 tasks: tasksWithSubtasks,
                 members: organizationMembers,
-                role: "admin"
+                role: "admin",
+                pointsEarned: pointsEarned
             };
         } else {
             //Member: Fetch only assigned subtasks
@@ -78,18 +95,34 @@ export const fetchProjectData = async (projectId: string) => {
                         include: {
                             subtasks: {
                                 where: { assignedUserId: userId },
+                                include: {
+                                    assignedUser: {
+                                        select: {
+                                            name: true,
+                                        }
+                                    },
+                                }
                             },
                         },
                     },
                 },
             });
-
-            const tasksWithSubtasks = assignedSubtasks.map((subtask) => subtask.task);
-
+            const tasksWithSubtasks = Array.from(
+                new Map(assignedSubtasks.map(subtask => [subtask.task.id, subtask.task])).values()
+            );
+            //Fetch points for that project
+            const pointsData = await prisma.pointsEarned.findMany({
+                where: {
+                    projectId: projectId,
+                    userId: userId
+                }
+            })
+            const pointsEarned = pointsData.reduce((total, data) => total + data.points, 0);
             return {
                 success: true,
                 tasks: tasksWithSubtasks,
-                role: "member"
+                role: "member",
+                pointsEarned: pointsEarned
             };
         }
     } catch (error) {

@@ -10,30 +10,28 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const Subtask = ({ session, subtaskId }: { session: Session, subtaskId: string;  }) => {
-    
+const Subtask = ({ session, subtaskId }: { session: Session, subtaskId: string; }) => {
+
     const [initialLoading, setInitialLoading] = useState(true)
 
     const [comments, setComments] = useState<CommentType[]>([])
     const [comment, setComment] = useState('');
-    const [subtask, setSubtask] = useState<SubtaskType>()
-    const [assignedUser, setAssignedUser] = useState<string | null>(null)
+    const [subtask, setSubtask] = useState<SubtaskType | null>(null)
 
-    const fetchSubtaskAndComment = async() => {
+    const fetchSubtaskAndComment = async () => {
         const res = await fetchSubtaskData(subtaskId);
-        if(res.success){
+        if (res.success) {
             setSubtask(res.subtask as SubtaskType);
             setComments(res.comments as CommentType[]);
-            setAssignedUser(res.assignedUser as string | null);
         }
         setInitialLoading(false);
     }
-    useEffect(()=>{
+    useEffect(() => {
         fetchSubtaskAndComment();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
+    }, [])
 
-    const submitComment = async (subtaskId:string, projectId:string) => {
+    const submitComment = async (subtaskId: string, projectId: string) => {
         if (!comment) {
             toast.error("Please type comment !");
             return;
@@ -46,15 +44,15 @@ const Subtask = ({ session, subtaskId }: { session: Session, subtaskId: string; 
             toast.error(res.message || "An error occurred");
         }
     }
-    if(initialLoading) return <div className="text-center text-xl font-bold">Loading...</div>
-    if(!subtask) return (
+    if (initialLoading) return <div className="text-center text-xl font-bold">Loading...</div>
+    if (!subtask) return (
         <div className="w-screen h-screen flex flex-col items-center justify-center gap-3">
-            <p className="text-3xl font-semibold">Something went wrong :(</p>
-            <p className="text-xl font-semibold">Try again !</p>
+            <p className="text-3xl font-semibold">Access Denied :(</p>
+            <p className="text-xl font-semibold mt-2">Contact organization admin !</p>
             <Link href="/dashboard" className="text-white text-lg bg-blue-600 px-4 py-2 rounded-xl mt-10">Go to Dashboard</Link>
         </div>
     )
-    
+
     return (
         <>
             <div>
@@ -67,12 +65,12 @@ const Subtask = ({ session, subtaskId }: { session: Session, subtaskId: string; 
                 </div>
 
                 <div className="bg-gray-100 p-6 rounded shadow-md">
-                    <h2 className="text-2xl font-bold mb-4">{subtask.name}</h2> {/* Updated */}
+                    <h2 className="text-2xl font-bold mb-4">{subtask.name}</h2>
                     <p className="text-sm text-gray-600 mb-2">
-                        Task: <span className="font-semibold">{subtask.task.name}</span>
+                        Task: <span className="font-semibold">{subtask.task?.name}</span>
                     </p>
                     <p className="text-sm text-gray-600 mb-2">
-                        Assigned To: <span className="font-semibold">{assignedUser || 'Unassigned'}</span>
+                        Assigned To: <span className="font-semibold">{subtask.assignedUserId ? subtask.assignedUser?.name : "Unassigned"}</span>
                     </p>
                     <p className="text-sm text-gray-600 mb-2">
                         Points: <span className="font-semibold">{subtask.points} points</span>
@@ -97,7 +95,7 @@ const Subtask = ({ session, subtaskId }: { session: Session, subtaskId: string; 
 
                 <div className="bg-white p-4 rounded shadow-md">
                     <h2 className="text-lg font-semibold mb-4">Comments</h2>
-                    <form action={()=>submitComment(subtask.id, subtask.task.project.id)}>
+                    <form action={() => submitComment(subtask.id, subtask.task.project.id)}>
                         <textarea
                             className="border p-2 w-full rounded mb-4"
                             placeholder="Add a comment..."

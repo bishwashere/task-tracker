@@ -7,7 +7,7 @@ import { TaskType } from "@/types/organization"
 
 const AddTaskPopup = ({ setTasks, projectId, modalIsOpen, setModalIsOpen }: {setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; projectId: string; modalIsOpen: boolean, setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const addTask = async(formData:FormData) => {
-        const res = await saveTask(projectId,formData.get('taskTitle') as string);
+        const res = await saveTask(projectId,formData.get('taskTitle') as string, formData.get('taskDescription') as string);
         if(res.success){
             toast.success(res.message);
             setTasks((prevTasks) => [...prevTasks, res.task as TaskType]);
@@ -32,6 +32,14 @@ const AddTaskPopup = ({ setTasks, projectId, modalIsOpen, setModalIsOpen }: {set
                     placeholder="Task Title"
                     name="taskTitle"
                     id="taskTitle"
+                    className="border p-2 rounded w-full mb-4"
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Task Description"
+                    name="taskDescription"
+                    id="taskDescription"
                     className="border p-2 rounded w-full mb-4"
                 />
                 <div className="flex justify-end mt-5">
