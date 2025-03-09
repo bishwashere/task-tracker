@@ -26,15 +26,19 @@ export default function Home() {
 
   // Handle keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    interface HandleKeyDownEvent extends KeyboardEvent {
+      key: string;
+    }
+
+    const handleKeyDown = (e: HandleKeyDownEvent) => {
       if (e.key === "ArrowRight") {
-        setActivePhoto((prev) => (prev + 1) % photos.length);
-        setIsPaused(true); // Pause on manual interaction
+      setActivePhoto((prev) => (prev + 1) % photos.length);
+      setIsPaused(true); // Pause on manual interaction
       } else if (e.key === "ArrowLeft") {
-        setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
-        setIsPaused(true); // Pause on manual interaction
+      setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
+      setIsPaused(true); // Pause on manual interaction
       } else if (isExpanded && e.key === "Escape") {
-        setIsExpanded(false); // Close expanded view with Escape
+      setIsExpanded(false); // Close expanded view with Escape
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -48,8 +52,8 @@ export default function Home() {
   };
 
   // Handle click on expanded image for navigation
-  const handleExpandedClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
+  const handleExpandedClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    const rect = (e.target as HTMLImageElement).getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const halfWidth = rect.width / 2;
 
