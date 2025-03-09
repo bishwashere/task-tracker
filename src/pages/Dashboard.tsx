@@ -136,7 +136,7 @@ const Dashboard = ({ session }: { session: Session }) => {
                             ))}
                         </select>
                     }
-                    <ProfileMenu session={session} selectedOrganization={selectedOrganization} fetchOrganizations={fetchOrganizations} />
+                    <ProfileMenu showSettings={true} session={session} selectedOrganization={selectedOrganization} fetchOrganizations={fetchOrganizations} />
                 </div>
             </div>
 

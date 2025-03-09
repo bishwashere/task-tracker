@@ -13,6 +13,6 @@ export default async function Page({
 
   if (!session) redirect('/login');
 
-  return <Subtask subtaskId={id} />
+  return <Subtask session={session} subtaskId={id} />
 
 }

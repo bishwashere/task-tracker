@@ -1,14 +1,16 @@
 "use client";
 import { saveComment } from "@/actions/subtask";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
+import ProfileMenu from "@/components/common/ProfileMenu";
 import SuperHeader from "@/components/headers/SuperHeader";
 import { fetchSubtaskData } from "@/data/subtask";
 import { CommentType, SubtaskType } from "@/types/organization";
+import { Session } from "next-auth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const Subtask = ({ subtaskId }: { subtaskId: string;  }) => {
+const Subtask = ({ session, subtaskId }: { session: Session, subtaskId: string;  }) => {
     
     const [initialLoading, setInitialLoading] = useState(true)
 
@@ -61,6 +63,7 @@ const Subtask = ({ subtaskId }: { subtaskId: string;  }) => {
             <div className="max-w-7xl mx-auto p-6 space-y-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold">Subtask Details</h1>
+                    <ProfileMenu session={session} showSettings={false} />
                 </div>
 
                 <div className="bg-gray-100 p-6 rounded shadow-md">

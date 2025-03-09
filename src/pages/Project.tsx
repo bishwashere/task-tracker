@@ -11,10 +11,11 @@ import { fetchProjectData } from "@/data/task";
 import { ProjectType, TaskType } from "@/types/organization";
 import { User } from "@/types/user";
 import { calculateProgressWithStats } from "@/utils/progressUtils";
+import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const Project = ({ project }: { project: ProjectType }) => {
+const Project = ({ session, project }: { session: Session, project: ProjectType }) => {
 
   const [initialLoading, setInitialLoading] = useState(true)
   const [members, setMembers] = useState<User[]>([]);
@@ -77,7 +78,7 @@ const Project = ({ project }: { project: ProjectType }) => {
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader projectName={project.name} />
+        <ProjectHeader session={session} projectName={project.name} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
@@ -97,7 +98,7 @@ const Project = ({ project }: { project: ProjectType }) => {
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader projectName={project.name} />
+        <ProjectHeader session={session} projectName={project.name} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
