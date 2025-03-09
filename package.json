@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    
     "db:update": "prisma db push && prisma generate"
   },
   "dependencies": {
@@ -19,7 +18,7 @@
     "axios": "^1.8.1",
     "bcryptjs": "^3.0.2",
     "next": "15.2.1",
-    "next-auth": "^5.0.0-beta.20",
+    "next-auth": "^5.0.0-beta.25",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",

@@ -13,7 +13,7 @@ import { Organization } from "@/types/organization";
 import logOut from "@/actions/logOut";
 import { Session } from "next-auth";
 
-const ProfileMenu = ({session, selectedOrganization, fetchOrganizations }: {session:Session; selectedOrganization: Organization | null; fetchOrganizations: () => Promise<void> }) => {
+const ProfileMenu = ({ showSettings, session, selectedOrganization, fetchOrganizations }: { showSettings: boolean; session:Session; selectedOrganization?: Organization | null; fetchOrganizations?: () => Promise<void> }) => {
 
     const [isOpen, setIsOpen] = useState(false);
     const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] = useState(false);
@@ -43,7 +43,7 @@ const ProfileMenu = ({session, selectedOrganization, fetchOrganizations }: {sess
             const result = await updateOrganizationName(selectedOrganization.id, formData.get('newOrganizationName') as string)
             if (result.success) {
                 toast.success(result.message);
-                fetchOrganizations();
+                fetchOrganizations?.();
             }
             else {
                 toast.error(result.message || 'An error occurred');
@@ -55,7 +55,7 @@ const ProfileMenu = ({session, selectedOrganization, fetchOrganizations }: {sess
             const result = await addUserToOrganization(selectedOrganization.id, formData.get('memberEmail') as string)
             if (result.success) {
                 toast.success(result.message);
-                fetchOrganizations();
+                fetchOrganizations?.();
             }
             else {
                 toast.error(result.message || 'An error occurred');
@@ -81,10 +81,8 @@ const ProfileMenu = ({session, selectedOrganization, fetchOrganizations }: {sess
                         <p className="text-sm font-semibold text-gray-500">{session?.user?.email}</p>
                     </div>
                     <hr className='border border-gray-300 my-1' />
-                    {selectedOrganization && selectedOrganization.members.some((member) => member.userId === session?.user?.id && member.role === "ADMIN") ?
+                    {showSettings && selectedOrganization && selectedOrganization.members.some((member) => member.userId === session?.user?.id && member.role === "ADMIN") &&
                         <button onClick={() => { setIsOpen(false); setEditOrganizationModalIsOpen(true) }} className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"><IoSettingsOutline />Settings</button>
-                        :
-                        <button className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"><IoSettingsOutline />Settings</button>
                     }
                     <button onClick={() => logOut()} className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"><MdLogout />Log out</button>
                 </div>
