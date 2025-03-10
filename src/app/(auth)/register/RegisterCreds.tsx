@@ -12,7 +12,7 @@ const RegisterCreds = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
 
     const registerUser = async (formData: FormData) => {
-        console.log(formData)
+        // console.log(formData)
         const res = await register(formData);
         if (res?.success) {
             toast.success(res.message);
