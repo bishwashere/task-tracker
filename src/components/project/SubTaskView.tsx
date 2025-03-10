@@ -6,6 +6,7 @@ import AddTagPopup from './AddTagPopup';
 import { assignUserToSubtask, togglePriority, updateSubtaskStatus } from '@/actions/task';
 import toast from 'react-hot-toast';
 import { useConfirmModal } from '../Modal/useConfirmModal';
+import { Session } from 'next-auth';
 
 export const SubTaskView = ({
   subtask,
@@ -15,7 +16,8 @@ export const SubTaskView = ({
   projectId,
   setTasks,
   editMode,
-  setPointsEarned
+  setPointsEarned,
+  session,
 }: {
   subtask: SubtaskType;
   taskId: string;
@@ -25,6 +27,7 @@ export const SubTaskView = ({
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   editMode: boolean;
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
+  session: Session;
 }) => {
   const router = useRouter();
 
@@ -73,7 +76,8 @@ export const SubTaskView = ({
             : task
         )
       );
-      setPointsEarned(prev => prev + subtask.points)
+      if(subtask.assignedUserId === session?.user?.id)
+        setPointsEarned(prev => prev + subtask.points)
     } else {
       toast.error(res.message || 'An error occurred')
     }

@@ -231,7 +231,7 @@ export const updateSubtaskStatus = async (subtaskId: string, status: string) => 
         }
         await prisma.pointsEarned.create({
             data: {
-                userId,
+                userId: subtask.assignedUserId? subtask.assignedUserId: userId,
                 organizationId: subtask.task.project.id,
                 organizationName: subtask.task.project.organization.name,
                 projectId: subtask.task.project.id,

@@ -185,6 +185,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
               role={currentUserRole}
               editMode={editMode}
               setPointsEarned={setPointsEarned}
+              session={session}
             />
           </>
         ) : (
