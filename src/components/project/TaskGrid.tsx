@@ -5,7 +5,7 @@ import AddSubtask from './AddSubtaskPopup';
 import toast from 'react-hot-toast';
 import { togglePriority } from '@/actions/task';
 
-export const TaskGrid = ({ tasks, setTasks, projectId, role }: { tasks: TaskType[]; setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; projectId: string; role: 'admin' | 'member' }) => {
+export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode }: { tasks: TaskType[]; setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; projectId: string; role: 'admin' | 'member'; editMode: boolean; }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false)
   const priorityToggle = async (taskId: string, subtaskId: string, priority: number) => {
@@ -48,7 +48,7 @@ export const TaskGrid = ({ tasks, setTasks, projectId, role }: { tasks: TaskType
               {task.name}
             </h3>
 
-            {role === 'admin' && (
+            {role === 'admin' && editMode && (
               <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} showText={false} />
             )}
           </div>

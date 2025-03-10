@@ -11,6 +11,7 @@ export const TaskList = ({
   projectId,
   setTasks,
   editMode,
+  setPointsEarned,
 }:{
   tasks: TaskType[];
   users: User[];
@@ -18,6 +19,7 @@ export const TaskList = ({
   projectId: string;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>
   editMode: boolean;
+  setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
 }) => {
 
   return (
@@ -39,6 +41,7 @@ export const TaskList = ({
                 projectId={projectId}
                 setTasks={setTasks}
                 editMode={editMode}
+                setPointsEarned={setPointsEarned}
               />
             ))}
           </div>

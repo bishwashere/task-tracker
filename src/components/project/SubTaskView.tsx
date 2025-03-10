@@ -14,7 +14,8 @@ export const SubTaskView = ({
   users,
   projectId,
   setTasks,
-  editMode
+  editMode,
+  setPointsEarned
 }: {
   subtask: SubtaskType;
   taskId: string;
@@ -23,6 +24,7 @@ export const SubTaskView = ({
   projectId: string;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   editMode: boolean;
+  setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const router = useRouter();
 
@@ -71,6 +73,7 @@ export const SubTaskView = ({
             : task
         )
       );
+      setPointsEarned(prev => prev + subtask.points)
     } else {
       toast.error(res.message || 'An error occurred')
     }
@@ -175,18 +178,16 @@ export const SubTaskView = ({
         ) : (
           <AddTagPopup setTasks={setTasks} taskId={taskId} subtaskId={subtask.id} projectId={projectId} />
         )}
-        {role === 'admin' && (
-          <button
-            onClick={() => priorityToggle()}
-            className={`text-sm rounded ${subtask.priority
-              ? 'text-yellow-500 hover:text-yellow-600'
-              : 'text-gray-500 hover:text-gray-600'
-              }`}
-            disabled={loading}
-          >
-            {subtask.priority ? '⭐' : '☆'}
-          </button>
-        )}
+        <button
+          onClick={() => priorityToggle()}
+          className={`text-sm rounded ${subtask.priority
+            ? 'text-yellow-500 hover:text-yellow-600'
+            : 'text-gray-500 hover:text-gray-600'
+            }`}
+          disabled={loading}
+        >
+          {subtask.priority ? '⭐' : '☆'}
+        </button>
         {subtask.status !== 'done' && (
           <button
             onClick={() => markAsDone(subtask.id)}

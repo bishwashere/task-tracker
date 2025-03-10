@@ -83,7 +83,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader session={session} projectName={project.name} points={pointsEarned} showPoints={true} />
+        <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
@@ -111,7 +111,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader session={session} projectName={project.name} points={pointsEarned} showPoints={true} />
+        <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
@@ -184,6 +184,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
               projectId={project.id}
               role={currentUserRole}
               editMode={editMode}
+              setPointsEarned={setPointsEarned}
             />
           </>
         ) : (
@@ -195,6 +196,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
             setTasks={setTasks}
             projectId={project.id}
             role={currentUserRole}
+            editMode={editMode}
           />
         )}
       </div>
