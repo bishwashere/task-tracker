@@ -3,6 +3,7 @@ import { SubTaskView } from '@/components/project/SubTaskView';
 import { TaskType } from '@/types/organization';
 import { User } from '@/types/user';
 import AddSubtask from './AddSubtaskPopup';
+import { Session } from 'next-auth';
 
 export const TaskList = ({
   tasks,
@@ -12,6 +13,7 @@ export const TaskList = ({
   setTasks,
   editMode,
   setPointsEarned,
+  session,
 }:{
   tasks: TaskType[];
   users: User[];
@@ -20,6 +22,7 @@ export const TaskList = ({
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>
   editMode: boolean;
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
+  session: Session;
 }) => {
 
   return (
@@ -42,6 +45,7 @@ export const TaskList = ({
                 setTasks={setTasks}
                 editMode={editMode}
                 setPointsEarned={setPointsEarned}
+                session={session}
               />
             ))}
           </div>
