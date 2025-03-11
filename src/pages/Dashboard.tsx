@@ -141,8 +141,13 @@ const Dashboard = ({ session }: { session: Session }) => {
                 </div>
             </div>
 
+            {/* Sample Organization */}
             {!selectedOrganization &&
-                <p className="text-center text-gray-500 mt-16">No organization selected or available.</p>
+              <div className="bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer" onClick={() => setAddOrganizationModalIsOpen(true)}>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Step 1: Add Organization</h3>
+                </div>
+              </div>
             }
 
             {/* Add a project */}
@@ -209,7 +214,14 @@ const Dashboard = ({ session }: { session: Session }) => {
                     })}
                 </div>
                 )}
-                {selectedOrganization && selectedOrganization.projects.length===0 && <p className="text-center text-gray-500 mt-16">No projects created. Create a new project</p>}
+              {/* Sample Project */}
+                {selectedOrganization && selectedOrganization.projects.length===0 &&
+                  <div className="bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer" onClick={() => setAddProjectModalIsOpen(true)}>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">Step 2: Add a project</h3>
+                    </div>
+                  </div>
+                  }
         </div>
     );
 }
