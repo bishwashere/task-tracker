@@ -3,10 +3,12 @@ import { auth } from "@/lib/auth"
 import Points from "@/pages/Points";
 import { redirect } from "next/navigation"
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
     const session = await auth();
-
+    const { fromProject } = await searchParams;
+    let projectId: string | null = null;
+    if(typeof fromProject === "string") projectId = fromProject;
     if (!session) redirect('/login');
 
-    return <Points session={session} />
+    return <Points projectId={projectId} session={session} />
 }

@@ -72,6 +72,8 @@ const AddSubtask = ({ setTasks, taskId, projectId, showText=true }: { setTasks: 
                 placeholder="Points"
                 id="points"
                 name="points"
+                defaultValue={1}
+                min={1}
                 // value={points}
                 // onChange={(e) => setPoints(parseInt(e.target.value, 10))}
                 className="border p-2 rounded w-full mb-4"

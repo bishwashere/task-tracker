@@ -46,7 +46,7 @@ type Organization = {
 };
 
 
-const Points = ({ session }: { session: Session }) => {
+const Points = ({ projectId, session }: { projectId:string | null; session: Session }) => {
 
     const [data, setData] = useState<Organization[]>([])
     const [initialLoading, setInitialLoading] = useState(true)
@@ -67,28 +67,16 @@ const Points = ({ session }: { session: Session }) => {
         return <div className="text-center text-xl font-bold">Loading...</div>;
     }
 
-    if (!data.length) return (
-        <>
-            <SuperHeader path="/dashboard" />
-            <div className="max-w-7xl mx-auto p-6 space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold">Points Earned</h1>
-                    <ProfileMenu session={session} showSettings={false} />
-                </div>
-            </div>
-            <div className="flex items-center justify-center mt-6 text-md">No points earned.</div>
-        </>
-    )
     return (
         <>
-            <SuperHeader path="/dashboard" />
+            <SuperHeader path={`${projectId?`/project/${projectId}`:'/dashboard'}`} />
             <div className="max-w-7xl mx-auto p-6 space-y-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold">Points Earned</h1>
                     <ProfileMenu session={session} showSettings={false} />
                 </div>
 
-                {data.map((org) => (
+                {data.length ? data.map((org) => (
                     <div key={org.id} className="mb-6">
                         {/* Organization */}
                         <h2 className="text-lg font-bold">
@@ -121,7 +109,10 @@ const Points = ({ session }: { session: Session }) => {
                             ))}
                         </div>
                     </div>
-                ))}
+                ))
+            :
+                <div className="flex items-center justify-center mt-6 text-md">No points earned.</div>
+            }
             </div>
         </>
     )

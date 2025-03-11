@@ -24,14 +24,14 @@ export const useConfirmModal = () => {
 
   const ConfirmationModal = () => (
     isOpen && (
-      <Modal modalIsOpen={isOpen} setModalIsOpen={setIsOpen} className="w-[100%] md:w-[50%] lg:w-[35%] px-10 py-10">
+      <Modal modalIsOpen={isOpen} setModalIsOpen={setIsOpen} className="w-[80%] md:w-[40%] lg:w-[25%] px-6 py-6">
         <div className="w-full flex justify-end">
           <button onClick={() => handleConfirm(false)} className="cursor-pointer">
             <IoMdClose className="text-2xl" />
           </button>
         </div>
-        <p className='py-6 font-semibold'>{message}</p>
-        <div className="flex justify-end mt-5">
+        <p className='py-4'>{message}</p>
+        <div className="flex justify-end">
           <button
             onClick={() => handleConfirm(true)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2 disabled:opacity-75"

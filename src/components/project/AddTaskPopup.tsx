@@ -35,12 +35,11 @@ const AddTaskPopup = ({ setTasks, projectId, modalIsOpen, setModalIsOpen }: {set
                     className="border p-2 rounded w-full mb-4"
                     required
                 />
-                <input
-                    type="text"
+                <textarea
                     placeholder="Task Description"
                     name="taskDescription"
                     id="taskDescription"
-                    className="border p-2 rounded w-full mb-4"
+                    className="border p-2 rounded w-full h-24 mb-4"
                 />
                 <div className="flex justify-end mt-5">
                     <FormSubmitButton

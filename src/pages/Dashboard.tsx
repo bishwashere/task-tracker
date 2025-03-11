@@ -156,7 +156,7 @@ const Dashboard = ({ session }: { session: Session }) => {
                     <button className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer" onClick={() => setAddProjectModalIsOpen(true)}>
                         Add a project
                     </button>
-                    <Modal modalIsOpen={addProjectModalIsOpen} setModalIsOpen={setAddProjectModalIsOpen} className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10">
+                    <Modal modalIsOpen={addProjectModalIsOpen} setModalIsOpen={setAddProjectModalIsOpen} className="w-[100%] md:w-96 px-10 py-10">
                         <div className="w-full flex justify-between">
                             <h3 className="text-2xl font-semibold">Add Project</h3>
                             <button onClick={() => setAddProjectModalIsOpen(false)} className="cursor-pointer">
@@ -170,15 +170,14 @@ const Dashboard = ({ session }: { session: Session }) => {
                                 placeholder="Project Title"
                                 name="projectTitle"
                                 id="projectTitle"
-                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                                className="w-full p-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                                 required
                             />
-                            <input
-                                type="text"
+                            <textarea
                                 placeholder="Project Description"
                                 name="projectDescription"
                                 id="projectDescription"
-                                className="w-[95%] md:w-[80%] p-2 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                                className="w-full h-24 p-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
                             />
                             {/* <hr className='border border-gray-300 my-6' /> */}
                             <div className="flex mt-5">
@@ -194,7 +193,7 @@ const Dashboard = ({ session }: { session: Session }) => {
             {/* Display projects for Selected Organization */}
             {selectedOrganization && selectedOrganization.projects.length > 0 && (
                 <div className="space-y-4">
-                    {Object.values(selectedOrganization.projects || {}).map((project) => {
+                    {Object.values(selectedOrganization.projects || {}).reverse().map((project) => {
                         const progress = calculateProgress(Object.values(project.tasks || {}));
                         return (
                             <div

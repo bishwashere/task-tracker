@@ -145,7 +145,7 @@ export const togglePriority = async (subtaskId: string, projectId: string, prior
             (member) => member.userId === userId
         );
 
-        if (!userOrg || userOrg.role !== "ADMIN") {
+        if (!userOrg) {
             return { success: false, message: "Permission denied" };
         }
 
@@ -231,7 +231,7 @@ export const updateSubtaskStatus = async (subtaskId: string, status: string) => 
         }
         await prisma.pointsEarned.create({
             data: {
-                userId,
+                userId: subtask.assignedUserId? subtask.assignedUserId: userId,
                 organizationId: subtask.task.project.id,
                 organizationName: subtask.task.project.organization.name,
                 projectId: subtask.task.project.id,
@@ -240,7 +240,7 @@ export const updateSubtaskStatus = async (subtaskId: string, status: string) => 
                 taskName: subtask.task.name,
                 subtaskId: subtaskId,
                 subtaskName: subtask.name,
-                points: subtask.points
+                points: subtask.points <= 0 ? 1 : subtask.points
             }
         })
         const updatedSubtask = await prisma.subtask.update({

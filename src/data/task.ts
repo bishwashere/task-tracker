@@ -65,6 +65,7 @@ export const fetchProjectData = async (projectId: string) => {
                 select: {
                     id: true,
                     name: true,
+                    email: true,
                 },
             });
 
