@@ -212,12 +212,12 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
         {/* Display AI Suggested Tasks */}
         {aiSuggestedTasks.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-lg font-semibold">AI Suggested Tasks</h3>
+            <h3 className="text-lg font-semibold">Maybe add these tasks?</h3>
             {aiSuggestedTasks.map((task, i) => (
-              <div key={i} className="flex justify-between items-center p-2 border-b">
+              <div key={i} className="mb-6 p-4 rounded bg-gray-50 border border-gray-200 relative">
                 <div>
                   <h4 className="font-semibold">{task.name}</h4>
-                  <p>{task.description}</p>
+                  {/*<p>{task.description}</p>*/}
                 </div>
                 <div className="flex gap-2">
                   <button

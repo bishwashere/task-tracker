@@ -2,13 +2,8 @@ export const suggestProjectTaskPrompt = (
   projectTitle: string,
   projectDescription: string
 ) => `
-Here's your AI prompt:  
-
-**Prompt:**  
-"I will provide you with a project title and description. Your task is to generate 5-6 strictly relevant tasks for tracking project progress.  
-
-Return the response as a plain JSON array of objects with the following format:  
-
+**Prompt:**
+"Generate 3-5 strictly relevant tasks for given project, to get it started. Return the response as a plain JSON array of objects with the following format:
 \`\`\`json
 [
   {
@@ -17,9 +12,7 @@ Return the response as a plain JSON array of objects with the following format:
   }
 ]
 \`\`\`
-
 Do not include any additional messages, explanations, or formatting—just return the JSON response in the specified format."
-
 Project Title: ${projectTitle}
 Project Description: ${projectDescription}
 `;
