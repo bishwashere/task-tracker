@@ -15,41 +15,80 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MdEditSquare } from "react-icons/md";
+import { getAISuggestedTasksByProjectId, deleteAISuggestedTask } from "@/actions/get-ai-sugested-task";
+import { saveTask } from "@/actions/task";
 
 const Project = ({ session, project }: { session: Session, project: ProjectType }) => {
-
-  const [initialLoading, setInitialLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true);
   const [members, setMembers] = useState<User[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [currentUserRole, setCurrentUserRole] = useState<'admin' | 'member'>('member')
+  const [currentUserRole, setCurrentUserRole] = useState<'admin' | 'member'>('member');
   const [viewMode, setViewMode] = useState('list'); // Default view state
   const [editMode, setEditMode] = useState(false);
-
   const [subtaskFilter, setSubtaskFilter] = useState<'all' | 'pending' | 'done'>('all');
-  const [showSubtasks, setShowSubtasks] = useState(true)
-  const [pointsEarned, setPointsEarned] = useState<number>(0)
+  const [showSubtasks, setShowSubtasks] = useState(true);
+  const [pointsEarned, setPointsEarned] = useState<number>(0);
+  const [addTaskModalOpen, setaddTaskModalOpen] = useState(false);
+  const [aiSuggestedTasks, setAiSuggestedTasks] = useState<{
+    id: string;
+    name: string;
+    description: string | null;
+    projectId: string;
+  }[]>([]);
 
-  const [addTaskModalOpen, setaddTaskModalOpen] = useState(false)
-
-  //fetch tasks and subtasks
+  // Fetch tasks and subtasks
   const fetchtasksWithSubTasks = async () => {
     const res = await fetchProjectData(project.id);
     if (res.success) {
-      // console.log(res.pointsEarned)
       setTasks(res.tasks as unknown as TaskType[]);
-      setCurrentUserRole(res.role as 'admin' | 'member')
-      setPointsEarned(res.pointsEarned as number)
-      if (res.members)
-        setMembers(res.members as User[])
+      setCurrentUserRole(res.role as 'admin' | 'member');
+      setPointsEarned(res.pointsEarned as number);
+      if (res.members) setMembers(res.members as User[]);
     } else {
-      toast.error(res.message || "An error occurred!")
+      toast.error(res.message || "An error occurred!");
     }
-    setInitialLoading(false)
-  }
+    setInitialLoading(false);
+  };
+
+  // Fetch AI suggested tasks
+  const fetchAISuggestedTasks = async () => {
+    const res = await getAISuggestedTasksByProjectId(project.id);
+    if (res.success) {
+      setAiSuggestedTasks(res.tasks || []);
+    } else {
+      toast.error(res.message || "An error occurred!");
+    }
+  };
+
   useEffect(() => {
     fetchtasksWithSubTasks();
+    fetchAISuggestedTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
+
+  const handleAcceptSuggestedTask = async (task: any) => {
+    // Add the suggested task to the regular tasks
+    const newTask = {
+      name: task.name,
+      description: task.description,
+      projectId: project.id,
+    };
+    // Call your add task function here (e.g., addTask(newTask))
+    // Remove the suggested task from the AI suggested tasks in the database
+    await deleteAISuggestedTask(task.id);
+    // Update the state
+    //@ts-expect-error: Type 'TaskType[]' is not assignable to type 'SetStateAction<TaskType[]>'.
+    setTasks([...tasks, newTask]);
+    setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== task.id));
+    await saveTask(project.id, task.name, task.description);
+  };
+
+  const handleRejectSuggestedTask = async (taskId: string) => {
+    // Remove the suggested task from the AI suggested tasks in the database
+    await deleteAISuggestedTask(taskId);
+    // Update the state
+    setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== taskId));
+  };
 
   const stats = calculateProgressWithStats(tasks);
 
@@ -64,14 +103,12 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           if (subtaskFilter === 'done') return subtask.status === 'done';
           return false;
         });
-        // console.log(`Task ${task.name} (${task.id}):`, filteredSubtasks);
         return {
           ...task,
           subtasks: filteredSubtasks,
         };
       })
       .filter((task) => subtaskFilter === "all" || task.subtasks.length > 0);
-    // console.log('Filtered Tasks:', filteredTasks);
     return filteredTasks;
   };
 
@@ -79,33 +116,33 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     return <div className="text-center text-xl font-bold">Loading...</div>;
   }
 
-  if (!tasks.length) return (
-    <>
-      <SuperHeader path="/dashboard" />
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
-        <div className="mb-6">
-          <ProgressBar progress={stats.progress} />
-          <p className="text-sm text-gray-600 mt-2">
-            {stats.progress}% Complete • {stats.totalSubtasks} subtasks •{' '}
-            {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
-          </p>
-        </div>
-        <div className="flex justify-end mt-3">
-          {currentUserRole === "admin" &&
-            <div className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2" onClick={() => setaddTaskModalOpen(true)}>
-              Add a new task
-              <button className="bg-gray-500 text-white w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 z-10">+</button>
-            </div>
-          }
-          <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
-        </div>
-        <div className="mt-10 flex flex-row items-center justify-center gap-1">
-          <p>No task found.</p>
-        </div>
-      </div>
-    </>
-  )
+  // if (!tasks.length) return (
+  //   <>
+  //     <SuperHeader path="/dashboard" />
+  //     <div className="max-w-7xl mx-auto p-6 space-y-6">
+  //       <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
+  //       <div className="mb-6">
+  //         <ProgressBar progress={stats.progress} />
+  //         <p className="text-sm text-gray-600 mt-2">
+  //           {stats.progress}% Complete • {stats.totalSubtasks} subtasks •{' '}
+  //           {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
+  //         </p>
+  //       </div>
+  //       <div className="flex justify-end mt-3">
+  //         {currentUserRole === "admin" &&
+  //           <div className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2" onClick={() => setaddTaskModalOpen(true)}>
+  //             Add a new task
+  //             <button className="bg-gray-500 text-white w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 z-10">+</button>
+  //           </div>
+  //         }
+  //         <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
+  //       </div>
+  //       <div className="mt-10 flex flex-row items-center justify-center gap-1">
+  //         <p>No task found.</p>
+  //       </div>
+  //     </div>
+  //   </>
+  // );
 
   return (
     <>
@@ -171,6 +208,36 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           }
           <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
         </div>
+
+        {/* Display AI Suggested Tasks */}
+        {aiSuggestedTasks.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold">AI Suggested Tasks</h3>
+            {aiSuggestedTasks.map((task, i) => (
+              <div key={i} className="flex justify-between items-center p-2 border-b">
+                <div>
+                  <h4 className="font-semibold">{task.name}</h4>
+                  <p>{task.description}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-green-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleAcceptSuggestedTask(task)}
+                  >
+                    ✓
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleRejectSuggestedTask(task.id)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {!tasks.length && <p>No tasks Found</p>}
         {viewMode === 'list' ? (
           <>
