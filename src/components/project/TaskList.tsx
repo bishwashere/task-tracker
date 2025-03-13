@@ -4,6 +4,7 @@ import { TaskType } from '@/types/organization';
 import { User } from '@/types/user';
 import AddSubtask from './AddSubtaskPopup';
 import { Session } from 'next-auth';
+import EditTaskPopup from './EditTaskPopup';
 
 export const TaskList = ({
   tasks,
@@ -32,7 +33,10 @@ export const TaskList = ({
           {role === 'admin' && editMode && (
             <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} />
           )}
-          <h3 className="text-xl font-bold mb-4">{task.name}</h3>
+          <div className='flex flex-row items-center gap-2'>
+              <h3 className="text-xl font-bold mb-4">{task.name}</h3>
+              {role==="admin" && editMode && <EditTaskPopup task={task} projectId={projectId} setTasks={setTasks} />}
+          </div>
           <div className="grid grid-cols-1 gap-4">
             {task.subtasks.map((subtask) => (
               <SubTaskView
