@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { isUserValid } from "./isUserValid";
-import { ai } from "@/lib/ai";
 
 export const addProject = async (
   organizationId: string,
@@ -36,23 +35,6 @@ export const addProject = async (
         description: projectDescription,
         organizationId,
       },
-    });
-
-    const suggestedTasks = await ai.suggestProjectTasks({
-      projectName,
-      projectDescription,
-    });
-
-    // Prepare data for bulk write
-    const tasksData = suggestedTasks.map((task) => ({
-      name: task.title,
-      description: task.description,
-      projectId: project.id,
-    }));
-
-    // Save suggested tasks to the database using bulk write
-    await prisma.aISuggestedTask.createMany({
-      data: tasksData,
     });
 
     return { success: true, message: "Project added !", project };

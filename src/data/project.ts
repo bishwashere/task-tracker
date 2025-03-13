@@ -12,7 +12,12 @@ export const getProjectById = async (projectId: string) => {
         // First, find the project to get its organizationId
         const project = await prisma.project.findUnique({
             where: { id: projectId },
-            select: { id: true, organizationId: true, name: true },
+            select: { 
+                id: true, 
+                organizationId: true, 
+                name: true,
+                hasAiSuggestTasks: true  // Add this field to always include it
+            },
         });
 
         if (!project) {

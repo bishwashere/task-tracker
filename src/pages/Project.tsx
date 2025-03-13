@@ -15,8 +15,9 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MdEditSquare } from "react-icons/md";
-import { getAISuggestedTasksByProjectId, deleteAISuggestedTask } from "@/actions/get-ai-sugested-task";
+import { getAISuggestedTasksByProjectId, deleteAISuggestedTask } from "@/actions/ai-sugested-task";
 import { saveTask } from "@/actions/task";
+import TaskGenerationLoader from "@/components/common/TaskGenerationLoader";
 
 const Project = ({ session, project }: { session: Session, project: ProjectType }) => {
   const [initialLoading, setInitialLoading] = useState(true);
@@ -55,6 +56,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     const res = await getAISuggestedTasksByProjectId(project.id);
     if (res.success) {
       setAiSuggestedTasks(res.tasks || []);
+      project.hasAiSuggestTasks = true;
     } else {
       toast.error(res.message || "An error occurred!");
     }
@@ -66,7 +68,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAcceptSuggestedTask = async (task: any) => {
+  const handleAcceptSuggestedTask = async (task: { id: string; name: string; description: string | null }) => {
     // Add the suggested task to the regular tasks
     const newTask = {
       name: task.name,
@@ -80,7 +82,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     //@ts-expect-error: Type 'TaskType[]' is not assignable to type 'SetStateAction<TaskType[]>'.
     setTasks([...tasks, newTask]);
     setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== task.id));
-    await saveTask(project.id, task.name, task.description);
+    await saveTask(project.id, task.name, task.description || "");
   };
 
   const handleRejectSuggestedTask = async (taskId: string) => {
@@ -112,9 +114,11 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     return filteredTasks;
   };
 
-  if (initialLoading) {
-    return <div className="text-center text-xl font-bold">Loading...</div>;
-  }
+
+  useEffect(() => {
+    console.log(project)
+  }, [project])
+
 
   // if (!tasks.length) return (
   //   <>
@@ -209,64 +213,78 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
         </div>
 
-        {/* Display AI Suggested Tasks */}
-        {aiSuggestedTasks.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold">Maybe add these tasks?</h3>
-            {aiSuggestedTasks.map((task, i) => (
-              <div key={i} className="mb-6 p-4 rounded bg-gray-50 border border-gray-200 relative">
-                <div>
-                  <h4 className="font-semibold">{task.name}</h4>
-                  {/*<p>{task.description}</p>*/}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-green-500 text-white px-2 py-1 rounded"
-                    onClick={() => handleAcceptSuggestedTask(task)}
-                  >
-                    ✓
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() => handleRejectSuggestedTask(task.id)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
 
-        {!tasks.length && <p>No tasks Found</p>}
-        {viewMode === 'list' ? (
-          <>
-            <TaskList
-              tasks={getFilteredTasks().map((task) => ({
-                ...task,
-                subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
-              }))}
-              setTasks={setTasks}
-              users={members}
-              projectId={project.id}
-              role={currentUserRole}
-              editMode={editMode}
-              setPointsEarned={setPointsEarned}
-              session={session}
-            />
-          </>
-        ) : (
-          <TaskGrid
-            tasks={getFilteredTasks().map((task) => ({
-              ...task,
-              subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
-            }))}
-            setTasks={setTasks}
-            projectId={project.id}
-            role={currentUserRole}
-            editMode={editMode}
-          />
-        )}
+        {
+
+          project && !project.hasAiSuggestTasks ?
+            <TaskGenerationLoader /> :
+            initialLoading ? <div className="text-center text-xl font-bold">Loading...</div> :
+
+              <>
+
+                {/* Display AI Suggested Tasks */}
+                {aiSuggestedTasks.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold">Maybe add these tasks?</h3>
+                    {aiSuggestedTasks.map((task, i) => (
+                      <div key={i} className="mb-6 p-4 rounded bg-gray-50 border border-gray-200 relative">
+                        <div>
+                          <h4 className="font-semibold">{task.name}</h4>
+                          {/*<p>{task.description}</p>*/}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            className="bg-green-500 text-white px-2 py-1 rounded"
+                            onClick={() => handleAcceptSuggestedTask(task)}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            className="bg-red-500 text-white px-2 py-1 rounded"
+                            onClick={() => handleRejectSuggestedTask(task.id)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!tasks.length && <p>No tasks Found</p>}
+                {viewMode === 'list' ? (
+                  <>
+                    <TaskList
+                      tasks={getFilteredTasks().map((task) => ({
+                        ...task,
+                        subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
+                      }))}
+                      setTasks={setTasks}
+                      users={members}
+                      projectId={project.id}
+                      role={currentUserRole}
+                      editMode={editMode}
+                      setPointsEarned={setPointsEarned}
+                      session={session}
+                    />
+                  </>
+                ) : (
+                  <TaskGrid
+                    tasks={getFilteredTasks().map((task) => ({
+                      ...task,
+                      subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
+                    }))}
+                    setTasks={setTasks}
+                    projectId={project.id}
+                    role={currentUserRole}
+                    editMode={editMode}
+                  />
+                )}
+              </>
+
+
+        }
+
       </div>
     </>
   );

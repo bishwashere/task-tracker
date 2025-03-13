@@ -17,11 +17,14 @@ export default async function Page({
   if (!session) redirect('/login');
 
   const projectInfo = await getProjectById(id);
-  if(projectInfo.success){
-    return <Project session={session} project={projectInfo.project  as unknown as ProjectType} />
+
+  console.log(projectInfo)
+
+  if (projectInfo.success) {
+    return <Project session={session} project={projectInfo.project as unknown as ProjectType} />
   }
   else {
-    return(
+    return (
       <div className="w-screen h-screen flex flex-col items-center justify-center gap-3">
         <p className="text-3xl font-semibold">Access Denied :(</p>
         <p className="text-xl font-semibold mt-2">Contact organization admin !</p>

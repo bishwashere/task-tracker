@@ -24,6 +24,7 @@ export type ProjectType = {
   description?: string;
   organizationId: string;
   organization: Organization;
+  hasAiSuggestTasks: boolean;
   tasks: TaskType[];
 };
 
