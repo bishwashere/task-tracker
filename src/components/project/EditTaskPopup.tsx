@@ -1,7 +1,7 @@
 import { IoMdClose } from "react-icons/io"
 import Modal from "../Modal/Modal"
 import FormSubmitButton from "../common/FormSubmitButton"
-import { editTask, saveTask } from "@/actions/task"
+import { editTask } from "@/actions/task"
 import toast from "react-hot-toast"
 import { TaskType } from "@/types/organization"
 import { BiEditAlt } from "react-icons/bi"
