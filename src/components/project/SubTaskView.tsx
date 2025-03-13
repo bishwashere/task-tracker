@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { SubtaskType, TaskType } from '@/types/organization';
 import { User } from '@/types/user';
 import AddTagPopup from './AddTagPopup';
-import { assignUserToSubtask, togglePriority, updateSubtaskStatus } from '@/actions/task';
+import { togglePriority, updateSubtaskStatus } from '@/actions/task';
 import toast from 'react-hot-toast';
 import { useConfirmModal } from '../Modal/useConfirmModal';
 import { Session } from 'next-auth';
@@ -85,29 +85,29 @@ export const SubTaskView = ({
     setLoading(false);
   };
 
-  const assignUser = async (subtaskId: string, userId: string) => {
-    const confirmed = await confirmAction('Are you sure you want to assign this user to the subtask?');
-    if (!confirmed) return;
-    const res = await assignUserToSubtask(subtaskId, projectId, userId);
-    if (res.success) {
-      toast.success("Assigned User to subtask!")
-      const updatedSubtask = res.updatedSubtask as SubtaskType;
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === taskId
-            ? {
-              ...task,
-              subtasks: task.subtasks.map((subtask) =>
-                subtask.id === updatedSubtask.id ? updatedSubtask : subtask
-              ),
-            }
-            : task
-        )
-      );
-    } else {
-      toast.error(res.message)
-    }
-  };
+  // const assignUser = async (subtaskId: string, userId: string) => {
+  //   const confirmed = await confirmAction('Are you sure you want to assign this user to the subtask?');
+  //   if (!confirmed) return;
+  //   const res = await assignUserToSubtask(subtaskId, projectId, userId);
+  //   if (res.success) {
+  //     toast.success("Assigned User to subtask!")
+  //     const updatedSubtask = res.updatedSubtask as SubtaskType;
+  //     setTasks((prevTasks) =>
+  //       prevTasks.map((task) =>
+  //         task.id === taskId
+  //           ? {
+  //             ...task,
+  //             subtasks: task.subtasks.map((subtask) =>
+  //               subtask.id === updatedSubtask.id ? updatedSubtask : subtask
+  //             ),
+  //           }
+  //           : task
+  //       )
+  //     );
+  //   } else {
+  //     toast.error(res.message)
+  //   }
+  // };
 
   const dueRemaining = (dueDate: Date) => {
     const currentDate = new Date();
