@@ -47,6 +47,53 @@ export const saveTask = async (projectId: string, taskTitle: string, taskDescrip
     }
 };
 
+export const editTask = async (projectId: string, taskId:string, taskTitle: string, taskDescription: string) => {
+    const userId = await isUserValid();
+    if (!userId) {
+        return { success: false, message: "Unauthorized !" };
+    }
+    try {
+        // Fetch project and organization
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            include: { organization: { include: { members: true } } },
+        });
+
+        if (!project) {
+            return { success: false, message: "Project not found" };
+        }
+
+        // Check if the user is an admin in the organization
+        const userOrg = project.organization.members.find(
+            (member) => member.userId === userId
+        );
+
+        if (!userOrg || userOrg.role !== "ADMIN") {
+            return { success: false, message: "Permission denied" };
+        }
+
+        // Create a new task
+        const task = await prisma.task.update({
+            where: {
+                id: taskId,
+            },
+            data: {
+                name: taskTitle,
+                description: taskDescription,
+                projectId,
+            },
+            include: {
+                subtasks: true,
+            }
+        });
+
+        return { success: true, message: "Task Edited !", task };
+    } catch (error) {
+        console.error("Error adding task:", error);
+        return { success: false, message: "An error occurred while adding the task." };
+    }
+};
+
 export const saveSubTask = async (taskId: string, projectId: string, subTaskName: string, dueDate: Date, points: number) => {
     const userId = await isUserValid();
     if (!userId) {
@@ -87,6 +134,56 @@ export const saveSubTask = async (taskId: string, projectId: string, subTaskName
         revalidatePath(`/tasks/${taskId}`);
 
         return { success: true, message: "Task Added!", subTask };
+    } catch (error) {
+        console.error("Error adding subtask:", error);
+        return { success: false, message: "An error occurred while adding the subtask." };
+    }
+};
+
+export const editSubTask = async (taskId: string, projectId: string, subTaskId: string, subTaskName: string, dueDate: Date, points: number, assignedUserId: string | null) => {
+    const userId = await isUserValid();
+    if (!userId) {
+        return { success: false, message: "Unauthorized !" };
+    }
+    try {
+        // Fetch project and organization
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            include: { organization: { include: { members: true } } },
+        });
+
+        if (!project) {
+            return { success: false, message: "Project not found" };
+        }
+
+        // Check if the user is an admin in the organization
+        const userOrg = project.organization.members.find(
+            (member) => member.userId === userId
+        );
+
+        if (!userOrg || userOrg.role !== "ADMIN") {
+            return { success: false, message: "Permission denied" };
+        }
+
+        // Create a new task
+        const subTask = await prisma.subtask.update({
+            where: {id: subTaskId},
+            data: {
+                name: subTaskName,
+                dueDate,
+                points,
+                assignedUserId: assignedUserId,
+                taskId
+            },
+            include: {
+                assignedUser: true,
+            }
+        });
+
+        // Revalidate the cache to reflect the new subtask
+        revalidatePath(`/tasks/${taskId}`);
+
+        return { success: true, message: "Subtask Edited !", subTask };
     } catch (error) {
         console.error("Error adding subtask:", error);
         return { success: false, message: "An error occurred while adding the subtask." };

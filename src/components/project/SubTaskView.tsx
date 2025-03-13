@@ -7,6 +7,7 @@ import { assignUserToSubtask, togglePriority, updateSubtaskStatus } from '@/acti
 import toast from 'react-hot-toast';
 import { useConfirmModal } from '../Modal/useConfirmModal';
 import { Session } from 'next-auth';
+import EditSubtaskPopup from './EditSubtaskPopup';
 
 export const SubTaskView = ({
   subtask,
@@ -145,31 +146,21 @@ export const SubTaskView = ({
         }`}
     >
       <div>
-        <h4 className="text-lg font-semibold cursor-pointer hover:underline">
+        <div className="flex flex-row gap-2 items-center">
           <span
-            className="cursor-pointer"
+            className="cursor-pointer hover:underline text-lg font-semibold"
             onClick={() =>
               router.push(`/project/subtask/${subtask.id}`)
             }
           >
             {subtask.name}
           </span>
-        </h4>
-        <p className="text-sm">{subtask.status} • {!editMode ? subtask.assignedUserId ? `${subtask.assignedUser?.name} • ` : "Unassigned • " : ""}{subtask.points} points {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}</p>
-        {role === 'admin' && editMode && (
-          <select
-            value={subtask.assignedUserId || ''}
-            onChange={(e) => assignUser(subtask.id, e.target.value)}
-            className="mt-2 border p-1 rounded"
-          >
-            <option value="">Unassigned</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
-          </select>
-        )}
+          {role === 'admin' && editMode && (
+            <EditSubtaskPopup users={users} projectId={projectId} setTasks={setTasks} subtask={subtask} taskId={taskId} />
+          )}
+        </div>
+        <p className="text-sm">{subtask.status} • {subtask.assignedUserId ? `${subtask.assignedUser?.name} • ` : "Unassigned • "}{subtask.points} points {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}</p>
+          
       </div>
       <div className="flex items-center gap-2">
         {subtask.tagName ? (
