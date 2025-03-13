@@ -1,6 +1,6 @@
 "use server";
 import { auth } from "@/lib/auth";
-import Dashboard from "@/pages/Dashboard";
+import Dashboard from "@/page/Dashboard";
 import { redirect } from "next/navigation";
 
 export default async function Page() {

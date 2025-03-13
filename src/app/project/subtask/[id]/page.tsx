@@ -1,6 +1,6 @@
 "use server";
 import { auth } from "@/lib/auth"
-import Subtask from "@/pages/Subtask";
+import Subtask from "@/page/Subtask";
 import { redirect } from "next/navigation"
 
 export default async function Page({

@@ -1,6 +1,6 @@
 "use server";
 import { auth } from "@/lib/auth"
-import Points from "@/pages/Points";
+import Points from "@/page/Points";
 import { redirect } from "next/navigation"
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {

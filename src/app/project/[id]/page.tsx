@@ -1,7 +1,7 @@
 "use server";
 import { getProjectById } from "@/data/project";
 import { auth } from "@/lib/auth"
-import Project from "@/pages/Project"
+import Project from "@/page/Project"
 import { ProjectType } from "@/types/organization";
 import Link from "next/link";
 import { redirect } from "next/navigation"
