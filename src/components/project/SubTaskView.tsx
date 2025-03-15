@@ -159,8 +159,18 @@ export const SubTaskView = ({
             <EditSubtaskPopup users={users} projectId={projectId} setTasks={setTasks} subtask={subtask} taskId={taskId} />
           )}
         </div>
-        <p className="text-sm">{subtask.status} • {subtask.assignedUserId ? `${subtask.assignedUser?.name} • ` : "Unassigned • "}{subtask.points} points {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}</p>
-          
+        <p className="text-sm">
+          {subtask.status} •{' '}
+          {subtask.assignedUserId ? (
+            <span className="inline-block px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-gray-100">
+              {subtask.assignedUser?.name}
+            </span>
+          ) : (
+            "Unassigned"
+          )}{' '}
+          • {subtask.points} points{' '}
+          {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}
+        </p>
       </div>
       <div className="flex items-center gap-2">
         {subtask.tagName ? (
