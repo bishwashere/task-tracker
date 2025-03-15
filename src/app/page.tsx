@@ -103,7 +103,7 @@ export default function Home() {
           </p>
           <a href="./login" className="mt-10 inline-block animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <button className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300">
-              Build together
+              🧱 Build together
             </button>
           </a>
           {/* Enhanced Photo Gallery */}
