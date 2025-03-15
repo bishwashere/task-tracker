@@ -140,7 +140,7 @@ export const SubTaskView = ({
   return (
     <div
       key={subtask.id}
-      className={`p-4 rounded shadow-md flex justify-between items-center ${subtask.status === 'done'
+      className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === 'done'
         ? 'bg-green-200 text-green-700 hover:bg-green-300'
         : 'bg-white hover:bg-gray-100'
         }`}
