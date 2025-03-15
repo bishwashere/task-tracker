@@ -15,7 +15,7 @@ export const TaskList = ({
   editMode,
   setPointsEarned,
   session,
-}:{
+}: {
   tasks: TaskType[];
   users: User[];
   role: 'admin' | 'member';
@@ -31,11 +31,11 @@ export const TaskList = ({
       {tasks.map((task) => (
         <div key={task.id} className="mb-6 p-4 rounded hover:bg-gray-50 border border-gray-200 relative">
           {role === 'admin' && editMode && (
-            <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} />
+            <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} showAi={!task.hasAISuggestions} />
           )}
           <div className='flex flex-row items-center gap-2'>
-              <h3 className="text-xl font-bold mb-4">{task.name}</h3>
-              {role==="admin" && editMode && <EditTaskPopup task={task} projectId={projectId} setTasks={setTasks} />}
+            <h3 className="text-xl font-bold mb-4">{task.name}</h3>
+            {role === "admin" && editMode && <EditTaskPopup task={task} projectId={projectId} setTasks={setTasks} />}
           </div>
           <div className="grid grid-cols-1 gap-4">
             {task.subtasks.map((subtask) => (
@@ -55,7 +55,7 @@ export const TaskList = ({
           </div>
         </div>
       ))}
-      
+
     </div>
   );
 };

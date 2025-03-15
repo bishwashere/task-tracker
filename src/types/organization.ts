@@ -17,7 +17,6 @@ export type UserOrganization = {
   createdAt: Date;
 };
 
-
 export type ProjectType = {
   id: string;
   name: string;
@@ -28,7 +27,6 @@ export type ProjectType = {
   tasks: TaskType[];
 };
 
-
 export type TaskType = {
   id: string;
   name: string;
@@ -36,6 +34,7 @@ export type TaskType = {
   projectId: string;
   project: ProjectType;
   subtasks: SubtaskType[];
+  hasAISuggestions: boolean;
 };
 
 export type SubtaskType = {

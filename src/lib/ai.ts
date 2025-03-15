@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { suggestProjectTaskPrompt } from "./prompt";
+import { suggestProjectTaskPrompt, suggestSubtaskPrompt } from "./prompt";
 import { z } from "zod";
 
 /**
@@ -67,10 +67,56 @@ class AI {
       description: z.string().optional().default(""),
     })
   );
+
+  private suggestedSubtaskJSONParserSchema = z.array(
+    z.object({
+      title: z.string(),
+    })
+  );
+
+  async suggestProjectSubtasks({
+    projectName,
+    taskTitle,
+    taskDescription,
+    projectDescription,
+  }: SuggestProjectSubtasks): Promise<string[]> {
+    const model = this.genAI.getGenerativeModel({
+      model: "models/gemini-2.0-flash-001",
+    });
+
+    const result = await model.generateContent(
+      suggestSubtaskPrompt({
+        projectName,
+        taskTitle,
+        taskDescription,
+        projectDescription,
+      })
+    );
+
+    const res = result.response.text().trim();
+
+    try {
+      const json = this.suggestedSubtaskJSONParserSchema.parse(
+        JSON.parse(this.extractJSON(res) || "")
+      );
+      console.log("json", json);
+      return json.map((item) => item.title);
+    } catch {
+      console.error("Failed to parse JSON", res);
+      return [];
+    }
+  }
 }
 
 export interface SuggestProjectTasks {
   projectName: string;
+  projectDescription: string;
+}
+
+export interface SuggestProjectSubtasks {
+  projectName: string;
+  taskTitle: string;
+  taskDescription?: string;
   projectDescription: string;
 }
 

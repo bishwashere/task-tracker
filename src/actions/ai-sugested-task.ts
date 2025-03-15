@@ -86,3 +86,39 @@ export const deleteAISuggestedTask = async (taskId: string) => {
     };
   }
 };
+
+export const getAISuggestedSubtasks = async (taskId: string) => {
+  const task = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+    },
+    include: {
+      project: true,
+    },
+  });
+
+  if (!task) {
+    return {
+      success: false,
+      message: "Task not found",
+    };
+  }
+
+  const subtasks = await ai.suggestProjectSubtasks({
+    projectName: task.project.name,
+    taskTitle: task.name,
+    taskDescription: task.description || "",
+    projectDescription: task.project.description || "",
+  });
+
+  await prisma.task.update({
+    where: {
+      id: taskId,
+    },
+    data: {
+      hasAISuggestions: true,
+    },
+  });
+
+  return { success: true, subtasks };
+};

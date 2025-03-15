@@ -11,7 +11,11 @@ const LOADING_STEPS = [
   "Preparing final recommendations...",
 ]
 
-export default function TaskGenerationLoader() {
+type Props = {
+  onComplete?: () => void
+}
+
+export default function TaskGenerationLoader({ onComplete }: Props) {
   const [progress, setProgress] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [currentStep, setCurrentStep] = useState(0)
@@ -42,8 +46,14 @@ export default function TaskGenerationLoader() {
     }
   }, [progress, currentStep])
 
-  // return null if progress is 100%
-  if (progress === 100) return null
+  useEffect(() => {
+    if (progress === 100) {
+      setTimeout(() => {
+        onComplete?.()
+      }, 400)
+    }
+  }, [progress])
+
 
   return (
     <div className="w-full max-w-md mx-auto p-6">

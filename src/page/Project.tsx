@@ -56,7 +56,6 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     const res = await getAISuggestedTasksByProjectId(project.id);
     if (res.success) {
       setAiSuggestedTasks(res.tasks || []);
-      project.hasAiSuggestTasks = true;
     } else {
       toast.error(res.message || "An error occurred!");
     }
@@ -69,20 +68,17 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
   }, []);
 
   const handleAcceptSuggestedTask = async (task: { id: string; name: string; description: string | null }) => {
-    // Add the suggested task to the regular tasks
-    const newTask = {
-      name: task.name,
-      description: task.description,
-      projectId: project.id,
-    };
     // Call your add task function here (e.g., addTask(newTask))
     // Remove the suggested task from the AI suggested tasks in the database
-    await deleteAISuggestedTask(task.id);
     // Update the state
-    //@ts-expect-error: Type 'TaskType[]' is not assignable to type 'SetStateAction<TaskType[]>'.
-    setTasks([...tasks, newTask]);
-    setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== task.id));
-    await saveTask(project.id, task.name, task.description || "");
+
+    const res = await saveTask(project.id, task.name, task.description || "");
+    if (res.success && res.task) {
+      setTasks((prevTasks) => [...prevTasks, res.task as unknown as TaskType]);
+      setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== task.id));
+      await deleteAISuggestedTask(task.id);
+
+    }
   };
 
   const handleRejectSuggestedTask = async (taskId: string) => {
@@ -217,7 +213,11 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
         {
 
           project && !project.hasAiSuggestTasks ?
-            <TaskGenerationLoader /> :
+            <TaskGenerationLoader
+              onComplete={() => {
+                project.hasAiSuggestTasks = true;
+              }}
+            /> :
             initialLoading ? <div className="text-center text-xl font-bold">Loading...</div> :
 
               <>
@@ -227,7 +227,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold">Maybe add these tasks?</h3>
                     {aiSuggestedTasks.map((task, i) => (
-                      <div key={i} className="mb-6 p-4 rounded bg-gray-50 border border-gray-200 relative">
+                      <div key={i} className="mb-6 p-4 rounded bg-gray-50 border border-gray-200 relative flex justify-between">
                         <div>
                           <h4 className="font-semibold">{task.name}</h4>
                           {/*<p>{task.description}</p>*/}

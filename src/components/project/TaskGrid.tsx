@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import AddSubtask from './AddSubtaskPopup';
 import toast from 'react-hot-toast';
 import { togglePriority } from '@/actions/task';
+import AISubtaskDialog from '../common/AISubtaskGenerator';
 
 export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode }: { tasks: TaskType[]; setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; projectId: string; role: 'admin' | 'member'; editMode: boolean; }) => {
   const router = useRouter();
@@ -41,15 +42,15 @@ export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode }: { tasks
           <div className="flex justify-between items-start gap-4">
             <h3
               className="text-lg font-bold cursor-pointer flex-1"
-              // onClick={() =>
-              //   router.push(`/${role === 'admin' ? 'admin' : 'user'}/subtasks/${task.id}`)
-              // }
+            // onClick={() =>
+            //   router.push(`/${role === 'admin' ? 'admin' : 'user'}/subtasks/${task.id}`)
+            // }
             >
               {task.name}
             </h3>
 
             {role === 'admin' && editMode && (
-              <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} showText={false} />
+              <AddSubtask setTasks={setTasks} taskId={task.id} projectId={projectId} showText={false} showAi={!task.hasAISuggestions} />
             )}
           </div>
 
