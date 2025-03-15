@@ -42,9 +42,9 @@ const AddTagPopup = ({ setTasks, taskId, subtaskId, projectId }: { setTasks: Rea
     <>
       <button
         onClick={() => setModalIsOpen(true)}
-        className="text-sm text-blue-500 hover:underline"
+        className="text-sm text-blue-300 hover:underline"
       >
-        +Add Tag
+        +Tag
       </button>
 
       <Modal modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} className="w-[100%] md:w-96 px-10 py-10">
