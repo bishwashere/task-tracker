@@ -30,12 +30,16 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
   const [showSubtasks, setShowSubtasks] = useState(true);
   const [pointsEarned, setPointsEarned] = useState<number>(0);
   const [addTaskModalOpen, setaddTaskModalOpen] = useState(false);
+  const [showTaskGeneration, setShowTaskGeneration] = useState(!project.hasAiSuggestTasks);
   const [aiSuggestedTasks, setAiSuggestedTasks] = useState<{
     id: string;
     name: string;
     description: string | null;
     projectId: string;
   }[]>([]);
+
+
+
 
   // Fetch tasks and subtasks
   const fetchtasksWithSubTasks = async () => {
@@ -212,10 +216,11 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
 
         {
 
-          project && !project.hasAiSuggestTasks ?
+          showTaskGeneration ?
             <TaskGenerationLoader
               onComplete={() => {
-                project.hasAiSuggestTasks = true;
+                console.log("Task generation complete");
+                setShowTaskGeneration(false);
               }}
             /> :
             initialLoading ? <div className="text-center text-xl font-bold">Loading...</div> :

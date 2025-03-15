@@ -50,9 +50,9 @@ export default function TaskGenerationLoader({ onComplete }: Props) {
     if (progress === 100) {
       setTimeout(() => {
         onComplete?.()
-      }, 400)
+      }, 100)
     }
-  }, [progress])
+  }, [onComplete, progress])
 
 
   return (
