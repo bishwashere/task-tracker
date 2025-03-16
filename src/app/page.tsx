@@ -83,7 +83,7 @@ export default function Home() {
           </p>
           <a href="./login" className="mt-10 inline-block animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <button className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
-              🚀 Get Started
+              🚀 Start for Free
             </button>
           </a>
           <div className="mt-12 max-w-md lg:max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "0.6s" }}>
