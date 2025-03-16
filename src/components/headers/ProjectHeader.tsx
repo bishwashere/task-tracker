@@ -6,8 +6,8 @@ import Link from 'next/link';
 
 export const  ProjectHeader = ({ session, projectName, projectId, points, showPoints=false }: { session: Session; projectName: string; projectId?:string; points?: number; showPoints?: boolean }) => {
   return(
-  <div className="flex justify-between items-center mb-6">
-    <h1 className="text-3xl font-bold">Project: {projectName}</h1>
+  <div className="flex justify-between items-center mb-5">
+    <h1 className="text-xl font-bold">Project: {projectName}</h1>
     <div className='flex flex-row justify-center items-center gap-5'>
       {showPoints && projectId && <Link href={`/points?fromProject=${projectId}`} className='flex flex-row justify-center items-center gap-1'>
         <HiCurrencyDollar className='text-3xl text-[#fbbc05]'/>

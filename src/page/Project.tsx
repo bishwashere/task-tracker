@@ -151,7 +151,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
   return (
     <>
       <SuperHeader path="/dashboard" />
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-4 space-y-6">
         <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
         <div className="mb-6">
           <ProgressBar progress={stats.progress} />
@@ -160,7 +160,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
             {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
           </p>
         </div>
-        <div className="flex justify-start items-center space-x-4 mb-6">
+        <div className="flex justify-start items-center space-x-4 mb-4">
           <button
             className={`px-4 py-2 rounded ${subtaskFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
               }`}
