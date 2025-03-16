@@ -153,30 +153,30 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-4 space-y-6">
         <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
-        <div className="mb-6">
+        <div className="mb-4">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
             {stats.progress}% Complete • {stats.totalSubtasks} subtasks •{' '}
             {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
           </p>
         </div>
-        <div className="flex justify-start items-center space-x-4 mb-4">
+        <div className="flex justify-start items-center space-x-4 mb-2">
           <button
-            className={`px-4 py-2 rounded ${subtaskFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+            className={`px-4 py-2 rounded text-sm ${subtaskFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setSubtaskFilter('all')}
           >
             All
           </button>
           <button
-            className={`px-4 py-2 rounded ${subtaskFilter === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+            className={`px-4 py-2 rounded text-sm ${subtaskFilter === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setSubtaskFilter('pending')}
           >
             Pending
           </button>
           <button
-            className={`px-4 py-2 rounded ${subtaskFilter === 'done' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+            className={`px-4 py-2 rounded text-sm ${subtaskFilter === 'done' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setSubtaskFilter('done')}
           >
@@ -184,7 +184,7 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
           </button>
         </div>
 
-        <div className="mb-6 flex flex-row justify-between">
+        <div className="mb-4 flex flex-row justify-between">
           <p
             className="cursor-pointer text-blue-500 hover:underline w-fit"
             onClick={() => setShowSubtasks(!showSubtasks)}
@@ -229,10 +229,10 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
 
                 {/* Display AI Suggested Tasks */}
                 {aiSuggestedTasks.length > 0 && (
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <h3 className="text-lg font-semibold">Maybe add these tasks?</h3>
                     {aiSuggestedTasks.map((task, i) => (
-                      <div key={i} className="mb-6 p-4 rounded bg-gray-50 border border-gray-200 relative flex justify-between">
+                      <div key={i} className="mb-4 p-4 rounded bg-gray-50 border border-gray-200 relative flex justify-between">
                         <div>
                           <h4 className="font-semibold">{task.name}</h4>
                           {/*<p>{task.description}</p>*/}
