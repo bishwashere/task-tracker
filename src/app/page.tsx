@@ -86,7 +86,7 @@ export default function Home() {
               🚀 Get Started
             </button>
           </a>
-          <div className="mt-12 max-w-md mx-auto animate-fade-in" style={{ animationDelay: "0.6s" }}>
+          <div className="mt-12 max-w-md lg:max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "0.6s" }}>
             <div
               className="bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-md"
               onMouseEnter={() => setIsPaused(true)}
@@ -95,7 +95,7 @@ export default function Home() {
               <img
                 src={photos[activePhoto]}
                 alt={`Azent.io Screenshot ${activePhoto + 1}`}
-                className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-95 transition-all duration-300"
+                className="w-full h-48 lg:h-[36rem] object-cover rounded-lg cursor-pointer hover:opacity-95 transition-all duration-300"
                 onClick={handleImageClick}
               />
               <div className="flex justify-center space-x-2 mt-2">
@@ -125,7 +125,6 @@ export default function Home() {
                 alt={`Azent.io Screenshot ${activePhoto + 1} Expanded`}
                 className="w-full h-full object-contain rounded-xl shadow-xl"
               />
-              {/* Left Arrow */}
               <div
                 className="absolute left-0 top-0 h-full w-1/2 flex items-center justify-start opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
                 onClick={(e) => {
@@ -135,7 +134,6 @@ export default function Home() {
               >
                 <FaArrowLeft className="text-white text-4xl ml-4 drop-shadow-md" />
               </div>
-              {/* Right Arrow */}
               <div
                 className="absolute right-0 top-0 h-full w-1/2 flex items-center justify-end opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
                 onClick={(e) => {
