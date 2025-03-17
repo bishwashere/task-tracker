@@ -71,6 +71,7 @@ model Organization {
   id        String             @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
   projects  Project[]
   members   UserOrganization[]
 }
@@ -83,6 +84,7 @@ model UserOrganization {
   organizationId String           @db.ObjectId
   role           OrganizationRole // "ADMIN" or "MEMBER"
   createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   @@unique([userId, organizationId]) // Ensure a user is in an org only once
 }
@@ -118,6 +120,8 @@ model Project {
   hasAiSuggestTasks Boolean           @default(false)
   tasks             Task[]
   AISuggestedTask   AISuggestedTask[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
 
 model Task {
@@ -128,6 +132,8 @@ model Task {
   projectId        String    @db.ObjectId
   subtasks         Subtask[]
   hasAISuggestions Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Subtask {
@@ -144,6 +150,8 @@ model Subtask {
   tagName        String?
   tagColor       String?
   comments       Comment[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Comment {
@@ -154,6 +162,7 @@ model Comment {
   userId    String   @db.ObjectId
   comment   String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AISuggestedTask {
