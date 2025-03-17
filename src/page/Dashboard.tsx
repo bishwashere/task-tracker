@@ -25,16 +25,28 @@ const Dashboard = ({ session }: { session: Session }) => {
     const [addOrganizationModalIsOpen, setAddOrganizationModalIsOpen] = useState(false);
     const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false)
 
+    const selectCurrentOrganization = (organization: Organization | Organization[]) => {
+        const storedOrganizationId = localStorage.getItem('rememberOrganizationId');
+        if(Array.isArray(organization)) {
+            const selectedOrg = organization.find(org => org.id === storedOrganizationId);
+            if(selectedOrg) {
+                setSelectedOrganization(selectedOrg);
+            } else {
+                setSelectedOrganization(organization[0]);
+                localStorage.setItem('rememberOrganizationId', organization[0].id);
+            }
+        } else {
+            setSelectedOrganization(organization);
+            localStorage.setItem('rememberOrganizationId', organization.id);
+        }
+    }
+
     const fetchOrganizations = async () => {
         const res = await getOrganization();
         if (res.success && res.organizations?.length) {
             setOrganizations(res.organizations as unknown as Organization[]);
-            // setSelectedOrganization((prevSelected) => {
-            //     // If an organization is already selected, find it in the new data and select it otherwise select first
-            //     const updatedSelectedOrg = res.data.find(org => org.id === prevSelected?.id) as unknown as Organization;
-            //     return updatedSelectedOrg ? updatedSelectedOrg : res.data[0] as unknown as Organization;
-            // });
-            setSelectedOrganization(res.organizations[0] as Organization)
+            selectCurrentOrganization(res.organizations as Organization[]);
+            // setSelectedOrganization(res.organizations[0] as Organization)
         }
         setInitialLoading(false)
     }
@@ -55,7 +67,7 @@ const Dashboard = ({ session }: { session: Session }) => {
         if (result.success) {
             toast.success(result.message);
             setOrganizations([...organizations, result.organization as Organization]);
-            setSelectedOrganization(result.organization as Organization)
+            selectCurrentOrganization(result.organization as Organization)
             setAddOrganizationModalIsOpen(false);
         }
         else {
@@ -127,7 +139,7 @@ const Dashboard = ({ session }: { session: Session }) => {
                     {organizations.length > 0 && selectedOrganization &&
                         <select
                             value={selectedOrganization.id}
-                            onChange={(e) => setSelectedOrganization(organizations.find((org) => org.id === e.target.value) as Organization)}
+                            onChange={(e) => selectCurrentOrganization(organizations.find((org) => org.id === e.target.value) as Organization)}
                             className="border p-2 rounded"
                         >
                             {organizations.map((org) => (
