@@ -107,6 +107,7 @@ model PointsEarned {
   taskId           String @db.ObjectId
   taskName         String
   points           Float  @default(0)
+  createdAt      DateTime  @default(now())
 
   @@unique([userId, subtaskId])
 }
@@ -171,4 +172,5 @@ model AISuggestedTask {
   description String?
   projectId   String  @db.ObjectId
   project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }

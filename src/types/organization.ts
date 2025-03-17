@@ -3,9 +3,10 @@ import { User } from "./user";
 export type Organization = {
   id: string;
   name: string;
-  createdAt: Date;
   projects: ProjectType[];
   members: UserOrganization[];
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type UserOrganization = {
@@ -25,6 +26,8 @@ export type ProjectType = {
   organization: Organization;
   hasAiSuggestTasks: boolean;
   tasks: TaskType[];
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type TaskType = {
@@ -35,6 +38,8 @@ export type TaskType = {
   project: ProjectType;
   subtasks: SubtaskType[];
   hasAISuggestions: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type SubtaskType = {
@@ -51,6 +56,8 @@ export type SubtaskType = {
   tagName: string;
   tagColor: string;
   comments: CommentType[];
+  createdAt: Date;
+  updatedAt: Date;
 };
 export type CommentType = {
   id: string;
@@ -60,6 +67,7 @@ export type CommentType = {
   user: User;
   comment: string;
   createdAt: Date;
+  updatedAt: Date;
 };
 export type PointsEarnedType = {
   id: string;
@@ -73,4 +81,5 @@ export type PointsEarnedType = {
   taskId: string;
   taskName: string;
   points: number;
+  createdAt: Date;
 };

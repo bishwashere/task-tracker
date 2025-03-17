@@ -45,7 +45,7 @@ const Dashboard = ({ session }: { session: Session }) => {
         const res = await getOrganization();
         if (res.success && res.organizations?.length) {
             setOrganizations(res.organizations as unknown as Organization[]);
-            selectCurrentOrganization(res.organizations as Organization[]);
+            selectCurrentOrganization(res.organizations as unknown as Organization[]);
             // setSelectedOrganization(res.organizations[0] as Organization)
         }
         setInitialLoading(false)
@@ -66,8 +66,8 @@ const Dashboard = ({ session }: { session: Session }) => {
         const result = await createOrganization(formData);
         if (result.success) {
             toast.success(result.message);
-            setOrganizations([...organizations, result.organization as Organization]);
-            selectCurrentOrganization(result.organization as Organization)
+            setOrganizations([...organizations, result.organization as unknown as Organization]);
+            selectCurrentOrganization(result.organization as unknown as Organization)
             setAddOrganizationModalIsOpen(false);
         }
         else {
