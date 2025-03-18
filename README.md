@@ -1,3 +1,6 @@
+### 03-18
+Fixes for subtask edit
+
 ### 03-17  
 Fix to org remember + created/last updated dates adding  
 eslint fixes  
