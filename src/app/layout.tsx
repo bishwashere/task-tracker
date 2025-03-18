@@ -17,6 +17,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Task Tracker",
   description: "Task Management Finally Done Right.",
+  keywords: "task management, productivity, task tracker, project management, to-do list, task organizer",
+  authors: [{ name: "Binit KC" }],
+  openGraph: {
+    title: "Task Tracker",
+    description: "Task Management Finally Done Right.",
+    type: "website",
+    locale: "en_US",
+    siteName: "azent.io",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
