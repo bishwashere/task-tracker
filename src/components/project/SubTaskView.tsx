@@ -19,6 +19,7 @@ export const SubTaskView = ({
   editMode,
   setPointsEarned,
   session,
+  isNewTask,
 }: {
   subtask: SubtaskType;
   taskId: string;
@@ -29,6 +30,7 @@ export const SubTaskView = ({
   editMode: boolean;
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
   session: Session;
+  isNewTask: (createdAt: string | Date) => boolean;
 }) => {
   const router = useRouter();
 
@@ -149,14 +151,23 @@ export const SubTaskView = ({
         <div className="flex flex-row gap-2 items-center">
           <span
             className="cursor-pointer hover:underline text-lg font-semibold"
-            onClick={() =>
-              router.push(`/project/subtask/${subtask.id}`)
-            }
+            onClick={() => router.push(`/project/subtask/${subtask.id}`)}
           >
             {subtask.name}
           </span>
-          {role === 'admin' && editMode && (
-            <EditSubtaskPopup users={users} projectId={projectId} setTasks={setTasks} subtask={subtask} taskId={taskId} />
+          {subtask.createdAt && (
+            <span className="text-xs text-white bg-green-400 px-1 py-0.5 rounded">
+              {isNewTask(subtask.createdAt) ? "New" : ""}
+            </span>
+          )}
+          {role === "admin" && editMode && (
+            <EditSubtaskPopup
+              users={users}
+              projectId={projectId}
+              setTasks={setTasks}
+              subtask={subtask}
+              taskId={taskId}
+            />
           )}
         </div>
         <p className="text-sm">
