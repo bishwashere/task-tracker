@@ -156,13 +156,13 @@ export const SubTaskView = ({
             {subtask.name}
           </span>
           {subtask.createdAt && (
-            <span className="text-xs text-white bg-green-400 px-1 py-0.5 rounded">
+            <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
               {isNewTask(subtask.createdAt) ? (
                 <span className="w-2.5 h-2.5 bg-green-500 rounded-full mr-1"></span>
               ) : (
                 ""
               )}
-            </span>
+          </span>
           )}
           {role === "admin" && editMode && (
             <EditSubtaskPopup
