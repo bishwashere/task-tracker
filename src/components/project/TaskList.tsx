@@ -35,7 +35,7 @@ export const TaskList = ({
     }
     const diffDays = differenceInDays(now, taskDate);
     console.log("Date diff:", diffDays, "days for", createdAt);
-    return diffDays <= 1; // True if created today or yesterday
+    return diffDays <= 0; // True if created today or yesterday
   };
 
   return (
@@ -55,8 +55,12 @@ export const TaskList = ({
             <div className="flex flex-row items-center gap-1">
               <h3 className="text-xl font-bold mb-2">{task.name}</h3>
               {task.createdAt && (
-                <span className="text-xs text-white bg-green-400 px-1 py-0.5 rounded">
-                  {isNewTask(task.createdAt) ? "New" : ""}
+                <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
+                  {isNewTask(task.createdAt) ? (
+                    <span className="w-2.5 h-2.5 bg-green-500 rounded-full mr-1"></span>
+                  ) : (
+                    ""
+                  )}
                 </span>
               )}
               {role === "admin" && editMode && (
