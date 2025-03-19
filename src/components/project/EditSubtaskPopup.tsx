@@ -64,6 +64,7 @@ const EditSubtaskPopup = ({ users, subtask, setTasks, taskId, projectId }: { use
                         // value={subtaskName}
                         // onChange={(e) => setSubtaskName(e.target.value)}
                         className="border p-2 rounded w-full mb-4"
+                        required
                     />
                     <input
                         type="date"
@@ -74,6 +75,7 @@ const EditSubtaskPopup = ({ users, subtask, setTasks, taskId, projectId }: { use
                         // value={dueDate}
                         // onChange={(e) => setDueDate(e.target.value)}
                         className="border p-2 rounded w-full mb-4"
+                        required
                     />
                     <input
                         type="number"
@@ -85,6 +87,7 @@ const EditSubtaskPopup = ({ users, subtask, setTasks, taskId, projectId }: { use
                         // value={points}
                         // onChange={(e) => setPoints(parseInt(e.target.value, 10))}
                         className="border p-2 rounded w-full mb-4"
+                        required
                     />
                     <select
                         defaultValue={subtask.assignedUserId || ''}
