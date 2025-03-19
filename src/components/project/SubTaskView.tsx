@@ -157,7 +157,11 @@ export const SubTaskView = ({
           </span>
           {subtask.createdAt && (
             <span className="text-xs text-white bg-green-400 px-1 py-0.5 rounded">
-              {isNewTask(subtask.createdAt) ? "New" : ""}
+              {isNewTask(task.createdAt) ? (
+                <span className="w-2.5 h-2.5 bg-green-500 rounded-full mr-1"></span>
+              ) : (
+                ""
+              )}
             </span>
           )}
           {role === "admin" && editMode && (
