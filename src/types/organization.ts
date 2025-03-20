@@ -58,6 +58,7 @@ export type SubtaskType = {
   comments: CommentType[];
   createdAt: Date;
   updatedAt: Date;
+  issueCount?: number;
 };
 export type CommentType = {
   id: string;
@@ -68,6 +69,8 @@ export type CommentType = {
   comment: string;
   createdAt: Date;
   updatedAt: Date;
+  commentType: string;
+  resolved: boolean;
 };
 export type PointsEarnedType = {
   id: string;

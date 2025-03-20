@@ -59,3 +59,11 @@ button {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}

@@ -95,19 +95,19 @@ enum OrganizationRole {
 }
 
 model PointsEarned {
-  id               String @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String @db.ObjectId
-  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subtaskId        String @db.ObjectId
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @db.ObjectId
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtaskId        String   @db.ObjectId
   subtaskName      String
-  organizationId   String @db.ObjectId
+  organizationId   String   @db.ObjectId
   organizationName String
-  projectId        String @db.ObjectId
+  projectId        String   @db.ObjectId
   projectName      String
-  taskId           String @db.ObjectId
+  taskId           String   @db.ObjectId
   taskName         String
-  points           Float  @default(0)
-  createdAt      DateTime  @default(now())
+  points           Float    @default(0)
+  createdAt        DateTime @default(now())
 
   @@unique([userId, subtaskId])
 }
@@ -121,8 +121,8 @@ model Project {
   hasAiSuggestTasks Boolean           @default(false)
   tasks             Task[]
   AISuggestedTask   AISuggestedTask[]
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 model Task {
@@ -156,21 +156,23 @@ model Subtask {
 }
 
 model Comment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  subtask   Subtask  @relation(fields: [subtaskId], references: [id], onDelete: Cascade)
-  subtaskId String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @db.ObjectId
-  comment   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subtask     Subtask  @relation(fields: [subtaskId], references: [id], onDelete: Cascade)
+  subtaskId   String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @db.ObjectId
+  comment     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  commentType String   @default("comment")
+  resolved    Boolean  @default(false)
 }
 
 model AISuggestedTask {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  projectId   String  @db.ObjectId
-  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
+  projectId   String   @db.ObjectId
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 }
