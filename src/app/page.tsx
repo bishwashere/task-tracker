@@ -49,7 +49,7 @@ export default function Home() {
     setIsPaused(true);
   };
 
-  const handleCloseExpanded = () => {
+  const handleCloseExpandedlots = () => {
     setIsExpanded(false);
     setIsPaused(false);
   };
@@ -73,19 +73,26 @@ export default function Home() {
           aria-hidden="true"
         />
 
+        {/* Revised Hero Section with Added Text */}
         <header className="py-28 px-6 text-center bg-white/90 backdrop-blur-sm relative z-10">
           <div className="absolute top-0 left-1/2 w-20 h-1 bg-emerald-200 transform -translate-x-1/2" />
           <h1 className="text-5xl md:text-6xl font-bold text-emerald-600 animate-fade-in">
             Azent.io
           </h1>
           <p className="text-xl md:text-2xl mt-4 text-gray-700 max-w-xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Master your tasks with elegant simplicity.
+            Task Tracking with ease and clarity.
+          </p>
+          <p className="text-md text-gray-600 mt-2 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            Master your day in 60 seconds or less.
           </p>
           <a href="./login" className="mt-10 inline-block animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <button className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
-              🚀 Start for Free
+              🚀 Try Azent.io Free
             </button>
           </a>
+          <p className="text-sm text-gray-500 mt-4 animate-fade-in" style={{ animationDelay: "0.5s" }}>
+            (7-day free trial. No Stripe info needed upfront.)
+          </p>
           <div className="mt-12 max-w-md lg:max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "0.6s" }}>
             <div
               className="bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-md"
@@ -117,7 +124,7 @@ export default function Home() {
         {isExpanded && (
           <div
             className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
-            onClick={handleCloseExpanded}
+            onClick={handleCloseExpandedlots}
           >
             <div className="relative max-w-[90%] max-h-[90%] flex items-center justify-center">
               <img
@@ -132,7 +139,7 @@ export default function Home() {
                   handleExpandedClick("left");
                 }}
               >
-                <FaArrowLeft className="text-white text-4xl ml-4 drop-shadow-md" />
+                <FaArrowLeft className="text-black text-4xl ml-4 drop-shadow-md" />
               </div>
               <div
                 className="absolute right-0 top-0 h-full w-1/2 flex items-center justify-end opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
@@ -141,76 +148,76 @@ export default function Home() {
                   handleExpandedClick("right");
                 }}
               >
-                <FaArrowRight className="text-white text-4xl mr-4 drop-shadow-md" />
+                <FaArrowRight className="text-black text-4xl mr-4 drop-shadow-md" />
               </div>
             </div>
           </div>
         )}
 
-        <section className="py-16 px-6 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-6 animate-slide-in relative">
-              <span className="absolute -left-8 top-1/2 w-6 h-0.5 bg-emerald-200 transform -translate-y-1/2" />
-              Sharp & Serene
-              <span className="absolute -right-8 top-1/2 w-6 h-0.5 bg-emerald-200 transform -translate-y-1/2" />
-            </h2>
-            <p className="text-lg text-gray-600 bg-white/60 backdrop-blur-sm p-4 rounded-xl animate-slide-in" style={{ animationDelay: "0.2s" }}>
-              Organize tasks with precision and peace.
-            </p>
-          </div>
-        </section>
-
+        {/* Revised Features Section */}
         <section className="py-20 px-6 bg-gray-50 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row-reverse items-center justify-between gap-12">
-              <div className="md:w-1/3 bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in relative">
-                <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-300 rounded-full" />
-                <FaList className="text-emerald-500 text-3xl mb-4 mx-auto" />
-                <h3 className="text-xl font-semibold text-gray-800 text-center mb-2">Seamless Tracking</h3>
-                <p className="text-gray-600 text-center">
-                  Manage tasks effortlessly in seconds.
-                </p>
+          <div className="max-w-6xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-6 animate-fade-in">
+              Why Choose Azent.io?
+            </h2>
+            <p className="text-lg text-gray-600 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              Streamline your workflow with tools designed for clarity and ease.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+                <FaPen className="text-emerald-500 text-3xl mb-4 mx-auto" />
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Capture Tasks Instantly</h3>
+                <p className="text-gray-600">Jot down ideas without the clutter.</p>
               </div>
-              <div className="md:w-2/3 space-y-8">
-                <div className="flex items-center space-x-4 animate-slide-in" style={{ animationDelay: "0.2s" }}>
-                  <FaPen className="text-emerald-400 text-2xl flex-shrink-0" />
-                  <p className="text-gray-700 relative">
-                    Jot down tasks without the clutter.
-                    <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-emerald-200/50" />
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4 animate-slide-in" style={{ animationDelay: "0.4s" }}>
-                  <FaEye className="text-emerald-400 text-2xl flex-shrink-0" />
-                  <p className="text-gray-700 relative">
-                    See your priorities at a glance.
-                    <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-emerald-200/50" />
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4 animate-slide-in" style={{ animationDelay: "0.6s" }}>
-                  <FaCheckSquare className="text-emerald-400 text-2xl flex-shrink-0" />
-                  <p className="text-gray-700 relative">
-                    Mark tasks done with ease.
-                    <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-emerald-200/50" />
-                  </p>
-                </div>
+              <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+                <FaEye className="text-emerald-500 text-3xl mb-4 mx-auto" />
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Focus on Priorities</h3>
+                <p className="text-gray-600">See what matters at a glance.</p>
+              </div>
+              <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.6s" }}>
+                <FaCheckSquare className="text-emerald-500 text-3xl mb-4 mx-auto" />
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Finish with Ease</h3>
+                <p className="text-gray-600">Mark tasks done in one click.</p>
               </div>
             </div>
           </div>
         </section>
 
+        {/* Optional Testimonials Section - Uncomment to Use */}
+        {/*
+        <section className="py-16 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 italic animate-fade-in">
+              "Azent.io turned my chaotic to-do list into a calm, clear plan."
+            </p>
+            <p className="text-sm text-gray-500 mt-2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              - Sarah K., Freelancer
+            </p>
+          </div>
+        </section>
+        */}
+
+        {/* Revised Final Call-to-Action */}
         <section className="py-20 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-6 animate-fade-in">
-              Elevate Your Workflow
+              Take Control Today
             </h2>
             <p className="text-lg text-gray-600 mb-8 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              Azent.io brings clarity to your day. Begin today.
+              Start now and simplify your tasks with Azent.io’s elegant design.
             </p>
-            <a href="./login">
-              <button className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                Start Now
-              </button>
-            </a>
+            <div className="flex justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+              <a href="./login">
+                <button className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
+                  Get Started Free
+                </button>
+              </a>
+              <a href="./features">
+                <button className="px-8 py-3 bg-transparent text-emerald-600 font-semibold rounded-full border border-emerald-500 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
+                  Learn More
+                </button>
+              </a>
+            </div>
           </div>
           <div className="absolute bottom-0 left-1/2 w-20 h-1 bg-emerald-200 transform -translate-x-1/2" />
         </section>
