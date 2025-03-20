@@ -75,7 +75,6 @@ const EditSubtaskPopup = ({ users, subtask, setTasks, taskId, projectId }: { use
                         // value={dueDate}
                         // onChange={(e) => setDueDate(e.target.value)}
                         className="border p-2 rounded w-full mb-4"
-                        required
                     />
                     <input
                         type="number"
