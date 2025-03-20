@@ -33,7 +33,7 @@ export const SubTaskView = ({
   isNewTask: (createdAt: string | Date) => boolean;
 }) => {
   const router = useRouter();
-
+  const issueCount = subtask.issueCount || 0;
   const [loading, setLoading] = useState(false);
   const { confirmAction, ConfirmationModal } = useConfirmModal();
 
@@ -79,7 +79,7 @@ export const SubTaskView = ({
             : task
         )
       );
-      if(subtask.assignedUserId === session?.user?.id)
+      if (subtask.assignedUserId === session?.user?.id)
         setPointsEarned(prev => prev + subtask.points)
     } else {
       toast.error(res.message || 'An error occurred')
@@ -162,8 +162,17 @@ export const SubTaskView = ({
               ) : (
                 ""
               )}
-          </span>
+            </span>
           )}
+
+          {/* issue count badge > 0  */}
+          {
+            (subtask.issueCount || 0) > 0 && (
+              <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
+                {subtask.issueCount}
+              </span>
+            )
+          }
           {role === "admin" && editMode && (
             <EditSubtaskPopup
               users={users}

@@ -6,7 +6,11 @@ import toast from 'react-hot-toast';
 import { togglePriority } from '@/actions/task';
 import AISubtaskDialog from '../common/AISubtaskGenerator';
 
-export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode }: { tasks: TaskType[]; setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; projectId: string; role: 'admin' | 'member'; editMode: boolean; }) => {
+export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode, }: {
+  tasks: TaskType[]; setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; projectId: string; role: 'admin' | 'member'; editMode: boolean;
+
+
+}) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false)
   const priorityToggle = async (taskId: string, subtaskId: string, priority: number) => {
@@ -47,6 +51,9 @@ export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode }: { tasks
             // }
             >
               {task.name}
+
+
+
             </h3>
 
             {role === 'admin' && editMode && (
@@ -71,18 +78,23 @@ export const TaskGrid = ({ tasks, setTasks, projectId, role, editMode }: { tasks
                 >
                   {subtask.name}
                 </span>
-                {role === 'admin' && (
-                  <button
-                    onClick={() => priorityToggle(task.id, subtask.id, subtask.priority)}
-                    className={`text-sm rounded ${subtask.priority
-                      ? 'text-yellow-500 hover:text-yellow-600'
-                      : 'text-gray-500 hover:text-gray-600'
-                      }`}
-                    disabled={loading}
-                  >
-                    {subtask.priority ? '⭐' : '☆'}
-                  </button>
+                <div className='space-x-2'> {(subtask.issueCount || 0) > 0 && (
+                  <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
+                    {subtask.issueCount}
+                  </span>
                 )}
+                  {role === 'admin' && (
+                    <button
+                      onClick={() => priorityToggle(task.id, subtask.id, subtask.priority)}
+                      className={`text-sm rounded ${subtask.priority
+                        ? 'text-yellow-500 hover:text-yellow-600'
+                        : 'text-gray-500 hover:text-gray-600'
+                        }`}
+                      disabled={loading}
+                    >
+                      {subtask.priority ? '⭐' : '☆'}
+                    </button>
+                  )}</div>
               </li>
             ))}
           </ul>
