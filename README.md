@@ -1,3 +1,6 @@
+### 03-20  
+fixed optional date
+
 ### 03-18
 Fixes for subtask edit
 
