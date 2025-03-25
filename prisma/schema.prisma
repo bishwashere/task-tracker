@@ -65,7 +65,7 @@ model User {
   assignedSubtasks Subtask[]          @relation("AssignedSubtasks")
   Comment          Comment[]
   points           PointsEarned[]
-  Subscription     Subscription[]
+  subscription     Subscription[]
 }
 
 model Organization {
@@ -179,14 +179,15 @@ model AISuggestedTask {
 }
 
 model Subscription {
-  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId                   String   @db.ObjectId
-  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status                   String // "trialing", "active", "canceled", etc
-  startedAt                DateTime
-  endsAt                   DateTime
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  customerId               String
-  subscriptionIdFromStripe String
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String    @unique @db.ObjectId
+  user               User      @relation(fields: [userId], references: [id])
+  stripeCustomerId   String?
+  planId             String?
+  status             String    @default("trialing")
+  subscriptionId     String?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
