@@ -100,7 +100,7 @@ const Dashboard = ({ session }: { session: Session }) => {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-lg sm:text-2xl md:text-3xl font-bold ">Admin Dashboard</h1>
         <div className="flex items-center space-x-4 justify-center">
 
           {/* Add Organization */}

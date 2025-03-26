@@ -23,10 +23,10 @@ export default function PricingCards(
   const router = useRouter()
 
   return (
-    <div id="pricing" className="w-full py-16 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div id="pricing" className="w-full py-4 sm:py-16 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="container px-4 md:px-6 mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold tracking-tight mb-3">{header || "Transparent Pricing"}</h2>
+        <div className="text-center mb-6  sm:mb-12">
+          <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3">{header || "Transparent Pricing"}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             {desc || "Choose the plan that works best for you and your team. All plans include a free trial."}
           </p>
