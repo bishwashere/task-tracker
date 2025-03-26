@@ -58,11 +58,11 @@ const SubscriptionStatus = () => {
       >
 
 
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto max-sm:h-full">
 
           {
             data?.status !== "trialing" ?
-              <div className="py-6 space-y-8 max-w-5xl mx-auto pb-16">
+              <div className="py-6 space-y-4 sm:space-y-8 max-w-5xl mx-auto pb-4 sm:pb-16">
                 <div className="flex flex-col space-y-2">
                   <h1 className="text-3xl font-bold tracking-tight">Billing</h1>
                   <p className="text-muted-foreground">
