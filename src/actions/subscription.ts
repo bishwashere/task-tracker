@@ -20,7 +20,7 @@ export const getUserSubscription = createProtectedServerAction(
           // 7 day trial
           currentPeriodEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           userId: user.id,
-          status: "trialing",
+          status: "trial",
         },
       });
 

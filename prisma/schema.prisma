@@ -184,7 +184,7 @@ model Subscription {
   user               User      @relation(fields: [userId], references: [id])
   stripeCustomerId   String?
   planId             String?
-  status             String    @default("trialing")
+  status             String    @default("trial")
   subscriptionId     String?
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?

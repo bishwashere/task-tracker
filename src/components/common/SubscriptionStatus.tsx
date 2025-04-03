@@ -25,7 +25,7 @@ const SubscriptionStatus = () => {
 
     if (isSubscriptionExpired(sub?.currentPeriodEnd?.toString() || "").isExpired) {
       setIsSubModalOpen(true)
-    } else if (sub?.status === "trialing") {
+    } else if (sub?.status === "trial") {
 
       const lastModalShow = localStorage.getItem("lastModalShow")
 
@@ -49,8 +49,8 @@ const SubscriptionStatus = () => {
     <>
       <Button
         onClick={() => setIsSubModalOpen(true)}
-        size={"sm"} loading={loading} variant={"outline"} className={cn(data?.status === "trialing" ? "border-destructive text-destructive" : "", "capitalize")}>
-        {data?.status !== "trialing" ? "Manage Subscription" : data?.status}
+        size={"sm"} loading={loading} variant={"outline"} className={cn(data?.status === "trial" ? "border-destructive text-destructive" : "", "capitalize")}>
+        {data?.status !== "trail" ? "Manage Subscription" : data?.status}
       </Button>
       <Dialog
         open={isSubModalOpen}
@@ -61,7 +61,7 @@ const SubscriptionStatus = () => {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto max-sm:h-full">
 
           {
-            data?.status !== "trialing" ?
+            data?.status !== "trail" ?
               <div className="py-6 space-y-4 sm:space-y-8 max-w-5xl mx-auto pb-4 sm:pb-16">
                 <div className="flex flex-col space-y-2">
                   <h1 className="text-3xl font-bold tracking-tight">Billing</h1>
@@ -109,7 +109,7 @@ const SubscriptionStatus = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">
-                          {data?.status === "trialing"
+                          {data?.status === "trial"
                             ? "Trial ends on"
                             : data?.status === "canceled"
                               ? "Subscription ends on"
@@ -151,7 +151,7 @@ const SubscriptionStatus = () => {
               </div> :
               <>
                 <PricingCards
-                  desc={data?.status === "trialing"
+                  desc={data?.status === "trail"
                     ? "You are currently on the free trial plan. Upgrade to access more features !"
                     : undefined}
                   header={"Upgrade to access more..."}
@@ -161,7 +161,7 @@ const SubscriptionStatus = () => {
                   }}
                   plans={PLANS}
                 />
-                {data?.status === "trialing" && !isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired && <button
+                {data?.status === "trial" && !isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired && <button
                   className="text-black px-4 py-2 rounded underline"
                   onClick={() => setIsSubModalOpen(false)}
                 >
