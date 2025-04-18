@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '../ui/badge'
 import { Calendar1Icon, CreditCardIcon, ShieldCheckIcon } from 'lucide-react'
 import { formatDate } from '@/lib/format-date'
+import { MdSubscriptions } from 'react-icons/md'
 
 const SubscriptionStatus = () => {
   const { data, loading } = useFetch(getUserSubscription)
@@ -44,13 +45,12 @@ const SubscriptionStatus = () => {
 
   }, [data, loading])
 
-
   return (
     <>
       <Button
         onClick={() => setIsSubModalOpen(true)}
         size={"sm"} loading={loading} variant={"outline"} className={cn(data?.status === "trial" ? "border-destructive text-destructive" : "", "capitalize")}>
-        {data?.status !== "trail" ? "Manage Subscription" : data?.status}
+        {data?.status === "trial" ? data.status : "Manage Subscription"}
       </Button>
       <Dialog
         open={isSubModalOpen}
@@ -61,7 +61,30 @@ const SubscriptionStatus = () => {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto max-sm:h-full">
 
           {
-            data?.status !== "trail" ?
+            data?.status === "trial" ?
+              <>
+                <PricingCards
+                  desc={
+                    isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired ? "Your free trial has expired. Upgrade to access more features !" :
+                      data?.status === "trial"
+                        ? "You are currently on the free trial plan. Upgrade to access more features !" : undefined}
+
+                  header={isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired ? "Upgrade Now" : "Upgrade to access more..."}
+                  onSelectPlan={async (pkg) => {
+                    const res = await createStripeSession(pkg)
+                    if (res) router.push(res)
+                  }}
+                  plans={PLANS}
+                />
+                {
+                  data?.status === "trial" && !isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired && <button
+                    className="text-black px-4 py-2 rounded underline"
+                    onClick={() => setIsSubModalOpen(false)}
+                  >
+                    Continue with Free Trial!
+                  </button>
+                }
+              </> :
               <div className="py-6 space-y-4 sm:space-y-8 max-w-5xl mx-auto pb-4 sm:pb-16">
                 <div className="flex flex-col space-y-2">
                   <h1 className="text-3xl font-bold tracking-tight">Billing</h1>
@@ -146,29 +169,29 @@ const SubscriptionStatus = () => {
                       <Calendar1Icon className="mr-2 h-4 w-4" />
                       Manage Subscription
                     </Button>
+                    <Button
+                      onClick={async (e) => {
+
+                        e.currentTarget.disabled = true
+
+                        if (data?.status === "trial") {
+                          const res = await createStripeSession("plan:1")
+                          if (res) router.push(res)
+                        } else {
+
+                          const res = await createCustomerPortal()
+                          if (res) router.push(res)
+                        }
+                      }}
+                      className="w-full sm:w-auto"
+                    >
+                      <MdSubscriptions className="mr-2 h-4 w-4" />
+                      Renew
+                    </Button>
                   </CardFooter>
                 </Card>
-              </div> :
-              <>
-                <PricingCards
-                  desc={data?.status === "trail"
-                    ? "You are currently on the free trial plan. Upgrade to access more features !"
-                    : undefined}
-                  header={"Upgrade to access more..."}
-                  onSelectPlan={async (pkg) => {
-                    const res = await createStripeSession(pkg)
-                    if (res) router.push(res)
-                  }}
-                  plans={PLANS}
-                />
-                {data?.status === "trial" && !isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired && <button
-                  className="text-black px-4 py-2 rounded underline"
-                  onClick={() => setIsSubModalOpen(false)}
-                >
-                  Continue with Free Trial!
-                </button>
-                }
-              </>
+              </div>
+
           }
         </DialogContent>
       </Dialog>
