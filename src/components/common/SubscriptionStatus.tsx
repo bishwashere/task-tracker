@@ -169,7 +169,7 @@ const SubscriptionStatus = () => {
                       <Calendar1Icon className="mr-2 h-4 w-4" />
                       Manage Subscription
                     </Button>
-                    <Button
+                    {isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").isExpired && <Button
                       onClick={async (e) => {
 
                         e.currentTarget.disabled = true
@@ -187,7 +187,7 @@ const SubscriptionStatus = () => {
                     >
                       <MdSubscriptions className="mr-2 h-4 w-4" />
                       Renew
-                    </Button>
+                    </Button>}
                   </CardFooter>
                 </Card>
               </div>
