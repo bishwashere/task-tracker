@@ -1,49 +1,60 @@
 "use server";
-import { isUserValid } from "@/actions/isUserValid"
+
+import { isUserValid } from "@/actions/isUserValid";
 import { prisma } from "@/lib/prisma";
 
 export const getOrganization = async () => {
     const userId = await isUserValid();
     if (!userId) {
-        return { error: 'Unauthorized !' };
+        return { error: 'Unauthorized!' };
     }
+
     try {
-        const organizations = await prisma.organization.findMany({
-            where: {
-                members: {
-                    some: {
-                        userId: userId, // Find where the user is a member
-                    },
-                },
-            },
+        // Get the user's roles in organizations
+        const memberships = await prisma.userOrganization.findMany({
+            where: { userId },
             include: {
-                members: {
+                organization: {
                     include: {
-                        user: {
-                            select: {
-                                id: true,
-                                name: true,
-                                email: true,
-                            }
-                        }
+                        members: {
+                            include: {
+                                user: {
+                                    select: { id: true, name: true, email: true },
+                                },
+                            },
+                        },
+                        projects: {
+                            include: {
+                                tasks: {
+                                    include: {
+                                        subtasks: {
+                                            where: { assignedUserId: userId },
+                                            select: { id: true, status: true },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
-                projects: {
-                    include: {
-                        tasks: {
-                            select: {
-                                id: true,
-                                subtasks: {
-                                    select: {
-                                        id: true,
-                                        status: true,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
             },
+        });
+
+        // Build result with filtered projects for non-admins
+        const organizations = memberships.map(({ role, organization }) => {
+            const filteredProjects = organization.projects.filter(project => {
+                if (role === "ADMIN") return true;
+
+                // For MEMBER: check if any subtask in the project is assigned to the user
+                return project.tasks.some(task =>
+                    task.subtasks && task.subtasks.length > 0
+                );
+            });
+
+            return {
+                ...organization,
+                projects: filteredProjects,
+            };
         });
 
         return { success: true, organizations };
@@ -51,4 +62,4 @@ export const getOrganization = async () => {
         console.error("Error fetching user organizations:", error);
         return { success: false, message: "Failed to fetch organizations" };
     }
-}
+};
