@@ -29,6 +29,7 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ [key: string]: s
                 await signIn("credentials", formData)
               } catch (error) {
                 if (error instanceof AuthError) {
+                  //@ts-expect-error: .....
                   return redirect(`/login?error=${error.type}`)
                 }
                 throw error
