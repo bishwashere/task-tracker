@@ -23,6 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/cn";
 import { sortProjects } from "@/actions/project";
 import toast from "react-hot-toast";
+import { calculateProgressWithStats } from "@/utils/progressUtils";
 
 type Props = {
   projects: ProjectType[];
@@ -175,7 +176,7 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
   const router = useRouter();
-  const progress = calculateProgress(project.tasks);
+  const progress = calculateProgressWithStats(project.tasks);
 
   return (
     <div
@@ -187,32 +188,13 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
     >
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">{project.name}</h3>
-        <ProgressBar progress={progress} />
+        <ProgressBar progress={progress.progress} />
       </div>
       <p className="text-sm text-gray-500">{project.tasks.length} Tasks</p>
     </div>
   );
 };
 
-function calculateProgress(tasks: TaskType[]): number {
-  const totalSubtasks = tasks.reduce(
-    (sum, task) => sum + (task.subtasks?.length || 0),
-    0,
-  );
-
-  const completedSubtasks = tasks.reduce(
-    (sum, task) =>
-      sum +
-      (task.subtasks?.filter(
-        (subtask: SubtaskType) => subtask.status === "done",
-      ).length || 0),
-    0,
-  );
-
-  return totalSubtasks === 0
-    ? 0
-    : Math.round((completedSubtasks / totalSubtasks) * 100);
-}
 
 export default DashboardDraggableProjectList;
 

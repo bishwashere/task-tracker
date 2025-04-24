@@ -28,7 +28,7 @@ export const getOrganization = async () => {
                 tasks: {
                   include: {
                     subtasks: {
-                      where: { assignedUserId: userId },
+                      // where: { assignedUserId: userId },
                       select: { id: true, status: true },
                     },
                   },
@@ -51,7 +51,7 @@ export const getOrganization = async () => {
 
         // For MEMBER: check if any subtask in the project is assigned to the user
         return project.tasks.some(
-          (task) => task.subtasks && task.subtasks.length > 0,
+          (task) => task.subtasks && task.subtasks.length > 0
         );
       });
 
