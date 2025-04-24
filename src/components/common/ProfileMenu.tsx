@@ -103,7 +103,6 @@ const ProfileMenu = ({
             <FaRegUserCircle className="text-4xl cursor-pointer p-1" />
           )} */}
           <SettingsIcon className="size-7 cursor-pointer p-1" />
-
         </button>
       </div>
       {isOpen && (
@@ -117,20 +116,18 @@ const ProfileMenu = ({
               {session?.user?.email}
             </p>
           </div>
-          {
-            onEditButtonClick && (
-              <Fragment>
-                <hr className="border border-gray-300 my-1" />
-                <button
-                  onClick={onEditButtonClick}
-                  className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
-                >
-                  <Edit2Icon className="size-4" />
-                  Edit
-                </button>
-              </Fragment>
-            )
-          }
+          {onEditButtonClick && (
+            <Fragment>
+              <hr className="border border-gray-300 my-1" />
+              <button
+                onClick={onEditButtonClick}
+                className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
+              >
+                <Edit2Icon className="size-4" />
+                Edit
+              </button>
+            </Fragment>
+          )}
           <hr className="border border-gray-300 my-1" />
           {showSettings &&
             selectedOrganization &&

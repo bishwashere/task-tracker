@@ -114,17 +114,25 @@ model PointsEarned {
 }
 
 model Project {
-  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
   name              String
   description       String?
-  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId    String            @db.ObjectId
-  hasAiSuggestTasks Boolean           @default(false)
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId    String             @db.ObjectId
+  hasAiSuggestTasks Boolean            @default(false)
   tasks             Task[]
   AISuggestedTask   AISuggestedTask[]
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  sortIndex         Int?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  projectSortIndex  ProjectSortIndex[]
+}
+
+model ProjectSortIndex {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String  @db.ObjectId
+  sortIndex Int
+  userId    String  @db.ObjectId
+  project   Project @relation(fields: [projectId], references: [id])
 }
 
 model Task {

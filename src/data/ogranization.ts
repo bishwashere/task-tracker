@@ -33,6 +33,10 @@ export const getOrganization = async () => {
                     },
                   },
                 },
+                projectSortIndex: {
+                  where: { userId },
+                  select: { sortIndex: true },
+                },
               },
             },
           },

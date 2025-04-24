@@ -38,13 +38,66 @@ export const addProject = async (
         name: projectName,
         description: projectDescription,
         organizationId,
-        sortIndex: totalProjects, // Set the sortIndex to the total number of projects
+        projectSortIndex: {
+          create: {
+            sortIndex: totalProjects,
+            userId,
+          },
+        },
       },
     });
 
     return { success: true, message: "Project added !", project };
   } catch (error) {
     console.error("Error adding project:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export const sortProjects = async (
+  data: { projectId: string; sortIndex: number }[],
+) => {
+  try {
+    const userId = await isUserValid();
+
+    if (!userId) {
+      return { success: false, message: "Unauthorized !" };
+    }
+    await Promise.all(
+      data.map(async ({ projectId, sortIndex }) => {
+        const p = await prisma.projectSortIndex.findFirst({
+          where: {
+            projectId,
+            userId,
+          },
+        });
+
+        if (p) {
+          await prisma.projectSortIndex.update({
+            where: {
+              id: p.id,
+            },
+            data: {
+              sortIndex,
+            },
+          });
+        } else {
+          await prisma.projectSortIndex.create({
+            data: {
+              projectId,
+              userId,
+              sortIndex,
+            },
+          });
+        }
+      }),
+    );
+    return { success: true, message: "Projects sorted successfully" };
+  } catch (error) {
+    console.error("Error sorting projects:", error);
     return {
       success: false,
       message: "Something went wrong. Please try again.",
