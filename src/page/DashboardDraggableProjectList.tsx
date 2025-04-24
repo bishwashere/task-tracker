@@ -21,6 +21,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/cn";
+import { sortProjects } from "@/actions/project";
+import toast from "react-hot-toast";
 
 type Props = {
   projects: ProjectType[];
@@ -51,7 +53,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
     setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
@@ -65,11 +67,33 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
       const updatedProjects = arrayMove(projects, oldIndex, newIndex).map(
         (project, index) => ({
           ...project,
-          sortIndex: projects.length - 1 - index, // Reverse the index
+          projectSortIndex: [{ sortIndex: projects.length - 1 - index }] as [
+            { sortIndex: number },
+          ],
         }),
       );
 
+      // save this to use later if error occurred
+      const prevProjectData = projects;
+
       setProjects(updatedProjects);
+
+      // Send updated sort indices to the backend
+      const sortData = updatedProjects.map((project) => ({
+        projectId: project.id,
+        sortIndex: project?.projectSortIndex?.[0]?.sortIndex || 0,
+      }));
+
+      try {
+        const res = await sortProjects(sortData);
+        if (!res.success) {
+          toast.error(res.message || "An error occurred");
+          setProjects(prevProjectData);
+        }
+      } catch {
+        toast.error("An error occurred");
+        setProjects(prevProjectData);
+      }
     }
   };
 
@@ -86,7 +110,11 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
       >
         <div className="space-y-4">
           {projects
-            .sort((a, b) => (b.sortIndex || 0) - (a.sortIndex || 0)) // Reverse sort order
+            .sort(
+              (a, b) =>
+                (b?.projectSortIndex?.[0]?.sortIndex || 0) -
+                (a?.projectSortIndex?.[0]?.sortIndex || 0),
+            ) // Reverse sort order
             .map((project) => (
               <SortableProjectCard key={project.id} project={project} />
             ))}
@@ -125,7 +153,6 @@ const SortableProjectCard = ({ project }: SortableProjectCardProps) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    touchAction: "none", // Prevent scrolling while dragging on mobile
   };
 
   return (
@@ -134,7 +161,7 @@ const SortableProjectCard = ({ project }: SortableProjectCardProps) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="touch-none" // Prevent touch scrolling while dragging
+      className="cursor-grab active:cursor-grabbing"
     >
       <ProjectCard project={project} isDragging={isDragging} />
     </div>
@@ -188,3 +215,4 @@ function calculateProgress(tasks: TaskType[]): number {
 }
 
 export default DashboardDraggableProjectList;
+

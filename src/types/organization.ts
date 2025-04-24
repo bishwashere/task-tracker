@@ -28,7 +28,7 @@ export type ProjectType = {
   tasks: TaskType[];
   createdAt: Date;
   updatedAt: Date;
-  sortIndex?: number;
+  projectSortIndex: [{ sortIndex: number }];
 };
 
 export type TaskType = {

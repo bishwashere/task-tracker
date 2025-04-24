@@ -54,6 +54,7 @@ const Dashboard = ({ session }: { session: Session }) => {
 
   const fetchOrganizations = async () => {
     const res = await getOrganization();
+    console.log(res);
     if (res.success && res.organizations?.length) {
       setOrganizations(res.organizations as unknown as Organization[]);
       selectCurrentOrganization(res.organizations as unknown as Organization[]);

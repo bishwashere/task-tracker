@@ -32,7 +32,9 @@ export const ProjectHeader = ({
             <p className="text-xl mt-[2px]">{points}</p>
           </Link>
         )}
-        <ProfileMenu session={session} showSettings={false}
+        <ProfileMenu
+          session={session}
+          showSettings={false}
           onEditButtonClick={onEditButtonClick}
         />
       </div>
