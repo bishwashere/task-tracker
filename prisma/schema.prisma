@@ -124,6 +124,7 @@ model Project {
   AISuggestedTask   AISuggestedTask[]
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+  sortIndex         Int?
 }
 
 model Task {
