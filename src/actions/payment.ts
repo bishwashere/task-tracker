@@ -8,7 +8,7 @@ export const createStripeSession = createProtectedServerAction(
   async (pkg: string, user: User) => {
     const res = await stripe.createSession(pkg, user);
     return res?.url;
-  }
+  },
 );
 
 export const getUserSubscription = createProtectedServerAction(
@@ -18,7 +18,7 @@ export const getUserSubscription = createProtectedServerAction(
     });
 
     return s;
-  }
+  },
 );
 
 export const hasSession = createProtectedServerAction(
@@ -32,12 +32,12 @@ export const hasSession = createProtectedServerAction(
     } catch (e) {
       return false;
     }
-  }
+  },
 );
 
 export const createCustomerPortal = createProtectedServerAction(
   async (user: User) => {
     const url = await stripe.createCustomerPortal(user);
     return url;
-  }
+  },
 );

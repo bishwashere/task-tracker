@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { SubtaskType, TaskType } from '@/types/organization';
-import { User } from '@/types/user';
-import AddTagPopup from './AddTagPopup';
-import { togglePriority, updateSubtaskStatus } from '@/actions/task';
-import toast from 'react-hot-toast';
-import { useConfirmModal } from '../Modal/useConfirmModal';
-import { Session } from 'next-auth';
-import EditSubtaskPopup from './EditSubtaskPopup';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { SubtaskType, TaskType } from "@/types/organization";
+import { User } from "@/types/user";
+import AddTagPopup from "./AddTagPopup";
+import { togglePriority, updateSubtaskStatus } from "@/actions/task";
+import toast from "react-hot-toast";
+import { useConfirmModal } from "../Modal/useConfirmModal";
+import { Session } from "next-auth";
+import EditSubtaskPopup from "./EditSubtaskPopup";
 
 export const SubTaskView = ({
   subtask,
@@ -23,7 +23,7 @@ export const SubTaskView = ({
 }: {
   subtask: SubtaskType;
   taskId: string;
-  role: 'admin' | 'member';
+  role: "admin" | "member";
   users: User[];
   projectId: string;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
@@ -39,50 +39,56 @@ export const SubTaskView = ({
 
   const priorityToggle = async () => {
     setLoading(true);
-    const res = await togglePriority(subtask.id, projectId, subtask.priority === 0 ? 1 : 0);
+    const res = await togglePriority(
+      subtask.id,
+      projectId,
+      subtask.priority === 0 ? 1 : 0,
+    );
     if (res.success) {
       const updatedSubtask = res.updatedSubtask as SubtaskType;
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-              ...task,
-              subtasks: task.subtasks.map((subtask) =>
-                subtask.id === updatedSubtask.id ? updatedSubtask : subtask
-              ),
-            }
-            : task
-        )
+                ...task,
+                subtasks: task.subtasks.map((subtask) =>
+                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+                ),
+              }
+            : task,
+        ),
       );
     } else {
-      toast.error(res.message || 'An error Occurred');
+      toast.error(res.message || "An error Occurred");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const markAsDone = async (subtaskId: string) => {
-    const confirmed = await confirmAction('Are you sure you want to mark this subtask as done?');
+    const confirmed = await confirmAction(
+      "Are you sure you want to mark this subtask as done?",
+    );
     if (!confirmed) return;
     setLoading(true);
-    const res = await updateSubtaskStatus(subtaskId, 'done');
+    const res = await updateSubtaskStatus(subtaskId, "done");
     if (res.success) {
       const updatedSubtask = res.updatedSubtask as SubtaskType;
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-              ...task,
-              subtasks: task.subtasks.map((subtask) =>
-                subtask.id === updatedSubtask.id ? updatedSubtask : subtask
-              ),
-            }
-            : task
-        )
+                ...task,
+                subtasks: task.subtasks.map((subtask) =>
+                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+                ),
+              }
+            : task,
+        ),
       );
       if (subtask.assignedUserId === session?.user?.id)
-        setPointsEarned(prev => prev + subtask.points)
+        setPointsEarned((prev) => prev + subtask.points);
     } else {
-      toast.error(res.message || 'An error occurred')
+      toast.error(res.message || "An error occurred");
     }
     setLoading(false);
   };
@@ -130,22 +136,22 @@ export const SubTaskView = ({
       return "Past due";
     } else {
       const options: Intl.DateTimeFormatOptions = {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
+        month: "long",
+        day: "numeric",
+        year: "numeric",
       };
-      return dueDateObj.toLocaleDateString('en-US', options);
+      return dueDateObj.toLocaleDateString("en-US", options);
     }
   };
-
 
   return (
     <div
       key={subtask.id}
-      className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === 'done'
-        ? 'bg-green-200 text-green-700 hover:bg-green-300'
-        : 'bg-white hover:bg-gray-100'
-        }`}
+      className={`p-2 rounded shadow-md flex justify-between items-center ${
+        subtask.status === "done"
+          ? "bg-green-200 text-green-700 hover:bg-green-300"
+          : "bg-white hover:bg-gray-100"
+      }`}
     >
       <div>
         <div className="flex flex-row gap-2 items-center">
@@ -166,13 +172,11 @@ export const SubTaskView = ({
           )}
 
           {/* issue count badge > 0  */}
-          {
-            (subtask.issueCount || 0) > 0 && (
-              <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
-                {subtask.issueCount}
-              </span>
-            )
-          }
+          {(subtask.issueCount || 0) > 0 && (
+            <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
+              {subtask.issueCount}
+            </span>
+          )}
           {role === "admin" && editMode && (
             <EditSubtaskPopup
               users={users}
@@ -184,15 +188,15 @@ export const SubTaskView = ({
           )}
         </div>
         <p className="text-sm">
-          {subtask.status} •{' '}
+          {subtask.status} •{" "}
           {subtask.assignedUserId ? (
             <span className="inline-block px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-gray-100">
               {subtask.assignedUser?.name}
             </span>
           ) : (
             "Unassigned"
-          )}{' '}
-          • {subtask.points} points{' '}
+          )}{" "}
+          • {subtask.points} points{" "}
           {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}
         </p>
       </div>
@@ -200,24 +204,33 @@ export const SubTaskView = ({
         {subtask.tagName ? (
           <span
             className="px-2 py-1 rounded text-sm"
-            style={{ backgroundColor: subtask.tagColor || 'transparent', color: '#FFF' }}
+            style={{
+              backgroundColor: subtask.tagColor || "transparent",
+              color: "#FFF",
+            }}
           >
             {subtask.tagName}
           </span>
         ) : (
-          <AddTagPopup setTasks={setTasks} taskId={taskId} subtaskId={subtask.id} projectId={projectId} />
+          <AddTagPopup
+            setTasks={setTasks}
+            taskId={taskId}
+            subtaskId={subtask.id}
+            projectId={projectId}
+          />
         )}
         <button
           onClick={() => priorityToggle()}
-          className={`text-sm rounded ${subtask.priority
-            ? 'text-yellow-500 hover:text-yellow-600'
-            : 'text-gray-500 hover:text-gray-600'
-            }`}
+          className={`text-sm rounded ${
+            subtask.priority
+              ? "text-yellow-500 hover:text-yellow-600"
+              : "text-gray-500 hover:text-gray-600"
+          }`}
           disabled={loading}
         >
-          {subtask.priority ? '⭐' : '☆'}
+          {subtask.priority ? "⭐" : "☆"}
         </button>
-        {subtask.status !== 'done' && (
+        {subtask.status !== "done" && (
           <button
             onClick={() => markAsDone(subtask.id)}
             disabled={loading}

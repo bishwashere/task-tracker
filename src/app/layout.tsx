@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Task Tracker",
   description: "Task Management Finally Done Right.",
-  keywords: "task management, productivity, task tracker, project management, to-do list, task organizer",
+  keywords:
+    "task management, productivity, task tracker, project management, to-do list, task organizer",
   authors: [{ name: "Binit KC" }],
   openGraph: {
     title: "Task Tracker",
@@ -41,14 +42,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      ><SessionProvider>
-          {children}
-        </SessionProvider>
+      >
+        <SessionProvider>{children}</SessionProvider>
 
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

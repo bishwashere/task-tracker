@@ -110,7 +110,7 @@ class Stripe {
   }
 
   async handleInvoicePaymentSuccess(
-    event: StripeNative.InvoicePaymentSucceededEvent
+    event: StripeNative.InvoicePaymentSucceededEvent,
   ) {
     // Get the invoice object from the event data
     const invoice = event.data.object;
@@ -125,9 +125,8 @@ class Stripe {
     }
 
     // Retrieve the subscription details from Stripe using the subscription ID
-    const subscription = await this.stripe.subscriptions.retrieve(
-      subscriptionId
-    );
+    const subscription =
+      await this.stripe.subscriptions.retrieve(subscriptionId);
 
     // Extract userId and planId from the subscription metadata
     const userId = subscription.metadata?.userId;
@@ -167,7 +166,7 @@ class Stripe {
   }
 
   async handleInvoicePaymentFailed(
-    event: StripeNative.InvoicePaymentFailedEvent
+    event: StripeNative.InvoicePaymentFailedEvent,
   ) {
     const invoice = event.data.object;
     const subscriptionId = invoice.subscription as string;
@@ -178,9 +177,8 @@ class Stripe {
     }
 
     // Fetch subscription to get metadata
-    const subscription = await this.stripe.subscriptions.retrieve(
-      subscriptionId
-    );
+    const subscription =
+      await this.stripe.subscriptions.retrieve(subscriptionId);
     const userId = subscription.metadata?.userId;
 
     if (!userId) {
@@ -195,12 +193,12 @@ class Stripe {
     });
 
     console.warn(
-      `⚠️ Payment failed for user ${userId}, subscription set to past_due`
+      `⚠️ Payment failed for user ${userId}, subscription set to past_due`,
     );
   }
 
   async handleSubscriptionDeleted(
-    event: StripeNative.CustomerSubscriptionDeletedEvent
+    event: StripeNative.CustomerSubscriptionDeletedEvent,
   ) {
     const subscriptionId = event.data.object.id;
 
@@ -225,7 +223,7 @@ class Stripe {
   }
 
   async handleSubscriptionUpdate(
-    event: StripeNative.CustomerSubscriptionUpdatedEvent
+    event: StripeNative.CustomerSubscriptionUpdatedEvent,
   ) {
     // Extract subscription object from event
     const subscription = event.data.object;

@@ -1,6 +1,6 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
-export default function SuperHeader({ path }:{path:string}) {
+export default function SuperHeader({ path }: { path: string }) {
   const router = useRouter();
 
   return (

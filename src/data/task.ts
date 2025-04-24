@@ -55,9 +55,9 @@ export const fetchProjectData = async (projectId: string) => {
               },
               comments: {
                 where: {
-                  commentType: 'issue',
-                  resolved: false
-                }
+                  commentType: "issue",
+                  resolved: false,
+                },
               },
             },
           },
@@ -65,13 +65,13 @@ export const fetchProjectData = async (projectId: string) => {
       });
 
       // Add unresolved issue count to each subtask
-      tasksWithSubtasks = tasksWithSubtasks.map(task => ({
+      tasksWithSubtasks = tasksWithSubtasks.map((task) => ({
         ...task,
-        subtasks: task.subtasks.map(subtask => ({
+        subtasks: task.subtasks.map((subtask) => ({
           ...subtask,
           issueCount: subtask.comments.length,
-          comments: undefined // Remove the comments array since we now have the count
-        }))
+          comments: undefined, // Remove the comments array since we now have the count
+        })),
       }));
 
       //Fetch all organization members for admin
@@ -97,7 +97,7 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0
+        0,
       );
       return {
         success: true,
@@ -132,8 +132,8 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const tasksWithSubtasks = Array.from(
         new Map(
-          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task])
-        ).values()
+          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task]),
+        ).values(),
       );
       //Fetch points for that project
       const pointsData = await prisma.pointsEarned.findMany({
@@ -144,7 +144,7 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0
+        0,
       );
       return {
         success: true,

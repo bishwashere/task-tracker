@@ -5,7 +5,9 @@ import { IoMdClose } from "react-icons/io";
 export const useConfirmModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [resolvePromise, setResolvePromise] = useState<(value: boolean) => void>(() => () => {});
+  const [resolvePromise, setResolvePromise] = useState<
+    (value: boolean) => void
+  >(() => () => {});
 
   // Function to trigger the modal with a specific message
   const confirmAction = (text: string): Promise<boolean> => {
@@ -22,15 +24,22 @@ export const useConfirmModal = () => {
     resolvePromise(result);
   };
 
-  const ConfirmationModal = () => (
+  const ConfirmationModal = () =>
     isOpen && (
-      <Modal modalIsOpen={isOpen} setModalIsOpen={setIsOpen} className="w-[80%] md:w-[40%] lg:w-[25%] px-6 py-6">
+      <Modal
+        modalIsOpen={isOpen}
+        setModalIsOpen={setIsOpen}
+        className="w-[80%] md:w-[40%] lg:w-[25%] px-6 py-6"
+      >
         <div className="w-full flex justify-end">
-          <button onClick={() => handleConfirm(false)} className="cursor-pointer">
+          <button
+            onClick={() => handleConfirm(false)}
+            className="cursor-pointer"
+          >
             <IoMdClose className="text-2xl" />
           </button>
         </div>
-        <p className='py-4'>{message}</p>
+        <p className="py-4">{message}</p>
         <div className="flex justify-end">
           <button
             onClick={() => handleConfirm(true)}
@@ -46,8 +55,7 @@ export const useConfirmModal = () => {
           </button>
         </div>
       </Modal>
-    )
-  );
+    );
 
   return { confirmAction, ConfirmationModal };
 };

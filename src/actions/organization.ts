@@ -33,15 +33,15 @@ export const createOrganization = async (formData: FormData) => {
                 id: true,
                 name: true,
                 email: true,
-              }
-            }
+              },
+            },
           },
         },
         projects: true,
         name: true,
         id: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     return { success: true, message: "Organization created!", organization };
@@ -49,9 +49,12 @@ export const createOrganization = async (formData: FormData) => {
     console.error("Error creating organization:", error);
     return { success: false, message: "Failed to create organization." };
   }
-}
+};
 
-export const updateOrganizationName = async (organizationId: string, newName: string) => {
+export const updateOrganizationName = async (
+  organizationId: string,
+  newName: string,
+) => {
   const userId = await isUserValid();
   if (!userId) {
     return { success: false, message: "Unauthorized !" };
@@ -66,7 +69,10 @@ export const updateOrganizationName = async (organizationId: string, newName: st
       },
     });
     if (!adminCheck) {
-      return { success: false, message: "Only admins can update organization name" };
+      return {
+        success: false,
+        message: "Only admins can update organization name",
+      };
     }
     //Update organization name
     await prisma.organization.update({
@@ -80,7 +86,11 @@ export const updateOrganizationName = async (organizationId: string, newName: st
   }
 };
 
-export const addUserToOrganization = async (organizationId: string, userEmail: string, role: "ADMIN" | "MEMBER" = "MEMBER") => {
+export const addUserToOrganization = async (
+  organizationId: string,
+  userEmail: string,
+  role: "ADMIN" | "MEMBER" = "MEMBER",
+) => {
   const userId = await isUserValid();
   if (!userId) {
     return { success: false, message: "Unauthorized !" };
@@ -95,7 +105,10 @@ export const addUserToOrganization = async (organizationId: string, userEmail: s
       },
     });
     if (!adminCheck) {
-      return { success: false, message: "Only admins can add users to the organization." };
+      return {
+        success: false,
+        message: "Only admins can add users to the organization.",
+      };
     }
     // Find the user to add by email
     const userToAdd = await prisma.user.findUnique({
@@ -112,7 +125,10 @@ export const addUserToOrganization = async (organizationId: string, userEmail: s
       },
     });
     if (existingMembership) {
-      return { success: false, message: "User is already a member of this organization." };
+      return {
+        success: false,
+        message: "User is already a member of this organization.",
+      };
     }
     // Add user to organization
     await prisma.userOrganization.create({
@@ -123,9 +139,15 @@ export const addUserToOrganization = async (organizationId: string, userEmail: s
       },
     });
 
-    return { success: true, message: "User added to organization successfully." };
+    return {
+      success: true,
+      message: "User added to organization successfully.",
+    };
   } catch (error) {
     console.error("Error adding user to organization:", error);
-    return { success: false, message: "Something went wrong. Please try again." };
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
   }
 };

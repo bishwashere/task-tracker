@@ -1,42 +1,50 @@
-import { IoMdClose } from "react-icons/io"
-import Modal from "../Modal/Modal"
-import FormSubmitButton from "../common/FormSubmitButton"
-import { saveTaskTag } from "@/actions/task"
-import toast from "react-hot-toast"
-import { SubtaskType, TaskType } from "@/types/organization"
-import { useState } from "react"
+import { IoMdClose } from "react-icons/io";
+import Modal from "../Modal/Modal";
+import FormSubmitButton from "../common/FormSubmitButton";
+import { saveTaskTag } from "@/actions/task";
+import toast from "react-hot-toast";
+import { SubtaskType, TaskType } from "@/types/organization";
+import { useState } from "react";
 
-const AddTagPopup = ({ setTasks, taskId, subtaskId, projectId }: { setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; taskId: string; subtaskId: string; projectId: string; }) => {
+const AddTagPopup = ({
+  setTasks,
+  taskId,
+  subtaskId,
+  projectId,
+}: {
+  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  taskId: string;
+  subtaskId: string;
+  projectId: string;
+}) => {
+  const [tagColor, setTagColor] = useState("#FFFFFF");
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  const [tagColor, setTagColor] = useState('#FFFFFF');
-  const [modalIsOpen, setModalIsOpen] = useState(false)
-
-  const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF'];
+  const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"];
 
   const submitTag = async (formData: FormData) => {
-    const tagName = formData.get('tagName') as string;
+    const tagName = formData.get("tagName") as string;
     const res = await saveTaskTag(subtaskId, projectId, tagName, tagColor);
     if (res.success) {
       toast.success(res.message);
-      const updatedSubtask = res.updatedSubtask as SubtaskType
+      const updatedSubtask = res.updatedSubtask as SubtaskType;
       setTasks((prevTasks) =>
-         prevTasks.map((task) =>
+        prevTasks.map((task) =>
           task.id === taskId
             ? {
                 ...task,
                 subtasks: task.subtasks.map((subtask) =>
-                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask
+                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
                 ),
               }
-            : task
-        )
+            : task,
+        ),
       );
       setModalIsOpen(false);
-    }
-    else {
+    } else {
       toast.error(res.message);
     }
-  }
+  };
 
   return (
     <>
@@ -47,10 +55,17 @@ const AddTagPopup = ({ setTasks, taskId, subtaskId, projectId }: { setTasks: Rea
         +Tag
       </button>
 
-      <Modal modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} className="w-[100%] md:w-96 px-10 py-10">
+      <Modal
+        modalIsOpen={modalIsOpen}
+        setModalIsOpen={setModalIsOpen}
+        className="w-[100%] md:w-96 px-10 py-10"
+      >
         <div className="w-full flex justify-between">
           <h3 className="text-2xl font-semibold">Add Tag</h3>
-          <button onClick={() => setModalIsOpen(false)} className="cursor-pointer">
+          <button
+            onClick={() => setModalIsOpen(false)}
+            className="cursor-pointer"
+          >
             <IoMdClose className="text-2xl" />
           </button>
         </div>
@@ -73,16 +88,14 @@ const AddTagPopup = ({ setTasks, taskId, subtaskId, projectId }: { setTasks: Rea
                 <div
                   key={color}
                   style={{ backgroundColor: color }}
-                  className={`w-8 h-8 rounded ${tagColor === color ? 'ring-2 ring-black' : ''}`}
+                  className={`w-8 h-8 rounded ${tagColor === color ? "ring-2 ring-black" : ""}`}
                   onClick={() => setTagColor(color)}
                 />
               ))}
             </div>
           </label>
           <div className="flex justify-end mt-5">
-            <FormSubmitButton
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
-            >
+            <FormSubmitButton className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
               Save
             </FormSubmitButton>
             <button
@@ -96,7 +109,7 @@ const AddTagPopup = ({ setTasks, taskId, subtaskId, projectId }: { setTasks: Rea
         </form>
       </Modal>
     </>
-  )
-}
+  );
+};
 
 export default AddTagPopup;

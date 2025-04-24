@@ -1,7 +1,7 @@
-import ProgressBar from '@/components/common/ProgressBar';
-import { ProjectType, SubtaskType, TaskType } from '@/types/organization';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import ProgressBar from "@/components/common/ProgressBar";
+import { ProjectType, SubtaskType, TaskType } from "@/types/organization";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -12,15 +12,15 @@ import {
   MouseSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   useSortable,
-  verticalListSortingStrategy
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { cn } from '@/lib/cn';
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { cn } from "@/lib/cn";
 
 type Props = {
   projects: ProjectType[];
@@ -44,7 +44,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -56,14 +56,18 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const oldIndex = projects.findIndex((project) => project.id === active.id);
+      const oldIndex = projects.findIndex(
+        (project) => project.id === active.id,
+      );
       const newIndex = projects.findIndex((project) => project.id === over.id);
 
       // Update sortIndex in reverse order (highest at top)
-      const updatedProjects = arrayMove(projects, oldIndex, newIndex).map((project, index) => ({
-        ...project,
-        sortIndex: projects.length - 1 - index, // Reverse the index
-      }));
+      const updatedProjects = arrayMove(projects, oldIndex, newIndex).map(
+        (project, index) => ({
+          ...project,
+          sortIndex: projects.length - 1 - index, // Reverse the index
+        }),
+      );
 
       setProjects(updatedProjects);
     }
@@ -76,22 +80,22 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={projects.map(p => p.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={projects.map((p) => p.id)}
+        strategy={verticalListSortingStrategy}
+      >
         <div className="space-y-4">
           {projects
             .sort((a, b) => (b.sortIndex || 0) - (a.sortIndex || 0)) // Reverse sort order
             .map((project) => (
-              <SortableProjectCard
-                key={project.id}
-                project={project}
-              />
+              <SortableProjectCard key={project.id} project={project} />
             ))}
         </div>
       </SortableContext>
       <DragOverlay>
         {activeId ? (
           <ProjectCard
-            project={projects.find(p => p.id === activeId)!}
+            project={projects.find((p) => p.id === activeId)!}
             isDragging={true}
           />
         ) : null}
@@ -114,14 +118,14 @@ const SortableProjectCard = ({ project }: SortableProjectCardProps) => {
     isDragging,
   } = useSortable({
     id: project.id,
-    data: project
+    data: project,
   });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    touchAction: 'none', // Prevent scrolling while dragging on mobile
+    touchAction: "none", // Prevent scrolling while dragging on mobile
   };
 
   return (
@@ -149,8 +153,8 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
   return (
     <div
       className={cn(
-        'bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer select-none',
-        isDragging && 'border-red-500'
+        "bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer select-none",
+        isDragging && "border-red-500",
       )}
       onClick={() => router.push(`/project/${project.id}`)}
     >
@@ -158,9 +162,7 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
         <h3 className="text-lg font-semibold">{project.name}</h3>
         <ProgressBar progress={progress} />
       </div>
-      <p className="text-sm text-gray-500">
-        {project.tasks.length} Tasks
-      </p>
+      <p className="text-sm text-gray-500">{project.tasks.length} Tasks</p>
     </div>
   );
 };
@@ -168,16 +170,21 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
 function calculateProgress(tasks: TaskType[]): number {
   const totalSubtasks = tasks.reduce(
     (sum, task) => sum + (task.subtasks?.length || 0),
-    0
+    0,
   );
 
   const completedSubtasks = tasks.reduce(
     (sum, task) =>
-      sum + (task.subtasks?.filter((subtask: SubtaskType) => subtask.status === 'done').length || 0),
-    0
+      sum +
+      (task.subtasks?.filter(
+        (subtask: SubtaskType) => subtask.status === "done",
+      ).length || 0),
+    0,
   );
 
-  return totalSubtasks === 0 ? 0 : Math.round((completedSubtasks / totalSubtasks) * 100);
+  return totalSubtasks === 0
+    ? 0
+    : Math.round((completedSubtasks / totalSubtasks) * 100);
 }
 
 export default DashboardDraggableProjectList;

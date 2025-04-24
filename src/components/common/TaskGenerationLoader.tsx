@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { CheckmarkIcon, LoaderIcon } from "react-hot-toast"
+import { useEffect, useState } from "react";
+import { CheckmarkIcon, LoaderIcon } from "react-hot-toast";
 
 const LOADING_STEPS = [
   "Analyzing project requirements...",
@@ -9,51 +9,50 @@ const LOADING_STEPS = [
   "Calculating task priorities...",
   "Estimating time requirements...",
   "Preparing final recommendations...",
-]
+];
 
 type Props = {
-  onComplete?: () => void
-}
+  onComplete?: () => void;
+};
 
 export default function TaskGenerationLoader({ onComplete }: Props) {
-  const [progress, setProgress] = useState(0)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [currentStep, setCurrentStep] = useState(0)
+  const [progress, setProgress] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(progressInterval)
-          return 100
+          clearInterval(progressInterval);
+          return 100;
         }
-        return prev + 1
-      })
-    }, 50)
+        return prev + 1;
+      });
+    }, 50);
 
-    return () => clearInterval(progressInterval)
-  }, [])
+    return () => clearInterval(progressInterval);
+  }, []);
 
   useEffect(() => {
-    if (progress === 0) return
+    if (progress === 0) return;
 
-    const stepThreshold = 100 / LOADING_STEPS.length
-    const currentStepIndex = Math.floor(progress / stepThreshold)
+    const stepThreshold = 100 / LOADING_STEPS.length;
+    const currentStepIndex = Math.floor(progress / stepThreshold);
 
     if (currentStepIndex > currentStep && currentStep < LOADING_STEPS.length) {
-      setCompletedSteps((prev) => [...prev, currentStep])
-      setCurrentStep(currentStepIndex)
+      setCompletedSteps((prev) => [...prev, currentStep]);
+      setCurrentStep(currentStepIndex);
     }
-  }, [progress, currentStep])
+  }, [progress, currentStep]);
 
   useEffect(() => {
     if (progress === 100) {
       setTimeout(() => {
-        onComplete?.()
-      }, 100)
+        onComplete?.();
+      }, 100);
     }
-  }, [onComplete, progress])
-
+  }, [onComplete, progress]);
 
   return (
     <div className="w-full max-w-md mx-auto p-6">
@@ -66,13 +65,15 @@ export default function TaskGenerationLoader({ onComplete }: Props) {
       </div>
 
       {/* Progress Percentage */}
-      <div className="text-right text-sm text-gray-600 mb-6">{progress}% Complete</div>
+      <div className="text-right text-sm text-gray-600 mb-6">
+        {progress}% Complete
+      </div>
 
       {/* Loading Steps */}
       <div className="space-y-4">
         {LOADING_STEPS.map((step, index) => {
-          const isCompleted = completedSteps.includes(index)
-          const isCurrent = currentStep === index && !isCompleted
+          const isCompleted = completedSteps.includes(index);
+          const isCurrent = currentStep === index && !isCompleted;
 
           return (
             <div
@@ -94,10 +95,9 @@ export default function TaskGenerationLoader({ onComplete }: Props) {
               </div>
               <span>{step}</span>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
-

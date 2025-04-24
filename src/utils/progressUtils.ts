@@ -1,15 +1,15 @@
-import { TaskType } from '@/types/organization';
+import { TaskType } from "@/types/organization";
 
 export function calculateProgressWithStats(tasks: TaskType[]) {
   const totalSubtasks = tasks.reduce(
     (sum, task) => sum + task.subtasks?.length,
-    0
+    0,
   );
   const completedSubtasks = tasks.reduce(
     (sum, task) =>
       sum +
-      task.subtasks?.filter((subtask) => subtask.status === 'done').length,
-    0
+      task.subtasks?.filter((subtask) => subtask.status === "done").length,
+    0,
   );
   const pendingSubtasks = totalSubtasks - completedSubtasks;
 
@@ -31,12 +31,15 @@ export function calculateProgressWithStats(tasks: TaskType[]) {
   const assignedSubtasks = tasks.reduce(
     (sum, task) =>
       sum + task.subtasks?.filter((subtask) => subtask.assignedUserId).length,
-    0
+    0,
   );
   const unassignedSubtasks = totalSubtasks - assignedSubtasks;
 
   return {
-    progress: totalSubtasks === 0 ? 0 : Math.round((completedSubtasks / totalSubtasks) * 100),
+    progress:
+      totalSubtasks === 0
+        ? 0
+        : Math.round((completedSubtasks / totalSubtasks) * 100),
     totalSubtasks,
     completedSubtasks,
     pendingSubtasks,

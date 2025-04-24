@@ -4,10 +4,8 @@ import Dashboard from "@/page/Dashboard";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-    const session = await auth()
-    if (!session) redirect('/login')
-   
-    return (
-      <Dashboard session={session}/>
-    )
-  }
+  const session = await auth();
+  if (!session) redirect("/login");
+
+  return <Dashboard session={session} />;
+}

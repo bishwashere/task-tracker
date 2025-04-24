@@ -1,49 +1,54 @@
-"use client"
+"use client";
 
-import { Check, X, Sparkles, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { PLANS } from "@/constants/plans"
-import Link from "next/link"
-import { cn } from "@/lib/cn"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-
+import { Check, X, Sparkles, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PLANS } from "@/constants/plans";
+import Link from "next/link";
+import { cn } from "@/lib/cn";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export type Props = {
-  plans: typeof PLANS
-  desc?: string
-  header?: string
-  onSelectPlan?: (plan: string) => void
-}
+  plans: typeof PLANS;
+  desc?: string;
+  header?: string;
+  onSelectPlan?: (plan: string) => void;
+};
 
-export default function PricingCards(
-  { plans, desc, header, onSelectPlan }: Props
-) {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const router = useRouter()
+export default function PricingCards({
+  plans,
+  desc,
+  header,
+  onSelectPlan,
+}: Props) {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const router = useRouter();
 
   return (
-    <div id="pricing" className="w-full py-4 sm:py-16 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div
+      id="pricing"
+      className="w-full py-4 sm:py-16 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+    >
       <div className="container px-4 md:px-6 mx-auto">
         <div className="text-center mb-6  sm:mb-12">
-          <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3">{header || "Transparent Pricing"}</h2>
+          <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3">
+            {header || "Transparent Pricing"}
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            {desc || "Choose the plan that works best for you and your team. All plans include a free trial."}
+            {desc ||
+              "Choose the plan that works best for you and your team. All plans include a free trial."}
           </p>
-
         </div>
 
-        <div
-          className={cn("grid grid-cols-1 gap-8  mx-auto",)}
-        >
+        <div className={cn("grid grid-cols-1 gap-8  mx-auto")}>
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-xl overflow-hidden transition-all duration-300 ${plan.highlighted
-                ? "border-2 border-primary shadow-lg dark:shadow-primary/20"
-                : "border border-border shadow-md"
-                }`}
-
+              className={`relative rounded-xl overflow-hidden transition-all duration-300 ${
+                plan.highlighted
+                  ? "border-2 border-primary shadow-lg dark:shadow-primary/20"
+                  : "border border-border shadow-md"
+              }`}
             >
               {plan.highlighted && (
                 <div className="absolute top-0 left-0 right-0 bg-primary text-primary-foreground text-center py-1.5 text-sm font-medium">
@@ -66,9 +71,9 @@ export default function PricingCards(
                 </div>
                 <Button
                   onClick={() => {
-                    if (onSelectPlan) onSelectPlan(plan.id)
-                    else router.push(`/login?plan=${plan.id}`)
-                    setSelectedPlan(plan.id)
+                    if (onSelectPlan) onSelectPlan(plan.id);
+                    else router.push(`/login?plan=${plan.id}`);
+                    setSelectedPlan(plan.id);
                   }}
                   loading={selectedPlan === plan.id}
                   className={`w-full mb-6`}
@@ -92,10 +97,15 @@ export default function PricingCards(
 
                   {plan.limitations.length > 0 && (
                     <div>
-                      <h4 className="font-medium mb-2 text-muted-foreground">Limitations:</h4>
+                      <h4 className="font-medium mb-2 text-muted-foreground">
+                        Limitations:
+                      </h4>
                       <ul className="space-y-2">
                         {plan.limitations.map((limitation) => (
-                          <li key={limitation} className="flex items-start text-muted-foreground">
+                          <li
+                            key={limitation}
+                            className="flex items-start text-muted-foreground"
+                          >
                             <X className="h-5 w-5 text-muted-foreground/70 mr-2 shrink-0 mt-0.5" />
                             <span className="text-sm">{limitation}</span>
                           </li>
@@ -110,6 +120,5 @@ export default function PricingCards(
         </div>
       </div>
     </div>
-  )
+  );
 }
-

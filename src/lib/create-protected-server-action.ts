@@ -8,7 +8,7 @@ type ActionWithUser<Args extends unknown[], Return> = (
 ) => Promise<Return>;
 
 const createProtectedServerAction = <Args extends unknown[], Return>(
-  action: ActionWithUser<Args, Return>
+  action: ActionWithUser<Args, Return>,
 ) => {
   return (async (...args: Args) => {
     const session = await auth();

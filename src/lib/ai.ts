@@ -39,14 +39,14 @@ class AI {
     });
 
     const result = await model.generateContent(
-      suggestProjectTaskPrompt(projectName, projectDescription)
+      suggestProjectTaskPrompt(projectName, projectDescription),
     );
 
     const res = result.response.text().trim();
 
     try {
       const json = this.suggestedJSONParserSchema.parse(
-        JSON.parse(this.extractJSON(res) || "")
+        JSON.parse(this.extractJSON(res) || ""),
       );
       console.log("json", json);
       return json;
@@ -65,13 +65,13 @@ class AI {
     z.object({
       title: z.string(),
       description: z.string().optional().default(""),
-    })
+    }),
   );
 
   private suggestedSubtaskJSONParserSchema = z.array(
     z.object({
       title: z.string(),
-    })
+    }),
   );
 
   async suggestProjectSubtasks({
@@ -90,14 +90,14 @@ class AI {
         taskTitle,
         taskDescription,
         projectDescription,
-      })
+      }),
     );
 
     const res = result.response.text().trim();
 
     try {
       const json = this.suggestedSubtaskJSONParserSchema.parse(
-        JSON.parse(this.extractJSON(res) || "")
+        JSON.parse(this.extractJSON(res) || ""),
       );
       console.log("json", json);
       return json.map((item) => item.title);

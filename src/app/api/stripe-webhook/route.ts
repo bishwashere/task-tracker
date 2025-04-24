@@ -10,7 +10,7 @@ export const POST = async (req: Request) => {
     return stripe.stripe.webhooks.constructEvent(
       await req.text(),
       sig,
-      endpointSecret
+      endpointSecret,
     );
   });
 

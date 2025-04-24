@@ -68,7 +68,7 @@ export const fetchSubtaskData = async (subtaskId: string) => {
     }
     // Fetch organization members
     const isAdmin = organization.members.some(
-      (member) => member.userId === userId && member.role === "ADMIN"
+      (member) => member.userId === userId && member.role === "ADMIN",
     );
     const isAssignedUser = subtask.assignedUserId === userId;
     // Check if the user is authorized

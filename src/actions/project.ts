@@ -6,7 +6,7 @@ import { isUserValid } from "./isUserValid";
 export const addProject = async (
   organizationId: string,
   projectName: string,
-  projectDescription: string
+  projectDescription: string,
 ) => {
   const userId = await isUserValid();
   if (!userId) {

@@ -2,7 +2,7 @@ import { SuggestProjectSubtasks } from "./ai";
 
 export const suggestProjectTaskPrompt = (
   projectTitle: string,
-  projectDescription: string
+  projectDescription: string,
 ) => `
 **Prompt:**
 "Generate 3-5 strictly relevant tasks for given project, to get it started. Return the response as a plain JSON array of objects with the following format:

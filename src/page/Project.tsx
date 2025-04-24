@@ -15,38 +15,52 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MdEditSquare } from "react-icons/md";
-import { getAISuggestedTasksByProjectId, deleteAISuggestedTask } from "@/actions/ai-sugested-task";
+import {
+  getAISuggestedTasksByProjectId,
+  deleteAISuggestedTask,
+} from "@/actions/ai-sugested-task";
 import { saveTask } from "@/actions/task";
 import TaskGenerationLoader from "@/components/common/TaskGenerationLoader";
 
-const Project = ({ session, project }: { session: Session, project: ProjectType }) => {
+const Project = ({
+  session,
+  project,
+}: {
+  session: Session;
+  project: ProjectType;
+}) => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [members, setMembers] = useState<User[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [currentUserRole, setCurrentUserRole] = useState<'admin' | 'member'>('member');
-  const [viewMode, setViewMode] = useState('list'); // Default view state
+  const [currentUserRole, setCurrentUserRole] = useState<"admin" | "member">(
+    "member",
+  );
+  const [viewMode, setViewMode] = useState("list"); // Default view state
   const [editMode, setEditMode] = useState(false);
-  const [subtaskFilter, setSubtaskFilter] = useState<'all' | 'pending' | 'done'>('all');
+  const [subtaskFilter, setSubtaskFilter] = useState<
+    "all" | "pending" | "done"
+  >("all");
   const [showSubtasks, setShowSubtasks] = useState(true);
   const [pointsEarned, setPointsEarned] = useState<number>(0);
   const [addTaskModalOpen, setaddTaskModalOpen] = useState(false);
-  const [showTaskGeneration, setShowTaskGeneration] = useState(!project.hasAiSuggestTasks);
-  const [aiSuggestedTasks, setAiSuggestedTasks] = useState<{
-    id: string;
-    name: string;
-    description: string | null;
-    projectId: string;
-  }[]>([]);
-
-
-
+  const [showTaskGeneration, setShowTaskGeneration] = useState(
+    !project.hasAiSuggestTasks,
+  );
+  const [aiSuggestedTasks, setAiSuggestedTasks] = useState<
+    {
+      id: string;
+      name: string;
+      description: string | null;
+      projectId: string;
+    }[]
+  >([]);
 
   // Fetch tasks and subtasks
   const fetchtasksWithSubTasks = async () => {
     const res = await fetchProjectData(project.id);
     if (res.success) {
       setTasks(res.tasks as unknown as TaskType[]);
-      setCurrentUserRole(res.role as 'admin' | 'member');
+      setCurrentUserRole(res.role as "admin" | "member");
       setPointsEarned(res.pointsEarned as number);
       if (res.members) setMembers(res.members as User[]);
     } else {
@@ -71,7 +85,11 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAcceptSuggestedTask = async (task: { id: string; name: string; description: string | null }) => {
+  const handleAcceptSuggestedTask = async (task: {
+    id: string;
+    name: string;
+    description: string | null;
+  }) => {
     // Call your add task function here (e.g., addTask(newTask))
     // Remove the suggested task from the AI suggested tasks in the database
     // Update the state
@@ -81,7 +99,6 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
       setTasks((prevTasks) => [...prevTasks, res.task as unknown as TaskType]);
       setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== task.id));
       await deleteAISuggestedTask(task.id);
-
     }
   };
 
@@ -100,9 +117,9 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
       .map((task) => {
         // Ensure task.subtasks is always an array before filtering
         const filteredSubtasks = (task.subtasks || []).filter((subtask) => {
-          if (subtaskFilter === 'all') return true;
-          if (subtaskFilter === 'pending') return subtask.status === 'pending';
-          if (subtaskFilter === 'done') return subtask.status === 'done';
+          if (subtaskFilter === "all") return true;
+          if (subtaskFilter === "pending") return subtask.status === "pending";
+          if (subtaskFilter === "done") return subtask.status === "done";
           return false;
         });
         return {
@@ -114,11 +131,9 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     return filteredTasks;
   };
 
-
   useEffect(() => {
-    console.log(project)
-  }, [project])
-
+    console.log(project);
+  }, [project]);
 
   // if (!tasks.length) return (
   //   <>
@@ -152,33 +167,48 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
     <>
       <SuperHeader path="/dashboard" />
       <div className="max-w-7xl mx-auto p-4 space-y-6">
-        <ProjectHeader session={session} projectName={project.name} projectId={project.id} points={pointsEarned} showPoints={true} />
+        <ProjectHeader
+          session={session}
+          projectName={project.name}
+          projectId={project.id}
+          points={pointsEarned}
+          showPoints={true}
+        />
         <div className="mb-4">
           <ProgressBar progress={stats.progress} />
           <p className="text-sm text-gray-600 mt-2">
-            {stats.progress}% Complete • {stats.totalSubtasks} subtasks •{' '}
+            {stats.progress}% Complete • {stats.totalSubtasks} subtasks •{" "}
             {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
           </p>
         </div>
         <div className="flex justify-start items-center space-x-4 mb-2">
           <button
-            className={`px-4 py-2 rounded text-sm ${subtaskFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setSubtaskFilter('all')}
+            className={`px-4 py-2 rounded text-sm ${
+              subtaskFilter === "all"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSubtaskFilter("all")}
           >
             All
           </button>
           <button
-            className={`px-4 py-2 rounded text-sm ${subtaskFilter === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setSubtaskFilter('pending')}
+            className={`px-4 py-2 rounded text-sm ${
+              subtaskFilter === "pending"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSubtaskFilter("pending")}
           >
             Pending
           </button>
           <button
-            className={`px-4 py-2 rounded text-sm ${subtaskFilter === 'done' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setSubtaskFilter('done')}
+            className={`px-4 py-2 rounded text-sm ${
+              subtaskFilter === "done"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSubtaskFilter("done")}
           >
             Done
           </button>
@@ -195,104 +225,115 @@ const Project = ({ session, project }: { session: Session, project: ProjectType 
 
         <div className="flex flex-row items-center justify-end gap-4 -mt-5">
           {/* Toggle edit Mode */}
-          {currentUserRole === "admin" &&
+          {currentUserRole === "admin" && (
             <button onClick={() => setEditMode(!editMode)}>
-              <MdEditSquare className={`${editMode ? 'text-red-600' : 'text-blue-600'} text-2xl`} />
+              <MdEditSquare
+                className={`${editMode ? "text-red-600" : "text-blue-600"} text-2xl`}
+              />
             </button>
-          }
+          )}
           <ViewToggle onChange={(mode: string) => setViewMode(mode)} />
         </div>
 
         <div className="flex justify-end -mt-3">
-          {currentUserRole === "admin" && editMode &&
-            <div className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2" onClick={() => setaddTaskModalOpen(true)}>
+          {currentUserRole === "admin" && editMode && (
+            <div
+              className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2"
+              onClick={() => setaddTaskModalOpen(true)}
+            >
               Add task
-              <button className="bg-gray-500 text-white w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 z-10">+</button>
+              <button className="bg-gray-500 text-white w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 z-10">
+                +
+              </button>
             </div>
-          }
-          <AddTaskPopup setTasks={setTasks} projectId={project.id} modalIsOpen={addTaskModalOpen} setModalIsOpen={setaddTaskModalOpen} />
+          )}
+          <AddTaskPopup
+            setTasks={setTasks}
+            projectId={project.id}
+            modalIsOpen={addTaskModalOpen}
+            setModalIsOpen={setaddTaskModalOpen}
+          />
         </div>
 
-
-        {
-
-          showTaskGeneration ?
-            <TaskGenerationLoader
-              onComplete={() => {
-                console.log("Task generation complete");
-                setShowTaskGeneration(false);
-              }}
-            /> :
-            initialLoading ? <div className="text-center text-xl font-bold">Loading...</div> :
-
-              <>
-
-                {/* Display AI Suggested Tasks */}
-                {aiSuggestedTasks.length > 0 && (
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Maybe add these tasks?</h3>
-                    {aiSuggestedTasks.map((task, i) => (
-                      <div key={i} className="mb-4 p-4 rounded bg-gray-50 border border-gray-200 relative flex justify-between">
-                        <div>
-                          <h4 className="font-semibold">{task.name}</h4>
-                          {/*<p>{task.description}</p>*/}
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            className="bg-green-500 text-white px-2 py-1 rounded"
-                            onClick={() => handleAcceptSuggestedTask(task)}
-                          >
-                            ✓
-                          </button>
-                          <button
-                            className="bg-red-500 text-white px-2 py-1 rounded"
-                            onClick={() => handleRejectSuggestedTask(task.id)}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+        {showTaskGeneration ? (
+          <TaskGenerationLoader
+            onComplete={() => {
+              console.log("Task generation complete");
+              setShowTaskGeneration(false);
+            }}
+          />
+        ) : initialLoading ? (
+          <div className="text-center text-xl font-bold">Loading...</div>
+        ) : (
+          <>
+            {/* Display AI Suggested Tasks */}
+            {aiSuggestedTasks.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold">
+                  Maybe add these tasks?
+                </h3>
+                {aiSuggestedTasks.map((task, i) => (
+                  <div
+                    key={i}
+                    className="mb-4 p-4 rounded bg-gray-50 border border-gray-200 relative flex justify-between"
+                  >
+                    <div>
+                      <h4 className="font-semibold">{task.name}</h4>
+                      {/*<p>{task.description}</p>*/}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        className="bg-green-500 text-white px-2 py-1 rounded"
+                        onClick={() => handleAcceptSuggestedTask(task)}
+                      >
+                        ✓
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded"
+                        onClick={() => handleRejectSuggestedTask(task.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
-                )}
+                ))}
+              </div>
+            )}
 
-                {!tasks.length && <p>No tasks Found</p>}
-                {viewMode === 'list' ? (
-                  <>
-                    <TaskList
-                      tasks={getFilteredTasks().map((task) => ({
-                        ...task,
-                        subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
-                      }))}
-                      setTasks={setTasks}
-                      users={members}
-                      projectId={project.id}
-                      role={currentUserRole}
-                      editMode={editMode}
-                      setPointsEarned={setPointsEarned}
-                      session={session}
-                    />
-                  </>
-                ) : (
-                  <TaskGrid
-                    tasks={getFilteredTasks().map((task) => ({
-                      ...task,
-                      subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
-                    }))}
-                    setTasks={setTasks}
-                    projectId={project.id}
-                    role={currentUserRole}
-                    editMode={editMode}
-                  />
-                )}
+            {!tasks.length && <p>No tasks Found</p>}
+            {viewMode === "list" ? (
+              <>
+                <TaskList
+                  tasks={getFilteredTasks().map((task) => ({
+                    ...task,
+                    subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
+                  }))}
+                  setTasks={setTasks}
+                  users={members}
+                  projectId={project.id}
+                  role={currentUserRole}
+                  editMode={editMode}
+                  setPointsEarned={setPointsEarned}
+                  session={session}
+                />
               </>
-
-
-        }
-
+            ) : (
+              <TaskGrid
+                tasks={getFilteredTasks().map((task) => ({
+                  ...task,
+                  subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
+                }))}
+                setTasks={setTasks}
+                projectId={project.id}
+                role={currentUserRole}
+                editMode={editMode}
+              />
+            )}
+          </>
+        )}
       </div>
     </>
   );
-}
+};
 
 export default Project;

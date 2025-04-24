@@ -64,7 +64,11 @@ export const TaskList = ({
                 </span>
               )}
               {role === "admin" && editMode && (
-                <EditTaskPopup task={task} projectId={projectId} setTasks={setTasks} />
+                <EditTaskPopup
+                  task={task}
+                  projectId={projectId}
+                  setTasks={setTasks}
+                />
               )}
             </div>
             <div className="grid grid-cols-1 gap-2">

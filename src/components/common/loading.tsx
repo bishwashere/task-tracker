@@ -1,8 +1,12 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PaymentLoading() {
-
   return (
     <div className="wrapper flex items-center justify-center min-h-[80vh] py-12">
       <Card className="w-full max-w-md">
@@ -20,6 +24,5 @@ export default function PaymentLoading() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-

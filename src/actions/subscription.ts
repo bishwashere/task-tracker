@@ -28,5 +28,5 @@ export const getUserSubscription = createProtectedServerAction(
     }
 
     return subscription;
-  }
+  },
 );

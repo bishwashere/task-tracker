@@ -1,7 +1,13 @@
-import { XCircle } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { XCircle } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function PaymentFailedPage() {
   return (
@@ -17,13 +23,12 @@ export default function PaymentFailedPage() {
           We couldn&apos;t process your payment or it was canceled.
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Link href="/support">   <Button size="lg">
-            Contact Support
-          </Button>
+          <Link href="/support">
+            {" "}
+            <Button size="lg">Contact Support</Button>
           </Link>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-

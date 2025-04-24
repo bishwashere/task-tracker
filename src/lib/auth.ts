@@ -1,50 +1,62 @@
-import NextAuth, { CredentialsSignin } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "./prisma"
-import Google from "next-auth/providers/google"
-import GitHub from "next-auth/providers/github"
-import Credentials from "next-auth/providers/credentials"
-import { schema } from "./schema"
-import bcrypt from "bcryptjs"
+import NextAuth, { CredentialsSignin } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "./prisma";
+import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import Credentials from "next-auth/providers/credentials";
+import { schema } from "./schema";
+import bcrypt from "bcryptjs";
 
 const adapter = PrismaAdapter(prisma);
 class InvalidLoginError extends CredentialsSignin {
-  code = "Invalid username or password"
+  code = "Invalid username or password";
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter,
-  providers: [Google, GitHub, Credentials({
-    credentials: {
-      email: {},
-      password: {}
-    },
-    authorize: async (credentials) => {
-      const validatedCredentials = schema.parse(credentials);
-      
-      const user = await prisma.user.findFirst({
-        where: {
-          email: validatedCredentials.email,
+  providers: [
+    Google,
+    GitHub,
+    Credentials({
+      credentials: {
+        email: {},
+        password: {},
+      },
+      authorize: async (credentials) => {
+        const validatedCredentials = schema.parse(credentials);
+
+        const user = await prisma.user.findFirst({
+          where: {
+            email: validatedCredentials.email,
+          },
+        });
+        const passwordMatch = await bcrypt.compare(
+          validatedCredentials.password,
+          user?.password || "",
+        );
+        if (passwordMatch) {
+          return {
+            id: user?.id,
+            name: user?.name,
+            email: user?.email,
+            image: user?.image,
+          };
         }
-      });
-      const passwordMatch = await bcrypt.compare(validatedCredentials.password, user?.password || "");
-      if(passwordMatch){
-        return {id: user?.id, name: user?.name, email: user?.email, image: user?.image};;
-      }
-      throw new InvalidLoginError()
-    }
-  })],
-  session: {strategy: "jwt"},
+        throw new InvalidLoginError();
+      },
+    }),
+  ],
+  session: { strategy: "jwt" },
   callbacks: {
     async session({ session, token }) {
-      return{
+      return {
         ...session,
         user: {
           ...session.user,
-          id: token.sub
-        }
-      }
-    }
+          id: token.sub,
+        },
+      };
+    },
   },
   // callbacks: {
   //   async jwt({ token, account, user }) {
@@ -87,8 +99,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   //     return defaultEncode(params);
   //   },
   // },
-  pages:{
-    signIn: '/login',
-    error: '/login',
-  }
-})
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+});

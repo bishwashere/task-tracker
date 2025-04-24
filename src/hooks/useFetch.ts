@@ -19,7 +19,7 @@ type FetchResult<T> =
 
 export function useFetch<T>(
   fetcher: () => Promise<T>,
-  options?: FetchOptions<T>
+  options?: FetchOptions<T>,
 ) {
   const { disabled = false, onSuccess, onError } = options || {};
 

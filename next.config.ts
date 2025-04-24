@@ -8,21 +8,21 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
-    ]
+    ],
   },
   webpack(config) {
     config.resolve.fallback = {
       // if you miss it, all the other options in fallback, specified
       // by next.js will be dropped.
-      ...config.resolve.fallback,  
+      ...config.resolve.fallback,
       fs: false,
       async_hooks: false,
       child_process: false,
     };
-    
+
     return config;
   },
-  transpilePackages: ['next-auth']
+  transpilePackages: ["next-auth"],
 };
 
 export default nextConfig;
