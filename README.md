@@ -24,3 +24,7 @@ Fixed issues of Pages becoming a directory
 Fixed revisions like error message placement, login page restructuring, etc as well as new things like points, edit option for admin, etc.
 
 ### 2025-04-22
+
+
+### 2025-04-24
+Fixed edit button for admin
