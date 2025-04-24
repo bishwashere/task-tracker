@@ -153,7 +153,6 @@ const SortableProjectCard = ({ project }: SortableProjectCardProps) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    touchAction: "none", // Prevent scrolling while dragging on mobile
   };
 
   return (
@@ -162,7 +161,7 @@ const SortableProjectCard = ({ project }: SortableProjectCardProps) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="touch-none" // Prevent touch scrolling while dragging
+      className="cursor-grab active:cursor-grabbing"
     >
       <ProjectCard project={project} isDragging={isDragging} />
     </div>
@@ -216,3 +215,4 @@ function calculateProgress(tasks: TaskType[]): number {
 }
 
 export default DashboardDraggableProjectList;
+
