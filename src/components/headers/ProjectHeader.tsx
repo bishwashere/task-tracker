@@ -10,12 +10,14 @@ export const ProjectHeader = ({
   projectId,
   points,
   showPoints = false,
+  onEditButtonClick,
 }: {
   session: Session;
   projectName: string;
   projectId?: string;
   points?: number;
   showPoints?: boolean;
+  onEditButtonClick?: () => void;
 }) => {
   return (
     <div className="flex justify-between items-center mb-5 flex-col sm:flex-row">
@@ -30,7 +32,9 @@ export const ProjectHeader = ({
             <p className="text-xl mt-[2px]">{points}</p>
           </Link>
         )}
-        <ProfileMenu session={session} showSettings={false} />
+        <ProfileMenu session={session} showSettings={false}
+          onEditButtonClick={onEditButtonClick}
+        />
       </div>
     </div>
   );

@@ -173,6 +173,7 @@ const Project = ({
           projectId={project.id}
           points={pointsEarned}
           showPoints={true}
+          onEditButtonClick={() => setEditMode((prev) => !prev)}
         />
         <div className="mb-4">
           <ProgressBar progress={stats.progress} />
@@ -183,31 +184,28 @@ const Project = ({
         </div>
         <div className="flex justify-start items-center space-x-4 mb-2">
           <button
-            className={`px-4 py-2 rounded text-sm ${
-              subtaskFilter === "all"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
+            className={`px-4 py-2 rounded text-sm ${subtaskFilter === "all"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+              }`}
             onClick={() => setSubtaskFilter("all")}
           >
             All
           </button>
           <button
-            className={`px-4 py-2 rounded text-sm ${
-              subtaskFilter === "pending"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
+            className={`px-4 py-2 rounded text-sm ${subtaskFilter === "pending"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+              }`}
             onClick={() => setSubtaskFilter("pending")}
           >
             Pending
           </button>
           <button
-            className={`px-4 py-2 rounded text-sm ${
-              subtaskFilter === "done"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
+            className={`px-4 py-2 rounded text-sm ${subtaskFilter === "done"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+              }`}
             onClick={() => setSubtaskFilter("done")}
           >
             Done
@@ -225,13 +223,13 @@ const Project = ({
 
         <div className="flex flex-row items-center justify-end gap-4 -mt-5">
           {/* Toggle edit Mode */}
-          {currentUserRole === "admin" && (
+          {/* {currentUserRole === "admin" && (
             <button onClick={() => setEditMode(!editMode)}>
               <MdEditSquare
                 className={`${editMode ? "text-red-600" : "text-blue-600"} text-2xl`}
               />
             </button>
-          )}
+          )} */}
           <ViewToggle onChange={(mode: string) => setViewMode(mode)} />
         </div>
 

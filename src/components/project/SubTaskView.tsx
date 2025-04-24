@@ -50,11 +50,11 @@ export const SubTaskView = ({
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: task.subtasks.map((subtask) =>
-                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
-                ),
-              }
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+              ),
+            }
             : task,
         ),
       );
@@ -77,11 +77,11 @@ export const SubTaskView = ({
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: task.subtasks.map((subtask) =>
-                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
-                ),
-              }
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+              ),
+            }
             : task,
         ),
       );
@@ -147,11 +147,10 @@ export const SubTaskView = ({
   return (
     <div
       key={subtask.id}
-      className={`p-2 rounded shadow-md flex justify-between items-center ${
-        subtask.status === "done"
+      className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === "done"
           ? "bg-green-200 text-green-700 hover:bg-green-300"
           : "bg-white hover:bg-gray-100"
-      }`}
+        }`}
     >
       <div>
         <div className="flex flex-row gap-2 items-center">
@@ -200,46 +199,47 @@ export const SubTaskView = ({
           {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        {subtask.tagName ? (
-          <span
-            className="px-2 py-1 rounded text-sm"
-            style={{
-              backgroundColor: subtask.tagColor || "transparent",
-              color: "#FFF",
-            }}
-          >
-            {subtask.tagName}
-          </span>
-        ) : (
-          <AddTagPopup
-            setTasks={setTasks}
-            taskId={taskId}
-            subtaskId={subtask.id}
-            projectId={projectId}
-          />
-        )}
-        <button
-          onClick={() => priorityToggle()}
-          className={`text-sm rounded ${
-            subtask.priority
-              ? "text-yellow-500 hover:text-yellow-600"
-              : "text-gray-500 hover:text-gray-600"
-          }`}
-          disabled={loading}
-        >
-          {subtask.priority ? "⭐" : "☆"}
-        </button>
-        {subtask.status !== "done" && (
+      {role === "admin" && editMode && (
+        <div className="flex items-center gap-2">
+          {subtask.tagName ? (
+            <span
+              className="px-2 py-1 rounded text-sm"
+              style={{
+                backgroundColor: subtask.tagColor || "transparent",
+                color: "#FFF",
+              }}
+            >
+              {subtask.tagName}
+            </span>
+          ) : (
+            <AddTagPopup
+              setTasks={setTasks}
+              taskId={taskId}
+              subtaskId={subtask.id}
+              projectId={projectId}
+            />
+          )}
           <button
-            onClick={() => markAsDone(subtask.id)}
+            onClick={() => priorityToggle()}
+            className={`text-sm rounded ${subtask.priority
+                ? "text-yellow-500 hover:text-yellow-600"
+                : "text-gray-500 hover:text-gray-600"
+              }`}
             disabled={loading}
-            className="bg-green-100 text-white px-4 py-2 rounded hover:bg-green-200 disabled:opacity-75"
           >
-            &#10003;
+            {subtask.priority ? "⭐" : "☆"}
           </button>
-        )}
-      </div>
+          {subtask.status !== "done" && (
+            <button
+              onClick={() => markAsDone(subtask.id)}
+              disabled={loading}
+              className="bg-green-100 text-white px-4 py-2 rounded hover:bg-green-200 disabled:opacity-75"
+            >
+              &#10003;
+            </button>
+          )}
+        </div>)}
+
       <ConfirmationModal />
     </div>
   );

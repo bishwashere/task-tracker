@@ -4,7 +4,7 @@ import {
   updateOrganizationName,
 } from "@/actions/organization";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaRegUserCircle } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -16,17 +16,20 @@ import { Organization } from "@/types/organization";
 import logOut from "@/actions/logOut";
 import { Session } from "next-auth";
 import SubscriptionStatus from "./SubscriptionStatus";
+import { Edit2Icon, SettingsIcon } from "lucide-react";
 
 const ProfileMenu = ({
   showSettings,
   session,
   selectedOrganization,
   fetchOrganizations,
+  onEditButtonClick,
 }: {
   showSettings: boolean;
   session: Session;
   selectedOrganization?: Organization | null;
   fetchOrganizations?: () => Promise<void>;
+  onEditButtonClick?: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] =
@@ -88,7 +91,7 @@ const ProfileMenu = ({
         {/* Edit Organizations */}
         {/* Only edit section if user is admin of that organization */}
         <button onClick={handleProfileClick}>
-          {session?.user?.image ? (
+          {/* {session?.user?.image ? (
             <Image
               src={session.user.image}
               width="30"
@@ -98,7 +101,9 @@ const ProfileMenu = ({
             />
           ) : (
             <FaRegUserCircle className="text-4xl cursor-pointer p-1" />
-          )}
+          )} */}
+          <SettingsIcon className="size-7 cursor-pointer p-1" />
+
         </button>
       </div>
       {isOpen && (
@@ -112,6 +117,20 @@ const ProfileMenu = ({
               {session?.user?.email}
             </p>
           </div>
+          {
+            onEditButtonClick && (
+              <Fragment>
+                <hr className="border border-gray-300 my-1" />
+                <button
+                  onClick={onEditButtonClick}
+                  className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
+                >
+                  <Edit2Icon className="size-4" />
+                  Edit
+                </button>
+              </Fragment>
+            )
+          }
           <hr className="border border-gray-300 my-1" />
           {showSettings &&
             selectedOrganization &&
