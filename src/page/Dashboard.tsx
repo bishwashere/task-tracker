@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import ProfileMenu from "@/components/common/ProfileMenu";
 import ProgressBar from "@/components/common/ProgressBar";
 import { Session } from "next-auth";
+import DashboardDraggableProjectList from "./DashboardDraggableProjectList";
 
 const Dashboard = ({ session }: { session: Session }) => {
 
@@ -203,28 +204,9 @@ const Dashboard = ({ session }: { session: Session }) => {
         </div>
       }
       {/* Display projects for Selected Organization */}
-      {selectedOrganization && selectedOrganization.projects.length > 0 && (
-        <div className="space-y-4">
-          {Object.values(selectedOrganization.projects || {}).reverse().map((project) => {
-            const progress = calculateProgress(Object.values(project.tasks || {}));
-            return (
-              <div
-                key={project.id}
-                className="bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer"
-                onClick={() => router.push(`/project/${project.id}`)}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">{project.name}</h3>
-                  <ProgressBar progress={progress} />
-                </div>
-                <p className="text-sm text-gray-500">
-                  {Object.keys(project.tasks || {}).length} Tasks
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {selectedOrganization && selectedOrganization.projects.length > 0 && < DashboardDraggableProjectList
+        projects={selectedOrganization.projects}
+      />}
       {/* Sample Project */}
       {selectedOrganization && selectedOrganization.projects.length === 0 &&
         <div className="bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer" onClick={() => setAddProjectModalIsOpen(true)}>
@@ -237,20 +219,6 @@ const Dashboard = ({ session }: { session: Session }) => {
   );
 }
 
-function calculateProgress(tasks: Record<number, TaskType>) {
-  const totalSubtasks = Object.values(tasks).reduce(
-    (sum, task) => sum + (task.subtasks?.length || 0),
-    0
-  );
-  const completedSubtasks = Object.values(tasks).reduce(
-    (sum, task) =>
-      sum +
-      (task.subtasks?.filter((subtask: SubtaskType) => subtask.status === 'done').length || 0),
-    0
-  );
-  return totalSubtasks === 0
-    ? 0
-    : Math.round((completedSubtasks / totalSubtasks) * 100);
-}
+
 
 export default Dashboard;

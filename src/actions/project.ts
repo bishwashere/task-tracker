@@ -28,12 +28,17 @@ export const addProject = async (
       };
     }
 
+    const totalProjects = await prisma.project.count({
+      where: { organizationId },
+    });
+
     // Create the project
     const project = await prisma.project.create({
       data: {
         name: projectName,
         description: projectDescription,
         organizationId,
+        sortIndex: totalProjects, // Set the sortIndex to the total number of projects
       },
     });
 
