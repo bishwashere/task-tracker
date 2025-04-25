@@ -39,7 +39,7 @@ const Project = ({
   const [editMode, setEditMode] = useState(false);
   const [subtaskFilter, setSubtaskFilter] = useState<
     "all" | "pending" | "done"
-  >("all");
+  >("pending");
   const [showSubtasks, setShowSubtasks] = useState(true);
   const [pointsEarned, setPointsEarned] = useState<number>(0);
   const [addTaskModalOpen, setaddTaskModalOpen] = useState(false);
@@ -185,8 +185,8 @@ const Project = ({
         <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 mb-2">
           {
             ([
-              "all",
               "pending",
+              "all",
               "done",
             ] as const).map((filter) => (
               <button

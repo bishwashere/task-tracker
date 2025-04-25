@@ -1,3 +1,4 @@
+import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
 
 export default function SuperHeader({
@@ -10,7 +11,7 @@ export default function SuperHeader({
   const router = useRouter();
 
   return (
-    <div className="w-full p-4 flex items-center max-sm:pb-0">
+    <div className={cn("w-full p-4 flex items-center max-sm:pb-0", label && "justify-between")}>
       <button
         onClick={() => router.push(path)}
         className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
@@ -32,10 +33,17 @@ export default function SuperHeader({
         <span className="text-lg font-medium max-sm:hidden">
           {"Back"}
         </span>
-        <span className="text-lg font-bold sm:hidden">
-          {label || "Back"}
-        </span>
       </button>
+      {
+        label && (
+          <>
+            <span className="text-lg font-bold sm:hidden">
+              {label}
+            </span>
+            <span></span>
+          </>
+        )
+      }
     </div>
   );
 }
