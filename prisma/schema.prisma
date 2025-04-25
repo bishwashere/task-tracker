@@ -136,33 +136,51 @@ model ProjectSortIndex {
 }
 
 model Task {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   description      String?
-  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId        String    @db.ObjectId
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String          @db.ObjectId
   subtasks         Subtask[]
-  hasAISuggestions Boolean   @default(false)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  hasAISuggestions Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  taskSortIndex    TaskSortIndex[]
+}
+
+model TaskSortIndex {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  taskId    String @db.ObjectId
+  sortIndex Int
+  userId    String @db.ObjectId
+  task      Task   @relation(fields: [taskId], references: [id])
 }
 
 model Subtask {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  taskId         String    @db.ObjectId
-  task           Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  assignedUser   User?     @relation("AssignedSubtasks", fields: [assignedUserId], references: [id])
-  assignedUserId String?   @db.ObjectId
-  dueDate        DateTime?
-  points         Float     @default(10)
-  status         String    @default("pending")
-  priority       Int       @default(0)
-  tagName        String?
-  tagColor       String?
-  comments       Comment[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  taskId           String             @db.ObjectId
+  task             Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assignedUser     User?              @relation("AssignedSubtasks", fields: [assignedUserId], references: [id])
+  assignedUserId   String?            @db.ObjectId
+  dueDate          DateTime?
+  points           Float              @default(10)
+  status           String             @default("pending")
+  priority         Int                @default(0)
+  tagName          String?
+  tagColor         String?
+  comments         Comment[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  subtaskSortIndex SubtaskSortIndex[]
+}
+
+model SubtaskSortIndex {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  subtaskId String  @db.ObjectId
+  sortIndex Int
+  userId    String  @db.ObjectId
+  subtask   Subtask @relation(fields: [subtaskId], references: [id])
 }
 
 model Comment {

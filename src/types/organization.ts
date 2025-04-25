@@ -41,6 +41,7 @@ export type TaskType = {
   hasAISuggestions: boolean;
   createdAt: Date;
   updatedAt: Date;
+  taskSortIndex?: [{ sortIndex: number }];
 };
 
 export type SubtaskType = {
@@ -60,6 +61,7 @@ export type SubtaskType = {
   createdAt: Date;
   updatedAt: Date;
   issueCount?: number;
+  subtaskSortIndex?: [{ sortIndex: number }];
 };
 export type CommentType = {
   id: string;

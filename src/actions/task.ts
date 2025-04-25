@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 export const saveTask = async (
   projectId: string,
   taskTitle: string,
-  taskDescription: string,
+  taskDescription: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -25,7 +25,7 @@ export const saveTask = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
 
     if (!userOrg || userOrg.role !== "ADMIN") {
@@ -58,7 +58,7 @@ export const editTask = async (
   projectId: string,
   taskId: string,
   taskTitle: string,
-  taskDescription: string,
+  taskDescription: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -77,7 +77,7 @@ export const editTask = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
 
     if (!userOrg || userOrg.role !== "ADMIN") {
@@ -114,7 +114,7 @@ export const saveSubTask = async (
   projectId: string,
   subTaskName: string,
   dueDate: Date,
-  points: number,
+  points: number
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -133,7 +133,7 @@ export const saveSubTask = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
 
     if (!userOrg || userOrg.role !== "ADMIN") {
@@ -171,7 +171,7 @@ export const editSubTask = async (
   subTaskName: string,
   dueDate: Date,
   points: number,
-  assignedUserId: string | null,
+  assignedUserId: string | null
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -190,7 +190,7 @@ export const editSubTask = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
 
     if (!userOrg || userOrg.role !== "ADMIN") {
@@ -229,7 +229,7 @@ export const saveTaskTag = async (
   subtaskId: string,
   projectId: string,
   tagName: string,
-  tagColor: string,
+  tagColor: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -264,7 +264,7 @@ export const saveTaskTag = async (
 export const togglePriority = async (
   subtaskId: string,
   projectId: string,
-  priority: number,
+  priority: number
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -283,7 +283,7 @@ export const togglePriority = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
 
     if (!userOrg) {
@@ -306,7 +306,7 @@ export const togglePriority = async (
 
 export const updateSubtaskStatus = async (
   subtaskId: string,
-  status: string,
+  status: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -366,7 +366,7 @@ export const updateSubtaskStatus = async (
     }
     // Fetch organization members
     const isAdmin = organization.members.some(
-      (member) => member.userId === userId && member.role === "ADMIN",
+      (member) => member.userId === userId && member.role === "ADMIN"
     );
     const isAssignedUser = subtask.assignedUserId === userId;
     // Check if the user is authorized
@@ -407,7 +407,7 @@ export const updateSubtaskStatus = async (
 export const assignUserToSubtask = async (
   subtaskId: string,
   projectId: string,
-  memberUserId: string,
+  memberUserId: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -426,7 +426,7 @@ export const assignUserToSubtask = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
 
     if (!userOrg || userOrg.role !== "ADMIN") {
@@ -444,5 +444,51 @@ export const assignUserToSubtask = async (
   } catch (error) {
     console.error("Error while assigning user", error);
     return { success: false, message: "An error occurred." };
+  }
+};
+
+export const sortTasks = async (
+  data: { taskId: string; sortIndex: number }[]
+) => {
+  try {
+    const userId = await isUserValid();
+    if (!userId) {
+      return { success: false, message: "Unauthorized !" };
+    }
+    await Promise.all(
+      data.map(async ({ taskId, sortIndex }) => {
+        const p = await prisma.taskSortIndex.findFirst({
+          where: {
+            taskId,
+            userId,
+          },
+        });
+        if (p) {
+          await prisma.taskSortIndex.update({
+            where: {
+              id: p.id,
+            },
+            data: {
+              sortIndex,
+            },
+          });
+        } else {
+          await prisma.taskSortIndex.create({
+            data: {
+              taskId,
+              userId,
+              sortIndex,
+            },
+          });
+        }
+      })
+    );
+    return { success: true, message: "Tasks sorted successfully" };
+  } catch (error) {
+    console.error("Error sorting tasks:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
   }
 };
