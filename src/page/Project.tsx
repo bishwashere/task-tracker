@@ -61,6 +61,7 @@ const Project = ({
       projectId: string;
     }[]
   >([]);
+  const [userFilter, setUserFilter] = useState<string>("all"); // "all" | "unassigned" | userId
 
   // Fetch tasks and subtasks
   const fetchtasksWithSubTasks = async () => {
@@ -170,10 +171,10 @@ const Project = ({
 
 
   useEffect(() => {
-    const filter = filterByDate
+    const filter = filterByDate;
 
     // Reset to original tasks for "all" filter
-    if (filter === 'all') {
+    if (filter === 'all' && userFilter === 'all') {
       setTasks(originalTasks);
       return;
     }
@@ -207,6 +208,17 @@ const Project = ({
     const filteredTasks = originalTasks.map(task => ({
       ...task,
       subtasks: task.subtasks.filter(subtask => {
+        // First apply user filter
+        const passesUserFilter =
+          userFilter === 'all' ? true :
+            userFilter === 'unassigned' ? !subtask.assignedUserId :
+              subtask.assignedUserId === userFilter;
+
+        if (!passesUserFilter) return false;
+
+        // Then apply date filter if not "all"
+        if (filter === 'all') return true;
+
         if (!subtask.dueDate) return false;
 
         const subtaskDate = new Date(subtask.dueDate);
@@ -230,9 +242,9 @@ const Project = ({
     }))
       .filter(task => task.subtasks.length > 0);
 
-
     setTasks(filteredTasks);
-  }, [filterByDate, originalTasks]);
+    console.log("filteredTasks", filteredTasks);
+  }, [filterByDate, userFilter, originalTasks]);
 
   return (
     <>
@@ -288,15 +300,35 @@ const Project = ({
             <option value="month">This Month</option>
             <option value="year">This Year</option>
           </select>
+
         </div>
 
-        <div className="mb-4 flex flex-row justify-between">
+        <div className="mb-4 flex flex-row gap-4">
           <p
             className="cursor-pointer text-blue-500 hover:underline w-fit text-sm sm:text-base"
             onClick={() => setShowSubtasks(!showSubtasks)}
           >
             {showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
           </p>
+
+          {/* filter by assigned users */}
+          {
+            // only if admin
+            currentUserRole === "admin" &&
+            <> <Separator orientation="vertical" className="h-5" />
+              <select
+                className="border rounded px-2 py-1 text-sm"
+                value={userFilter}
+                onChange={(e) => setUserFilter(e.target.value)}
+              >
+                <option value="all">All Users</option>
+                <option value="unassigned">Unassigned</option>
+                {members.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select></>}
         </div>
 
         <div className="flex flex-row items-center justify-end gap-4 -mt-5">
@@ -419,6 +451,7 @@ const Project = ({
 };
 
 export default Project;
+
 
 
 
