@@ -58,18 +58,14 @@ const Dashboard = ({ session }: { session: Session }) => {
     console.log(res);
     if (res.success && res.organizations?.length) {
       setOrganizations(res.organizations as unknown as Organization[]);
-      // selectCurrentOrganization(res.organizations as unknown as Organization[]);
-      // setSelectedOrganization(res.organizations[0] as Organization)
+      selectCurrentOrganization(res.organizations as unknown as Organization[]);
     }
     setInitialLoading(false);
   };
-  // useEffect(() => {
-  //     console.log("ORG")
-  //     console.log(organizations)
-  // }, [organizations])
+
   useEffect(() => {
     fetchOrganizations();
-  }, [selectedOrganization]);
+  }, []);
 
   if (initialLoading) {
     return <div className="text-center text-xl font-bold">Loading...</div>;
