@@ -189,7 +189,7 @@ export const SubTaskView = ({
         </div>
         <div className="text-sm">
           {subtask.status} •{" "}
-          {subtask.assignedUserId ? (
+          {subtask.assignedUserId && subtask.assignedUser ? (
             <div className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-background">
               <Avatar className="border-foreground" src={subtask.assignedUser?.image || ""} alt={subtask.assignedUser?.name || ""} size="xs" />  {subtask.assignedUser?.name}
             </div>
