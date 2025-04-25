@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
+import { FaArrowLeft } from "react-icons/fa6";
 
 export default function SuperHeader({
   path,
@@ -16,20 +17,7 @@ export default function SuperHeader({
         onClick={() => router.push(path)}
         className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
+        <FaArrowLeft className="h-6 w-6" />
         <span className="text-lg font-medium max-sm:hidden">
           {"Back"}
         </span>
@@ -37,7 +25,7 @@ export default function SuperHeader({
       {
         label && (
           <>
-            <span className="text-lg font-bold sm:hidden">
+            <span className="text-2xl font-bold sm:hidden">
               {label}
             </span>
             <span></span>
