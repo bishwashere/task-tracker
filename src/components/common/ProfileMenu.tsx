@@ -17,6 +17,7 @@ import logOut from "@/actions/logOut";
 import { Session } from "next-auth";
 import SubscriptionStatus from "./SubscriptionStatus";
 import { Edit2Icon, SettingsIcon } from "lucide-react";
+import { Avatar } from "../ui/avatar";
 
 const ProfileMenu = ({
   showSettings,
@@ -110,17 +111,23 @@ const ProfileMenu = ({
           className="absolute right-0 min-w-48 bg-white rounded-lg py-2 w-fit"
           style={{ boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px" }}
         >
-          <div className="block px-3 p-2">
-            <p className="text-md font-semibold">{session?.user?.name}</p>
-            <p className="text-sm font-semibold text-gray-500">
-              {session?.user?.email}
-            </p>
+          <div className="px-3 p-2  flex gap-2.5">
+            <Avatar src={session?.user?.image || ""} alt={session?.user?.name || ""} size="sm" />
+            <div className="flex flex-col">
+              <p className="text-md font-semibold">{session?.user?.name}</p>
+              <p className="text-sm font-semibold text-gray-500">
+                {session?.user?.email}
+              </p>
+            </div>
           </div>
           {onEditButtonClick && (
             <Fragment>
               <hr className="border border-gray-300 my-1" />
               <button
-                onClick={onEditButtonClick}
+                onClick={() => {
+                  onEditButtonClick()
+                  setIsOpen(false)
+                }}
                 className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
               >
                 <Edit2Icon className="size-4" />

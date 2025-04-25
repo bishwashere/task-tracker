@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useConfirmModal } from "../Modal/useConfirmModal";
 import { Session } from "next-auth";
 import EditSubtaskPopup from "./EditSubtaskPopup";
+import { Avatar } from "../ui/avatar";
 
 export const SubTaskView = ({
   subtask,
@@ -50,11 +51,11 @@ export const SubTaskView = ({
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: task.subtasks.map((subtask) =>
-                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
-                ),
-              }
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+              ),
+            }
             : task,
         ),
       );
@@ -77,11 +78,11 @@ export const SubTaskView = ({
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: task.subtasks.map((subtask) =>
-                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
-                ),
-              }
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+              ),
+            }
             : task,
         ),
       );
@@ -147,11 +148,10 @@ export const SubTaskView = ({
   return (
     <div
       key={subtask.id}
-      className={`p-2 rounded shadow-md flex justify-between items-center ${
-        subtask.status === "done"
-          ? "bg-green-200 text-green-700 hover:bg-green-300"
-          : "bg-white hover:bg-gray-100"
-      }`}
+      className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === "done"
+        ? "bg-green-200 text-green-700 hover:bg-green-300"
+        : "bg-white hover:bg-gray-100"
+        }`}
     >
       <div>
         <div className="flex flex-row gap-2 items-center">
@@ -187,20 +187,20 @@ export const SubTaskView = ({
             />
           )}
         </div>
-        <p className="text-sm">
+        <div className="text-sm">
           {subtask.status} •{" "}
-          {subtask.assignedUserId ? (
-            <span className="inline-block px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-gray-100">
-              {subtask.assignedUser?.name}
-            </span>
+          {subtask.assignedUserId && subtask.assignedUser ? (
+            <div className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-background">
+              <Avatar className="border-foreground" src={subtask.assignedUser?.image || ""} alt={subtask.assignedUser?.name || ""} size="xs" />  {subtask.assignedUser?.name}
+            </div>
           ) : (
             "Unassigned"
           )}{" "}
           • {subtask.points} points{" "}
           {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}
-        </p>
+        </div>
       </div>
-      {role === "admin" && editMode && (
+      {editMode && (
         <div className="flex items-center gap-2">
           {subtask.tagName ? (
             <span
@@ -222,11 +222,10 @@ export const SubTaskView = ({
           )}
           <button
             onClick={() => priorityToggle()}
-            className={`text-sm rounded ${
-              subtask.priority
-                ? "text-yellow-500 hover:text-yellow-600"
-                : "text-gray-500 hover:text-gray-600"
-            }`}
+            className={`text-sm rounded ${subtask.priority
+              ? "text-yellow-500 hover:text-yellow-600"
+              : "text-gray-500 hover:text-gray-600"
+              }`}
             disabled={loading}
           >
             {subtask.priority ? "⭐" : "☆"}

@@ -24,11 +24,30 @@ export const getOrganization = async () => {
               },
             },
             projects: {
+              where: {
+                OR: [
+                  // Include all projects if user is ADMIN
+                  {
+                    organization: {
+                      members: { some: { userId, role: "ADMIN" } },
+                    },
+                  },
+                  // For MEMBER, include only projects with assigned subtasks
+                  {
+                    tasks: {
+                      some: {
+                        subtasks: {
+                          some: { assignedUserId: userId },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
               include: {
                 tasks: {
                   include: {
                     subtasks: {
-                      // where: { assignedUserId: userId },
                       select: { id: true, status: true },
                     },
                   },

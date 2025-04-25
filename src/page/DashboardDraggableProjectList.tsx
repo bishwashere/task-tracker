@@ -1,7 +1,7 @@
 import ProgressBar from "@/components/common/ProgressBar";
 import { ProjectType, SubtaskType, TaskType } from "@/types/organization";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -32,6 +32,10 @@ type Props = {
 const DashboardDraggableProjectList = ({ projects: p }: Props) => {
   const [projects, setProjects] = useState(p);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setProjects(p);
+  }, [p]);
 
   // Configure sensors for both mouse and touch interactions
   const sensors = useSensors(

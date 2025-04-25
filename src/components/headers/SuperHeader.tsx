@@ -1,10 +1,17 @@
+import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
 
-export default function SuperHeader({ path }: { path: string }) {
+export default function SuperHeader({
+  path,
+  label,
+}: {
+  path: string;
+  label?: string;
+}) {
   const router = useRouter();
 
   return (
-    <div className="w-full p-4 flex items-center">
+    <div className={cn("w-full p-4 flex items-center max-sm:pb-0", label && "justify-between")}>
       <button
         onClick={() => router.push(path)}
         className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
@@ -23,8 +30,20 @@ export default function SuperHeader({ path }: { path: string }) {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        <span className="text-lg font-medium">Back</span>
+        <span className="text-lg font-medium max-sm:hidden">
+          {"Back"}
+        </span>
       </button>
+      {
+        label && (
+          <>
+            <span className="text-lg font-bold sm:hidden">
+              {label}
+            </span>
+            <span></span>
+          </>
+        )
+      }
     </div>
   );
 }

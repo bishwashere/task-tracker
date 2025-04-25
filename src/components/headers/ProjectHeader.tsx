@@ -21,7 +21,7 @@ export const ProjectHeader = ({
 }) => {
   return (
     <div className="flex justify-between items-center mb-5 flex-col sm:flex-row">
-      <h1 className="text-2xl font-bold">Project: {projectName}</h1>
+      <h1 className="text-2xl font-bold max-sm:hidden">{projectName}</h1>
       <div className="flex flex-row justify-center items-center gap-5">
         {showPoints && projectId && (
           <Link
