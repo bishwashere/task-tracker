@@ -118,7 +118,7 @@ const Project = ({
         // Ensure task.subtasks is always an array before filtering
         const filteredSubtasks = (task.subtasks || []).filter((subtask) => {
           if (subtaskFilter === "all") return true;
-          if (subtaskFilter === "pending") return subtask.status === "pending";
+          if (subtaskFilter === "pending") return subtask.status === "pending"
           if (subtaskFilter === "done") return subtask.status === "done";
           return false;
         });
@@ -127,7 +127,7 @@ const Project = ({
           subtasks: filteredSubtasks,
         };
       })
-      .filter((task) => subtaskFilter === "all" || task.subtasks.length > 0);
+      .filter((task) => subtaskFilter === "done" ? task.subtasks.length > 0 : true);
     return filteredTasks;
   };
 
