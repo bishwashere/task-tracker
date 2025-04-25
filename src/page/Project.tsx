@@ -266,7 +266,7 @@ const Project = ({
           </p>
         </div>
         <div className="flex items-center gap-2.5">
-          <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 mb-2">
+          <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 ">
             {
               ([
                 "pending",
@@ -275,7 +275,7 @@ const Project = ({
               ] as const).map((filter) => (
                 <button
                   key={filter}
-                  className={`sm:px-4 capitalize px-2 text-xs sm:text-sm sm:py-2 py-0.5 rounded ${subtaskFilter === filter
+                  className={`sm:px-4 capitalize px-2 text-sm sm:py-2 py-0.5 rounded ${subtaskFilter === filter
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 text-gray-700"
                     }`}
@@ -286,30 +286,6 @@ const Project = ({
               ))
             }
           </div>
-          <Separator orientation="vertical" className="h-5" />
-          <select
-            className="border rounded px-2 py-1 text-sm"
-            value={filterByDate}
-            onChange={(e) => {
-              setFilterByDate(e.target.value as "all" | "today" | "week" | "month" | "year");
-            }}
-          >
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="year">This Year</option>
-          </select>
-
-        </div>
-
-        <div className="mb-4 flex flex-row gap-4">
-          <p
-            className="cursor-pointer text-blue-500 hover:underline w-fit text-sm sm:text-base"
-            onClick={() => setShowSubtasks(!showSubtasks)}
-          >
-            {showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
-          </p>
 
           {/* filter by assigned users */}
           {
@@ -329,6 +305,32 @@ const Project = ({
                   </option>
                 ))}
               </select></>}
+        </div>
+
+        <div className="mb-4 flex flex-row gap-4">
+          <p
+            className="cursor-pointer text-blue-500 hover:underline w-fit text-sm sm:text-base"
+            onClick={() => setShowSubtasks(!showSubtasks)}
+          >
+            {showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
+          </p>
+
+
+
+          <Separator orientation="vertical" className="h-5" />
+          <select
+            className="border rounded px-2 py-1 text-sm"
+            value={filterByDate}
+            onChange={(e) => {
+              setFilterByDate(e.target.value as "all" | "today" | "week" | "month" | "year");
+            }}
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+          </select>
         </div>
 
         <div className="flex flex-row items-center justify-end gap-4 -mt-5">
