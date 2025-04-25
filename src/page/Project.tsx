@@ -40,6 +40,9 @@ const Project = ({
     "member",
   );
   const [viewMode, setViewMode] = useState("list"); // Default view state
+  const [filterByDate, setFilterByDate] = useState<
+    "all" | "today" | "week" | "month" | "year"
+  >("all");
   const [editMode, setEditMode] = useState(false);
   const [subtaskFilter, setSubtaskFilter] = useState<
     "all" | "pending" | "done"
@@ -63,7 +66,6 @@ const Project = ({
   const fetchtasksWithSubTasks = async () => {
     const res = await fetchProjectData(project.id);
     if (res.success) {
-      setTasks(res.tasks as unknown as TaskType[]);
       setOriginalTasks(res.tasks as unknown as TaskType[]); // Store original tasks
       setCurrentUserRole(res.role as "admin" | "member");
       setPointsEarned(res.pointsEarned as number);
@@ -101,7 +103,7 @@ const Project = ({
 
     const res = await saveTask(project.id, task.name, task.description || "");
     if (res.success && res.task) {
-      setTasks((prevTasks) => [...prevTasks, res.task as unknown as TaskType]);
+      setOriginalTasks((prevTasks) => [...prevTasks, res.task as unknown as TaskType]);
       setAiSuggestedTasks(aiSuggestedTasks.filter((t) => t.id !== task.id));
       await deleteAISuggestedTask(task.id);
     }
@@ -136,9 +138,7 @@ const Project = ({
     return filteredTasks;
   };
 
-  useEffect(() => {
-    console.log(project);
-  }, [project]);
+
 
   // if (!tasks.length) return (
   //   <>
@@ -168,9 +168,71 @@ const Project = ({
   //   </>
   // );
 
+
   useEffect(() => {
-    console.log("tasks", tasks);
-  }, [tasks])
+    const filter = filterByDate
+
+    // Reset to original tasks for "all" filter
+    if (filter === 'all') {
+      setTasks(originalTasks);
+      return;
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const isToday = (date: Date) => {
+      return date.getFullYear() === today.getFullYear() &&
+        date.getMonth() === today.getMonth() &&
+        date.getDate() === today.getDate();
+    };
+
+    const isSameWeek = (date: Date) => {
+      const taskWeek = Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7);
+      const currentWeek = Math.ceil((today.getDate() + new Date(today.getFullYear(), today.getMonth(), 1).getDay()) / 7);
+      return date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear() &&
+        taskWeek === currentWeek;
+    };
+
+    const isSameMonth = (date: Date) => {
+      return date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
+    };
+
+    const isSameYear = (date: Date) => {
+      return date.getFullYear() === today.getFullYear();
+    };
+
+    const filteredTasks = originalTasks.map(task => ({
+      ...task,
+      subtasks: task.subtasks.filter(subtask => {
+        if (!subtask.dueDate) return false;
+
+        const subtaskDate = new Date(subtask.dueDate);
+        if (isNaN(subtaskDate.getTime())) return false;
+
+        subtaskDate.setHours(0, 0, 0, 0);
+
+        switch (filter) {
+          case 'today':
+            return isToday(subtaskDate);
+          case 'week':
+            return isSameWeek(subtaskDate);
+          case 'month':
+            return isSameMonth(subtaskDate);
+          case 'year':
+            return isSameYear(subtaskDate);
+          default:
+            return false;
+        }
+      })
+    }))
+      .filter(task => task.subtasks.length > 0);
+
+
+    setTasks(filteredTasks);
+  }, [filterByDate, originalTasks]);
 
   return (
     <>
@@ -215,69 +277,9 @@ const Project = ({
           <Separator orientation="vertical" className="h-5" />
           <select
             className="border rounded px-2 py-1 text-sm"
+            value={filterByDate}
             onChange={(e) => {
-              const filter = e.target.value;
-
-              // Reset to original tasks for "all" filter
-              if (filter === 'all') {
-                setTasks(originalTasks);
-                return;
-              }
-
-              const now = new Date();
-              const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-              const isToday = (date: Date) => {
-                return date.getFullYear() === today.getFullYear() &&
-                  date.getMonth() === today.getMonth() &&
-                  date.getDate() === today.getDate();
-              };
-
-              const isSameWeek = (date: Date) => {
-                const taskWeek = Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7);
-                const currentWeek = Math.ceil((today.getDate() + new Date(today.getFullYear(), today.getMonth(), 1).getDay()) / 7);
-                return date.getMonth() === today.getMonth() &&
-                  date.getFullYear() === today.getFullYear() &&
-                  taskWeek === currentWeek;
-              };
-
-              const isSameMonth = (date: Date) => {
-                return date.getMonth() === today.getMonth() &&
-                  date.getFullYear() === today.getFullYear();
-              };
-
-              const isSameYear = (date: Date) => {
-                return date.getFullYear() === today.getFullYear();
-              };
-
-              const filteredTasks = originalTasks.map(task => ({
-                ...task,
-                subtasks: task.subtasks.filter(subtask => {
-                  if (!subtask.dueDate) return false;
-
-                  const subtaskDate = new Date(subtask.dueDate);
-                  if (isNaN(subtaskDate.getTime())) return false;
-
-                  subtaskDate.setHours(0, 0, 0, 0);
-
-                  switch (filter) {
-                    case 'today':
-                      return isToday(subtaskDate);
-                    case 'week':
-                      return isSameWeek(subtaskDate);
-                    case 'month':
-                      return isSameMonth(subtaskDate);
-                    case 'year':
-                      return isSameYear(subtaskDate);
-                    default:
-                      return false;
-                  }
-                })
-              }))
-                .filter(task => task.subtasks.length > 0);
-
-
-              setTasks(filteredTasks);
+              setFilterByDate(e.target.value as "all" | "today" | "week" | "month" | "year");
             }}
           >
             <option value="all">All Time</option>
@@ -322,7 +324,9 @@ const Project = ({
             </div>
           )}
           <AddTaskPopup
-            setTasks={setTasks}
+            setTasks={(data) => {
+              setOriginalTasks(data);
+            }}
             projectId={project.id}
             modalIsOpen={addTaskModalOpen}
             setModalIsOpen={setaddTaskModalOpen}
@@ -382,7 +386,9 @@ const Project = ({
                     ...task,
                     subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
                   }))}
-                  setTasks={setTasks}
+                  setTasks={(data) => {
+                    setOriginalTasks(data);
+                  }}
                   users={members}
                   projectId={project.id}
                   role={currentUserRole}
@@ -397,7 +403,9 @@ const Project = ({
                   ...task,
                   subtasks: showSubtasks ? task.subtasks : [], // Show or hide subtasks based on `showSubtasks`
                 }))}
-                setTasks={setTasks}
+                setTasks={(data) => {
+                  setOriginalTasks(data);
+                }}
                 projectId={project.id}
                 role={currentUserRole}
                 editMode={editMode}
