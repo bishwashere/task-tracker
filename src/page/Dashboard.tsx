@@ -53,11 +53,12 @@ const Dashboard = ({ session }: { session: Session }) => {
   };
 
   const fetchOrganizations = async () => {
+    setInitialLoading(true);
     const res = await getOrganization();
     console.log(res);
     if (res.success && res.organizations?.length) {
       setOrganizations(res.organizations as unknown as Organization[]);
-      selectCurrentOrganization(res.organizations as unknown as Organization[]);
+      // selectCurrentOrganization(res.organizations as unknown as Organization[]);
       // setSelectedOrganization(res.organizations[0] as Organization)
     }
     setInitialLoading(false);
@@ -68,7 +69,7 @@ const Dashboard = ({ session }: { session: Session }) => {
   // }, [organizations])
   useEffect(() => {
     fetchOrganizations();
-  }, []);
+  }, [selectedOrganization]);
 
   if (initialLoading) {
     return <div className="text-center text-xl font-bold">Loading...</div>;
@@ -102,9 +103,9 @@ const Dashboard = ({ session }: { session: Session }) => {
           prevOrganizations.map((org) =>
             org.id === selectedOrganization.id
               ? {
-                  ...org,
-                  projects: [...org.projects, result.project as ProjectType],
-                }
+                ...org,
+                projects: [...org.projects, result.project as ProjectType],
+              }
               : org,
           ),
         );

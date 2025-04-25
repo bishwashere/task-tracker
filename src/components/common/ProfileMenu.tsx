@@ -120,7 +120,10 @@ const ProfileMenu = ({
             <Fragment>
               <hr className="border border-gray-300 my-1" />
               <button
-                onClick={onEditButtonClick}
+                onClick={() => {
+                  onEditButtonClick()
+                  setIsOpen(false)
+                }}
                 className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
               >
                 <Edit2Icon className="size-4" />

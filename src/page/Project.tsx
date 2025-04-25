@@ -165,7 +165,7 @@ const Project = ({
 
   return (
     <>
-      <SuperHeader path="/dashboard" />
+      <SuperHeader path="/dashboard" label={project.name} />
       <div className="max-w-7xl mx-auto p-4 space-y-6">
         <ProjectHeader
           session={session}
@@ -182,42 +182,30 @@ const Project = ({
             {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
           </p>
         </div>
-        <div className="flex justify-start items-center space-x-4 mb-2">
-          <button
-            className={`px-4 py-2 rounded text-sm ${
-              subtaskFilter === "all"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setSubtaskFilter("all")}
-          >
-            All
-          </button>
-          <button
-            className={`px-4 py-2 rounded text-sm ${
-              subtaskFilter === "pending"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setSubtaskFilter("pending")}
-          >
-            Pending
-          </button>
-          <button
-            className={`px-4 py-2 rounded text-sm ${
-              subtaskFilter === "done"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setSubtaskFilter("done")}
-          >
-            Done
-          </button>
+        <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 mb-2">
+          {
+            ([
+              "all",
+              "pending",
+              "done",
+            ] as const).map((filter) => (
+              <button
+                key={filter}
+                className={`sm:px-4 capitalize px-2 text-xs sm:text-sm sm:py-2 py-0.5 rounded ${subtaskFilter === filter
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+                  }`}
+                onClick={() => setSubtaskFilter(filter)}
+              >
+                {filter}
+              </button>
+            ))
+          }
         </div>
 
         <div className="mb-4 flex flex-row justify-between">
           <p
-            className="cursor-pointer text-blue-500 hover:underline w-fit"
+            className="cursor-pointer text-blue-500 hover:underline w-fit text-sm sm:text-base"
             onClick={() => setShowSubtasks(!showSubtasks)}
           >
             {showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
