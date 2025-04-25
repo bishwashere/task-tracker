@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import ProgressBar from "@/components/common/ProgressBar";
@@ -21,6 +23,7 @@ import {
 } from "@/actions/ai-sugested-task";
 import { saveTask } from "@/actions/task";
 import TaskGenerationLoader from "@/components/common/TaskGenerationLoader";
+import { Separator } from "@/components/ui/separator";
 
 const Project = ({
   session,
@@ -32,6 +35,7 @@ const Project = ({
   const [initialLoading, setInitialLoading] = useState(true);
   const [members, setMembers] = useState<User[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [originalTasks, setOriginalTasks] = useState<TaskType[]>([]);
   const [currentUserRole, setCurrentUserRole] = useState<"admin" | "member">(
     "member",
   );
@@ -60,6 +64,7 @@ const Project = ({
     const res = await fetchProjectData(project.id);
     if (res.success) {
       setTasks(res.tasks as unknown as TaskType[]);
+      setOriginalTasks(res.tasks as unknown as TaskType[]); // Store original tasks
       setCurrentUserRole(res.role as "admin" | "member");
       setPointsEarned(res.pointsEarned as number);
       if (res.members) setMembers(res.members as User[]);
@@ -163,6 +168,10 @@ const Project = ({
   //   </>
   // );
 
+  useEffect(() => {
+    console.log("tasks", tasks);
+  }, [tasks])
+
   return (
     <>
       <SuperHeader path="/dashboard" label={project.name} />
@@ -182,25 +191,101 @@ const Project = ({
             {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
           </p>
         </div>
-        <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 mb-2">
-          {
-            ([
-              "pending",
-              "all",
-              "done",
-            ] as const).map((filter) => (
-              <button
-                key={filter}
-                className={`sm:px-4 capitalize px-2 text-xs sm:text-sm sm:py-2 py-0.5 rounded ${subtaskFilter === filter
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-                  }`}
-                onClick={() => setSubtaskFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))
-          }
+        <div className="flex items-center gap-2.5">
+          <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 mb-2">
+            {
+              ([
+                "pending",
+                "all",
+                "done",
+              ] as const).map((filter) => (
+                <button
+                  key={filter}
+                  className={`sm:px-4 capitalize px-2 text-xs sm:text-sm sm:py-2 py-0.5 rounded ${subtaskFilter === filter
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                    }`}
+                  onClick={() => setSubtaskFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))
+            }
+          </div>
+          <Separator orientation="vertical" className="h-5" />
+          <select
+            className="border rounded px-2 py-1 text-sm"
+            onChange={(e) => {
+              const filter = e.target.value;
+
+              // Reset to original tasks for "all" filter
+              if (filter === 'all') {
+                setTasks(originalTasks);
+                return;
+              }
+
+              const now = new Date();
+              const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+              const isToday = (date: Date) => {
+                return date.getFullYear() === today.getFullYear() &&
+                  date.getMonth() === today.getMonth() &&
+                  date.getDate() === today.getDate();
+              };
+
+              const isSameWeek = (date: Date) => {
+                const taskWeek = Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7);
+                const currentWeek = Math.ceil((today.getDate() + new Date(today.getFullYear(), today.getMonth(), 1).getDay()) / 7);
+                return date.getMonth() === today.getMonth() &&
+                  date.getFullYear() === today.getFullYear() &&
+                  taskWeek === currentWeek;
+              };
+
+              const isSameMonth = (date: Date) => {
+                return date.getMonth() === today.getMonth() &&
+                  date.getFullYear() === today.getFullYear();
+              };
+
+              const isSameYear = (date: Date) => {
+                return date.getFullYear() === today.getFullYear();
+              };
+
+              const filteredTasks = originalTasks.map(task => ({
+                ...task,
+                subtasks: task.subtasks.filter(subtask => {
+                  if (!subtask.dueDate) return false;
+
+                  const subtaskDate = new Date(subtask.dueDate);
+                  if (isNaN(subtaskDate.getTime())) return false;
+
+                  subtaskDate.setHours(0, 0, 0, 0);
+
+                  switch (filter) {
+                    case 'today':
+                      return isToday(subtaskDate);
+                    case 'week':
+                      return isSameWeek(subtaskDate);
+                    case 'month':
+                      return isSameMonth(subtaskDate);
+                    case 'year':
+                      return isSameYear(subtaskDate);
+                    default:
+                      return false;
+                  }
+                })
+              }))
+                .filter(task => task.subtasks.length > 0);
+
+
+              setTasks(filteredTasks);
+            }}
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+          </select>
         </div>
 
         <div className="mb-4 flex flex-row justify-between">
@@ -326,3 +411,10 @@ const Project = ({
 };
 
 export default Project;
+
+
+
+
+
+
+
