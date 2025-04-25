@@ -59,7 +59,15 @@ export const fetchProjectData = async (projectId: string) => {
                   resolved: false,
                 },
               },
+              subtaskSortIndex: {
+                where: { userId },
+                select: { sortIndex: true },
+              },
             },
+          },
+          taskSortIndex: {
+            where: { userId },
+            select: { sortIndex: true },
           },
         },
       });
@@ -97,7 +105,7 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0,
+        0
       );
       return {
         success: true,
@@ -116,6 +124,10 @@ export const fetchProjectData = async (projectId: string) => {
         include: {
           task: {
             include: {
+              taskSortIndex: {
+                where: { userId },
+                select: { sortIndex: true },
+              },
               subtasks: {
                 where: { assignedUserId: userId },
                 include: {
@@ -123,6 +135,10 @@ export const fetchProjectData = async (projectId: string) => {
                     select: {
                       name: true,
                     },
+                  },
+                  subtaskSortIndex: {
+                    where: { userId },
+                    select: { sortIndex: true },
                   },
                 },
               },
@@ -132,8 +148,8 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const tasksWithSubtasks = Array.from(
         new Map(
-          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task]),
-        ).values(),
+          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task])
+        ).values()
       );
       //Fetch points for that project
       const pointsData = await prisma.pointsEarned.findMany({
@@ -144,7 +160,7 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0,
+        0
       );
       return {
         success: true,

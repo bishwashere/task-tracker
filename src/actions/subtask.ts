@@ -6,7 +6,7 @@ export const saveComment = async (
   subtaskId: string,
   projectId: string,
   userComment: string,
-  commentType: string,
+  commentType: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -24,7 +24,7 @@ export const saveComment = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === userId
     );
     if (!userOrg) {
       return { success: false, message: "Permission denied" };
@@ -56,5 +56,53 @@ export const saveComment = async (
   } catch (error) {
     console.error("Error while commenting", error);
     return { success: false, message: "An error occurred." };
+  }
+};
+
+export const sortSubtasks = async (
+  data: { subtaskId: string; sortIndex: number }[]
+) => {
+  try {
+    const userId = await isUserValid();
+    if (!userId) {
+      return { success: false, message: "Unauthorized !" };
+    }
+
+    await Promise.all(
+      data.map(async ({ subtaskId, sortIndex }) => {
+        const p = await prisma.subtaskSortIndex.findFirst({
+          where: {
+            subtaskId,
+            userId,
+          },
+        });
+        if (p) {
+          await prisma.subtaskSortIndex.update({
+            where: {
+              id: p.id,
+            },
+            data: {
+              sortIndex,
+            },
+          });
+        } else {
+          await prisma.subtaskSortIndex.create({
+            data: {
+              subtaskId,
+              userId,
+              sortIndex,
+            },
+          });
+        }
+      })
+    );
+
+    return { success: true, message: "Subtasks sorted successfully" };
+  } catch (error) {
+    console.error("Error sorting subtasks:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
   }
 };
