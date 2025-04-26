@@ -9,19 +9,157 @@ import { useConfirmModal } from "../Modal/useConfirmModal";
 import { Session } from "next-auth";
 import EditSubtaskPopup from "./EditSubtaskPopup";
 import { Avatar } from "../ui/avatar";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  DragStartEvent,
+  DragEndEvent,
+  TouchSensor,
+  MouseSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { cn } from "@/lib/cn";
+import { sortSubtasks } from "@/actions/subtask";
 
-export const SubTaskView = ({
-  subtask,
-  taskId,
-  role,
-  users,
-  projectId,
-  setTasks,
-  editMode,
-  setPointsEarned,
-  session,
-  isNewTask,
-}: {
+interface SubTaskListProps {
+  subtasks: SubtaskType[];
+  taskId: string;
+  role: "admin" | "member";
+  users: User[];
+  projectId: string;
+  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  editMode: boolean;
+  setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
+  session: Session;
+  isNewTask: (createdAt: string | Date) => boolean;
+}
+
+export const SubTaskList = (props: SubTaskListProps) => {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [subtasks, setSubtasks] = useState(props.subtasks);
+
+  // Configure sensors for both mouse and touch interactions
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    console.log("drag start")
+    // Stop event propagation to parent DnD context
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+
+    console.log("drag end")
+
+    // Stop event propagation to parent DnD context
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      const oldIndex = subtasks.findIndex(
+        (subtask) => subtask.id === active.id
+      );
+      const newIndex = subtasks.findIndex(
+        (subtask) => subtask.id === over.id
+      );
+
+      const updatedSubtasks = arrayMove(subtasks, oldIndex, newIndex).map(
+        (subtask, index) => ({
+          ...subtask,
+          subtaskSortIndex: [{ sortIndex: subtasks.length - 1 - index }] as [
+            { sortIndex: number }
+          ],
+        })
+      );
+
+      // Save the previous state in case of error
+      const prevSubtasks = subtasks;
+      setSubtasks(updatedSubtasks);
+
+      // Prepare sort data for the backend
+      const sortData = updatedSubtasks.map((subtask) => ({
+        subtaskId: subtask.id,
+        sortIndex: subtask?.subtaskSortIndex?.[0]?.sortIndex || 0,
+      }));
+
+      try {
+        const res = await sortSubtasks(sortData);
+        if (!res.success) {
+          toast.error(res.message || "An error occurred");
+          setSubtasks(prevSubtasks);
+        }
+      } catch {
+        toast.error("An error occurred");
+        setSubtasks(prevSubtasks);
+      }
+    }
+  };
+
+  return (
+    // Add onClick handler to prevent event bubbling
+    <div onClick={(e) => e.stopPropagation()}>
+      <DndContext
+        id="subtask-dnd-context"
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={subtasks.map((s) => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-2">
+            {subtasks
+              .sort(
+                (a, b) =>
+                  (b?.subtaskSortIndex?.[0]?.sortIndex || 0) -
+                  (a?.subtaskSortIndex?.[0]?.sortIndex || 0)
+              )
+              .map((subtask) => (
+                <SubTaskView
+                  key={subtask.id}
+                  subtask={subtask}
+                  {...props}
+                />
+              ))}
+          </div>
+        </SortableContext>
+        <DragOverlay>
+          {activeId ? (
+            <SubTaskViewDragOverlay
+              subtask={subtasks.find((s) => s.id === activeId)!}
+              {...props}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </div>
+  );
+};
+
+interface SubTaskViewProps {
   subtask: SubtaskType;
   taskId: string;
   role: "admin" | "member";
@@ -32,7 +170,60 @@ export const SubTaskView = ({
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
   session: Session;
   isNewTask: (createdAt: string | Date) => boolean;
-}) => {
+}
+
+export const SubTaskView = (props: SubTaskViewProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: props.subtask.id,
+    data: {
+      ...props.subtask,
+      isSubtask: true // Important: This flags it as a subtask
+    }
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="cursor-grab active:cursor-grabbing"
+    >
+      <SubTaskContent {...props} isDragging={isDragging} />
+    </div>
+  );
+};
+
+interface SubTaskContentProps extends SubTaskViewProps {
+  isDragging?: boolean;
+}
+
+export const SubTaskContent = ({
+  subtask,
+  taskId,
+  role,
+  users,
+  projectId,
+  setTasks,
+  editMode,
+  setPointsEarned,
+  session,
+  isNewTask,
+  isDragging,
+}: SubTaskContentProps) => {
   const router = useRouter();
   const issueCount = subtask.issueCount || 0;
   const [loading, setLoading] = useState(false);
@@ -74,7 +265,6 @@ export const SubTaskView = ({
     const res = await updateSubtaskStatus(subtaskId, "done");
     if (res.success) {
       const updatedSubtask = res.updatedSubtask as SubtaskType;
-      console.log("updatedSubtask", updatedSubtask,);
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
@@ -94,30 +284,6 @@ export const SubTaskView = ({
     }
     setLoading(false);
   };
-
-  // const assignUser = async (subtaskId: string, userId: string) => {
-  //   const confirmed = await confirmAction('Are you sure you want to assign this user to the subtask?');
-  //   if (!confirmed) return;
-  //   const res = await assignUserToSubtask(subtaskId, projectId, userId);
-  //   if (res.success) {
-  //     toast.success("Assigned User to subtask!")
-  //     const updatedSubtask = res.updatedSubtask as SubtaskType;
-  //     setTasks((prevTasks) =>
-  //       prevTasks.map((task) =>
-  //         task.id === taskId
-  //           ? {
-  //             ...task,
-  //             subtasks: task.subtasks.map((subtask) =>
-  //               subtask.id === updatedSubtask.id ? updatedSubtask : subtask
-  //             ),
-  //           }
-  //           : task
-  //       )
-  //     );
-  //   } else {
-  //     toast.error(res.message)
-  //   }
-  // };
 
   const dueRemaining = (dueDate: Date) => {
     const currentDate = new Date();
@@ -149,10 +315,13 @@ export const SubTaskView = ({
   return (
     <div
       key={subtask.id}
-      className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === "done"
-        ? "bg-green-200 text-green-700 hover:bg-green-300"
-        : "bg-white hover:bg-gray-100"
-        }`}
+      className={cn(
+        `p-2 rounded shadow-md flex justify-between items-center`,
+        subtask.status === "done"
+          ? "bg-green-200 text-green-700 hover:bg-green-300"
+          : "bg-white hover:bg-gray-100",
+        isDragging && "border-blue-500 shadow-lg"
+      )}
     >
       <div>
         <div className="flex flex-row gap-2 items-center">
@@ -172,7 +341,6 @@ export const SubTaskView = ({
             </span>
           )}
 
-          {/* issue count badge > 0  */}
           {(subtask.issueCount || 0) > 0 && (
             <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
               {subtask.issueCount}
@@ -247,3 +415,16 @@ export const SubTaskView = ({
     </div>
   );
 };
+
+export const SubTaskViewDragOverlay = (props: SubTaskViewProps) => {
+  // Add onClick handler to prevent event bubbling
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <SubTaskContent {...props} isDragging={true} />
+    </div>
+  );
+};
+
+
+
+

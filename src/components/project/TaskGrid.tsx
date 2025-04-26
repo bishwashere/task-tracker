@@ -31,17 +31,21 @@ export const TaskGrid = ({
   projectId,
   role,
   editMode,
+  originalTasks,
 }: {
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   projectId: string;
   role: "admin" | "member";
   editMode: boolean;
+  originalTasks: TaskType[];
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [sortedTasks, setSortedTasks] = useState(initialTasks);
+
+  console.log("originalTasks", originalTasks);
 
   useEffect(() => {
     const sorted = [...initialTasks].sort(
@@ -75,13 +79,13 @@ export const TaskGrid = ({
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const oldIndex = sortedTasks.findIndex((task) => task.id === active.id);
-      const newIndex = sortedTasks.findIndex((task) => task.id === over.id);
+      const oldIndex = initialTasks.findIndex((task) => task.id === active.id);
+      const newIndex = initialTasks.findIndex((task) => task.id === over.id);
 
-      const updatedTasks = arrayMove(sortedTasks, oldIndex, newIndex).map(
+      const updatedTasks = arrayMove(initialTasks, oldIndex, newIndex).map(
         (task, index) => ({
           ...task,
-          taskSortIndex: [{ sortIndex: sortedTasks.length - 1 - index }] as [
+          taskSortIndex: [{ sortIndex: initialTasks.length - 1 - index }] as [
             { sortIndex: number }
           ],
         })
@@ -216,7 +220,7 @@ const SortableTaskCard = (props: {
       style={style}
       {...attributes}
       {...listeners}
-      className={cn("touch-none", isDragging && "opacity-50")}
+      className={cn("cursor-grab active:cursor-grabbing", isDragging && "opacity-50")}
     >
       <TaskCard {...props} isDragging={isDragging} />
     </div>
@@ -272,8 +276,8 @@ const TaskCard = ({
           <li
             key={subtask.id}
             className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === "done"
-                ? "bg-green-200 text-green-700 hover:bg-green-300"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              ? "bg-green-200 text-green-700 hover:bg-green-300"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
           >
             <span
@@ -294,8 +298,8 @@ const TaskCard = ({
                     priorityToggle(task.id, subtask.id, subtask.priority)
                   }
                   className={`text-sm rounded ${subtask.priority
-                      ? "text-yellow-500 hover:text-yellow-600"
-                      : "text-gray-500 hover:text-gray-600"
+                    ? "text-yellow-500 hover:text-yellow-600"
+                    : "text-gray-500 hover:text-gray-600"
                     }`}
                   disabled={loading}
                 >
