@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { SubTaskView } from "@/components/project/SubTaskView";
-import { TaskType } from "@/types/organization";
+import { SubTaskView, SubTaskContent } from "@/components/project/SubTaskView";
+import { TaskType, SubtaskType } from "@/types/organization";
 import { User } from "@/types/user";
 import AddSubtask from "./AddSubtaskPopup";
 import { Session } from "next-auth";
@@ -26,6 +26,70 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { sortTasks } from "@/actions/task";
 import toast from "react-hot-toast";
+import { sortSubtasks } from "@/actions/subtask";
+
+interface DragOverlayContentProps {
+  activeId: string;
+  tasks: TaskType[];
+}
+
+const DragOverlayContent: React.FC<DragOverlayContentProps> = ({ activeId, tasks }) => {
+  // Find if it's a task or subtask
+  const task = tasks.find(t => t.id === activeId);
+  if (task) {
+    return (
+      <TaskItem
+        task={task}
+        index={tasks.findIndex(t => t.id === activeId)}
+        isDragging={true}
+      />
+    );
+  }
+
+  // Look for subtask
+  for (const task of tasks) {
+    const subtask = task.subtasks.find(s => s.id === activeId);
+    if (subtask) {
+      return (
+        <SubTaskContent
+          subtask={subtask}
+          taskId={task.id}
+          isDragging={true}
+          projectId={task.projectId}
+          role="member"
+          users={[]}
+          setTasks={() => { }}
+          editMode={false}
+          setPointsEarned={() => { }}
+          //@ts-expect-error:...........
+          session={null}
+          isNewTask={() => false}
+        />
+      );
+    }
+  }
+
+  return null;
+};
+
+interface TaskItemProps {
+  task: TaskType;
+  index: number;
+  isDragging: boolean;
+}
+
+const TaskItem: React.FC<TaskItemProps> = ({ task, index, isDragging }) => {
+  return (
+    <div className="flex items-start gap-1">
+      <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
+      <div className={`mb-6 p-2 rounded hover:bg-gray-50 border border-gray-200 relative flex-1 ${isDragging ? 'border-blue-500 shadow-lg' : ''}`}>
+        <div className="flex flex-row items-center gap-1">
+          <h3 className="text-xl font-bold mb-2">{task?.name}</h3>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const TaskList = ({
   tasks: initialTasks,
@@ -80,6 +144,8 @@ export const TaskList = ({
   );
 
   const handleDragStart = (event: DragStartEvent) => {
+    const isSubtask = event.active.data.current?.isSubtask;
+    console.log("drag start", isSubtask ? "subtask" : "task");
     setActiveId(event.active.id as string);
   };
 
@@ -87,41 +153,94 @@ export const TaskList = ({
     const { active, over } = event;
     setActiveId(null);
 
-    if (over && active.id !== over.id) {
-      const oldIndex = originalTasks.findIndex((task) => task.id === active.id);
-      const newIndex = originalTasks.findIndex((task) => task.id === over.id);
+    if (!over) return;
 
-      // Immediately update the local state first
-      const updatedTasks = arrayMove(originalTasks, oldIndex, newIndex).map(
-        (task, index) => ({
-          ...task,
-          taskSortIndex: [{ sortIndex: originalTasks.length - 1 - index }] as [
+    const isSubtask = active.data.current?.isSubtask;
+    const activeId = active.id;
+    const overId = over.id;
+
+    if (activeId === overId) return;
+
+    if (isSubtask) {
+      // Handle subtask reordering
+      const task = tasks.find(t =>
+        t.subtasks.some(s => s.id === activeId)
+      );
+      if (!task) return;
+
+      const oldIndex = task.subtasks.findIndex(s => s.id === activeId);
+      const newIndex = task.subtasks.findIndex(s => s.id === overId);
+
+      const updatedSubtasks = arrayMove(task.subtasks, oldIndex, newIndex).map(
+        (subtask, index) => ({
+          ...subtask,
+          subtaskSortIndex: [{ sortIndex: task.subtasks.length - 1 - index }] as [
             { sortIndex: number }
           ],
         })
       );
 
-      // Update both local and parent state immediately
+      // Update tasks state with new subtask order
+      const updatedTasks = tasks.map(t =>
+        t.id === task.id
+          ? { ...t, subtasks: updatedSubtasks }
+          : t
+      );
+
+      // Save previous state for rollback
+      const prevTasks = tasks;
       setTasks(updatedTasks);
       setParentTasks(updatedTasks);
 
-      // Then handle the backend update
-      const sortData = updatedTasks.map((task) => ({
+      // Prepare sort data for backend
+      const sortData = updatedSubtasks.map(subtask => ({
+        subtaskId: subtask.id,
+        sortIndex: subtask.subtaskSortIndex[0].sortIndex
+      }));
+
+      try {
+        const res = await sortSubtasks(sortData);
+        if (!res.success) {
+          toast.error(res.message || "An error occurred");
+          setTasks(prevTasks);
+          setParentTasks(prevTasks);
+        }
+      } catch {
+        toast.error("An error occurred");
+        setTasks(prevTasks);
+        setParentTasks(prevTasks);
+      }
+    } else {
+      // Handle task reordering (your existing task reordering logic)
+      const oldIndex = initialTasks.findIndex(task => task.id === activeId);
+      const newIndex = initialTasks.findIndex(task => task.id === overId);
+
+      const updatedTasks = arrayMove(initialTasks, oldIndex, newIndex).map(
+        (task, index) => ({
+          ...task,
+          taskSortIndex: [{ sortIndex: initialTasks.length - 1 - index }] as [
+            { sortIndex: number }
+          ],
+        })
+      );
+
+      setTasks(updatedTasks);
+      setParentTasks(updatedTasks);
+
+      const sortData = updatedTasks.map(task => ({
         taskId: task.id,
-        sortIndex: task?.taskSortIndex?.[0]?.sortIndex || 0,
+        sortIndex: task.taskSortIndex[0].sortIndex
       }));
 
       try {
         const res = await sortTasks(sortData);
         if (!res.success) {
           toast.error(res.message || "An error occurred");
-          // If error, revert both states
           setTasks(tasks);
           setParentTasks(tasks);
         }
       } catch {
         toast.error("An error occurred");
-        // If error, revert both states
         setTasks(tasks);
         setParentTasks(tasks);
       }
@@ -137,7 +256,7 @@ export const TaskList = ({
       transition,
       isDragging,
     } = useSortable({
-      id: task.id,
+      id: task?.id,
       transition: {
         duration: 200,
         easing: "ease"
@@ -163,16 +282,16 @@ export const TaskList = ({
           {role === "admin" && editMode && (
             <AddSubtask
               setTasks={setParentTasks}
-              taskId={task.id}
+              taskId={task?.id}
               projectId={projectId}
-              showAi={!task.hasAISuggestions}
+              showAi={!task?.hasAISuggestions}
             />
           )}
           <div className="flex flex-row items-center gap-1">
-            <h3 className="text-xl font-bold mb-2">{task.name}</h3>
-            {task.createdAt && (
+            <h3 className="text-xl font-bold mb-2">{task?.name}</h3>
+            {task?.createdAt && (
               <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
-                {isNewTask(task.createdAt) ? (
+                {isNewTask(task?.createdAt) ? (
                   <span className="w-2.5 h-2.5 bg-green-500 rounded-full mr-1"></span>
                 ) : (
                   ""
@@ -188,21 +307,28 @@ export const TaskList = ({
             )}
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {task.subtasks.map((subtask) => (
-              <SubTaskView
-                key={subtask.id}
-                subtask={subtask}
-                taskId={task.id}
-                role={role}
-                users={users}
-                projectId={projectId}
-                setTasks={setParentTasks}
-                editMode={editMode}
-                setPointsEarned={setPointsEarned}
-                session={session}
-                isNewTask={isNewTask}
-              />
-            ))}
+            {task?.subtasks.
+              // sort by sortIndex
+              sort(
+                (a, b) =>
+                  (b?.subtaskSortIndex?.[0]?.sortIndex || 0) -
+                  (a?.subtaskSortIndex?.[0]?.sortIndex || 0)
+              ).
+              map((subtask) => (
+                <SubTaskView
+                  key={subtask?.id}
+                  subtask={subtask}
+                  taskId={task?.id}
+                  role={role}
+                  users={users}
+                  projectId={projectId}
+                  setTasks={setParentTasks}
+                  editMode={editMode}
+                  setPointsEarned={setPointsEarned}
+                  session={session}
+                  isNewTask={isNewTask}
+                />
+              ))}
           </div>
         </div>
       </div>
@@ -219,9 +345,13 @@ export const TaskList = ({
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      id="task-dnd-context"
     >
       <SortableContext
-        items={tasks.map((t) => t.id)}
+        items={[
+          ...tasks.map(t => t.id),
+          ...tasks.flatMap(t => t.subtasks.map(s => s.id))
+        ]}
         strategy={verticalListSortingStrategy}
       >
         <div>
@@ -232,36 +362,22 @@ export const TaskList = ({
                 (a?.taskSortIndex?.[0]?.sortIndex || 0)
             )
             .map((task, index) => (
-              <SortableTaskItem key={task.id} task={task} index={index} />
+              <SortableTaskItem key={task?.id} task={task} index={index} />
             ))}
         </div>
       </SortableContext>
       <DragOverlay>
-        {activeId ? (
-          <TaskItem
-            task={tasks.find((t) => t.id === activeId)!}
-            index={tasks.findIndex((t) => t.id === activeId)}
-            isDragging={true}
+        {activeId && (
+          <DragOverlayContent
+            activeId={activeId}
+            tasks={tasks}
           />
-        ) : null}
+        )}
       </DragOverlay>
     </DndContext>
   );
 };
 
-// Separate non-draggable component for the overlay
-const TaskItem = ({ task, index, isDragging }: { task: TaskType; index: number; isDragging: boolean }) => {
-  return (
-    <div className="flex items-start gap-1">
-      <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
-      <div className={`mb-6 p-2 rounded hover:bg-gray-50 border border-gray-200 relative flex-1 ${isDragging ? 'border-blue-500 shadow-lg' : ''}`}>
-        <div className="flex flex-row items-center gap-1">
-          <h3 className="text-xl font-bold mb-2">{task.name}</h3>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 
 

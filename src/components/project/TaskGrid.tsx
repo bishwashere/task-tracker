@@ -79,13 +79,13 @@ export const TaskGrid = ({
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const oldIndex = originalTasks.findIndex((task) => task.id === active.id);
-      const newIndex = originalTasks.findIndex((task) => task.id === over.id);
+      const oldIndex = initialTasks.findIndex((task) => task.id === active.id);
+      const newIndex = initialTasks.findIndex((task) => task.id === over.id);
 
-      const updatedTasks = arrayMove(originalTasks, oldIndex, newIndex).map(
+      const updatedTasks = arrayMove(initialTasks, oldIndex, newIndex).map(
         (task, index) => ({
           ...task,
-          taskSortIndex: [{ sortIndex: originalTasks.length - 1 - index }] as [
+          taskSortIndex: [{ sortIndex: initialTasks.length - 1 - index }] as [
             { sortIndex: number }
           ],
         })
