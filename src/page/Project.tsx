@@ -440,6 +440,7 @@ const Project = ({
                   editMode={editMode}
                   setPointsEarned={setPointsEarned}
                   session={session}
+                  originalTasks={originalTasks}
                 />
               </>
             ) : (
@@ -454,6 +455,7 @@ const Project = ({
                 projectId={project.id}
                 role={currentUserRole}
                 editMode={editMode}
+                originalTasks={originalTasks}
               />
             )}
           </>

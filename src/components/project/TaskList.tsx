@@ -36,6 +36,7 @@ export const TaskList = ({
   editMode,
   setPointsEarned,
   session,
+  originalTasks,
 }: {
   tasks: TaskType[];
   users: User[];
@@ -45,6 +46,7 @@ export const TaskList = ({
   editMode: boolean;
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
   session: Session;
+  originalTasks: TaskType[];
 }) => {
 
 
@@ -86,14 +88,14 @@ export const TaskList = ({
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const oldIndex = tasks.findIndex((task) => task.id === active.id);
-      const newIndex = tasks.findIndex((task) => task.id === over.id);
+      const oldIndex = originalTasks.findIndex((task) => task.id === active.id);
+      const newIndex = originalTasks.findIndex((task) => task.id === over.id);
 
       // Immediately update the local state first
-      const updatedTasks = arrayMove(tasks, oldIndex, newIndex).map(
+      const updatedTasks = arrayMove(originalTasks, oldIndex, newIndex).map(
         (task, index) => ({
           ...task,
-          taskSortIndex: [{ sortIndex: tasks.length - 1 - index }] as [
+          taskSortIndex: [{ sortIndex: originalTasks.length - 1 - index }] as [
             { sortIndex: number }
           ],
         })
