@@ -44,17 +44,17 @@ const EditSubtaskPopup = ({
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: task.subtasks.some(
-                  (sub) => sub.id === res.subTask?.id,
+              ...task,
+              subtasks: task.subtasks.some(
+                (sub) => sub.id === res.subTask?.id,
+              )
+                ? task.subtasks.map((sub) =>
+                  sub.id === res.subTask?.id
+                    ? (res.subTask as unknown as SubtaskType)
+                    : sub,
                 )
-                  ? task.subtasks.map((sub) =>
-                      sub.id === res.subTask?.id
-                        ? (res.subTask as unknown as SubtaskType)
-                        : sub,
-                    )
-                  : [...task.subtasks, res.subTask as unknown as SubtaskType],
-              }
+                : [...task.subtasks, res.subTask as unknown as SubtaskType],
+            }
             : task,
         ),
       );
@@ -65,9 +65,9 @@ const EditSubtaskPopup = ({
   };
   return (
     <>
-      <button onClick={() => setModalIsOpen(true)}>
+      <button className="p-1" onClick={() => setModalIsOpen(true)}>
         <BiEditAlt className="text-red-600" />
-      </button>
+    </button >
       <Modal
         modalIsOpen={modalIsOpen}
         setModalIsOpen={setModalIsOpen}

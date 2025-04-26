@@ -135,7 +135,18 @@ const Project = ({
           subtasks: filteredSubtasks,
         };
       })
-      .filter((task) => subtaskFilter === "done" ? task.subtasks.length > 0 : true);
+      // now if all return all, if done, return task with subtasks > 0,
+      // if pending, return task with subtasks > 0 or task with subtask can also pass if it already does not have any task before 
+      // filtering
+      .filter((t) => {
+        if (subtaskFilter === "all") return true;
+        if (subtaskFilter === "done" && t.subtasks.length > 0) return true;
+        if (subtaskFilter === "pending") {
+          if (t.subtasks.length > 0) return true; // if subtasks > 0, return true
+          if (t.subtasks.length === 0 && originalTasks.find((ot) => ot.id === t.id)?.subtasks.length === 0) return true; // if subtasks === 0 and originalTasks.subtasks === 0, return true
+        }
+      });
+
     return filteredTasks;
   };
 
