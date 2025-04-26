@@ -51,6 +51,7 @@ export const fetchProjectData = async (projectId: string) => {
               assignedUser: {
                 select: {
                   name: true,
+                  image: true,
                 },
               },
               comments: {
