@@ -74,6 +74,7 @@ export const SubTaskView = ({
     const res = await updateSubtaskStatus(subtaskId, "done");
     if (res.success) {
       const updatedSubtask = res.updatedSubtask as SubtaskType;
+      console.log("updatedSubtask", updatedSubtask,);
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId

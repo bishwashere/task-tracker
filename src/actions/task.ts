@@ -395,6 +395,15 @@ export const updateSubtaskStatus = async (
       data: {
         status: status,
       },
+      include: {
+        assignedUser: {
+          select: {
+            name: true,
+            image: true,
+            id: true,
+          },
+        },
+      },
     });
 
     return { success: true, message: "Success", updatedSubtask };
