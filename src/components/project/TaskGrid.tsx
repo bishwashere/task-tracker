@@ -24,6 +24,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/cn";
+import { User } from "@/types/user";
 
 export const TaskGrid = ({
   tasks: initialTasks,
@@ -32,6 +33,7 @@ export const TaskGrid = ({
   role,
   editMode,
   originalTasks,
+  users
 }: {
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
@@ -39,6 +41,7 @@ export const TaskGrid = ({
   role: "admin" | "member";
   editMode: boolean;
   originalTasks: TaskType[];
+  users: User[]
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -167,6 +170,7 @@ export const TaskGrid = ({
               loading={loading}
               priorityToggle={priorityToggle}
               setTasks={setParentTasks}
+              users={users}
             />
           ))}
         </div>
@@ -182,6 +186,7 @@ export const TaskGrid = ({
             priorityToggle={priorityToggle}
             setTasks={setParentTasks}
             isDragging={true}
+            users={users}
           />
         ) : null}
       </DragOverlay>
@@ -197,6 +202,7 @@ const SortableTaskCard = (props: {
   loading: boolean;
   priorityToggle: (taskId: string, subtaskId: string, priority: number) => Promise<void>;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  users: User[]
 }) => {
   const {
     attributes,
@@ -222,7 +228,7 @@ const SortableTaskCard = (props: {
       {...listeners}
       className={cn("cursor-grab active:cursor-grabbing", isDragging && "opacity-50")}
     >
-      <TaskCard {...props} isDragging={isDragging} />
+      <TaskCard {...props} isDragging={isDragging} users={props.users} />
     </div>
   );
 };
@@ -236,6 +242,7 @@ const TaskCard = ({
   priorityToggle,
   setTasks,
   isDragging,
+  users
 }: {
   task: TaskType;
   role: "admin" | "member";
@@ -245,6 +252,7 @@ const TaskCard = ({
   priorityToggle: (taskId: string, subtaskId: string, priority: number) => Promise<void>;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   isDragging?: boolean;
+  users: User[]
 }) => {
   const router = useRouter();
 
@@ -267,6 +275,7 @@ const TaskCard = ({
             projectId={projectId}
             showText={false}
             showAi={!task.hasAISuggestions}
+            users={users}
           />
         )}
       </div>

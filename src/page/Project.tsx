@@ -456,6 +456,7 @@ const Project = ({
                 role={currentUserRole}
                 editMode={editMode}
                 originalTasks={originalTasks}
+                users={members}
               />
             )}
           </>

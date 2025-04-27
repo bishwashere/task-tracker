@@ -114,7 +114,8 @@ export const saveSubTask = async (
   projectId: string,
   subTaskName: string,
   dueDate: Date,
-  points: number
+  points: number,
+  assignedUserId: string | null
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -146,8 +147,11 @@ export const saveSubTask = async (
         name: subTaskName,
         dueDate,
         points,
-        assignedUserId: null,
+        assignedUserId: assignedUserId === "" ? null : assignedUserId,
         taskId,
+      },
+      include: {
+        assignedUser: true,
       },
     });
 
