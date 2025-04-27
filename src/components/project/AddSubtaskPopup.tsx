@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { SubtaskType, TaskType } from "@/types/organization";
 import AISubtaskDialog from "../common/AISubtaskGenerator";
+import { User } from "@/types/user";
 
 const AddSubtask = ({
   setTasks,
@@ -13,12 +14,14 @@ const AddSubtask = ({
   projectId,
   showText = true,
   showAi = true,
+  users = []
 }: {
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   taskId: string;
   projectId: string;
   showText?: boolean;
   showAi: boolean;
+  users: User[]
 }) => {
   const [showAiSuggestion, setShowAiSuggestion] = useState(showAi);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -31,12 +34,14 @@ const AddSubtask = ({
     const subTaskName = formData.get("subtaskName") as string;
     const dueDate = new Date(formData.get("dueDate") as string);
     const points = Number(formData.get("points") as string);
+    const assignedUserId = formData.get("assignedUserId") as string;
     const res = await saveSubTask(
       taskId,
       projectId,
       subTaskName,
       dueDate,
       points,
+      assignedUserId,
     );
     if (res.success) {
       toast.success(res.message);
@@ -44,12 +49,12 @@ const AddSubtask = ({
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: [
-                  ...task.subtasks,
-                  res.subTask as unknown as SubtaskType,
-                ],
-              }
+              ...task,
+              subtasks: [
+                ...task.subtasks,
+                res.subTask as unknown as SubtaskType,
+              ],
+            }
             : task,
         ),
       );
@@ -130,6 +135,18 @@ const AddSubtask = ({
             // onChange={(e) => setPoints(parseInt(e.target.value, 10))}
             className="border p-2 rounded w-full mb-4"
           />
+          <select
+            id="assignedUserId"
+            name="assignedUserId"
+            className="border p-2 rounded w-full mb-4"
+          >
+            <option value="">Unassigned</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name} ({user.email})
+              </option>
+            ))}
+          </select>
           <div className="flex justify-end mt-5">
             <FormSubmitButton className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
               Add Subtask

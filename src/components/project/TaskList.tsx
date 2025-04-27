@@ -285,6 +285,7 @@ export const TaskList = ({
               taskId={task?.id}
               projectId={projectId}
               showAi={!task?.hasAISuggestions}
+              users={users}
             />
           )}
           <div className="flex flex-row items-center gap-1">
