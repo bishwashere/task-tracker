@@ -398,6 +398,7 @@ export const updateSubtaskStatus = async (
       where: { id: subtaskId },
       data: {
         status: status,
+        completedAt: status === "done" ? new Date() : null,
       },
       include: {
         assignedUser: {
@@ -505,3 +506,48 @@ export const sortTasks = async (
     };
   }
 };
+
+export const deleteTask = async (taskId: string) => {
+  try {
+    const userId = await isUserValid();
+    if (!userId) {
+      return { success: false, message: "Unauthorized!" };
+    }
+
+    // First, delete all subtasks and their related records
+    const subtasks = await prisma.subtask.findMany({
+      where: { taskId },
+    });
+
+    for (const subtask of subtasks) {
+      // Delete subtask sort indices
+      await prisma.subtaskSortIndex.deleteMany({
+        where: { subtaskId: subtask.id },
+      });
+
+      // Delete the subtask
+      await prisma.subtask.delete({
+        where: { id: subtask.id },
+      });
+    }
+
+    // Delete task sort indices
+    await prisma.taskSortIndex.deleteMany({
+      where: { taskId },
+    });
+
+    // Finally, delete the task
+    await prisma.task.delete({
+      where: { id: taskId },
+    });
+
+    return { success: true, message: "Task deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+

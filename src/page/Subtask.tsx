@@ -27,7 +27,7 @@ const Subtask = ({
   const fetchSubtaskAndComment = async () => {
     const res = await fetchSubtaskData(subtaskId);
     if (res.success) {
-      setSubtask(res.subtask as SubtaskType);
+      setSubtask(res.subtask as unknown as SubtaskType);
       setComments(res.comments as CommentType[]);
     }
     setInitialLoading(false);
@@ -105,10 +105,10 @@ const Subtask = ({
             <span className="font-semibold">
               {subtask.dueDate
                 ? new Date(subtask.dueDate).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
+                  month: "long",
+                  day: "2-digit",
+                  year: "numeric",
+                })
                 : "No due date"}
             </span>
           </p>
@@ -199,9 +199,9 @@ const Subtask = ({
                                   comments.map((comment) =>
                                     comment.id === c.id
                                       ? ({
-                                          ...comment,
-                                          resolved: true,
-                                        } as CommentType)
+                                        ...comment,
+                                        resolved: true,
+                                      } as CommentType)
                                       : comment,
                                   ),
                                 );

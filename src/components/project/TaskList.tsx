@@ -27,6 +27,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { sortTasks } from "@/actions/task";
 import toast from "react-hot-toast";
 import { sortSubtasks } from "@/actions/subtask";
+import DeleteTask from "./DeleteTask";
+import { cn } from "@/lib/cn";
 
 interface DragOverlayContentProps {
   activeId: string;
@@ -113,7 +115,7 @@ export const TaskList = ({
   originalTasks: TaskType[];
 }) => {
 
-
+  const [activeType, setActiveType] = useState<'task' | 'subtask' | null>(null);
   const [tasks, setTasks] = useState(initialTasks);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -145,8 +147,8 @@ export const TaskList = ({
 
   const handleDragStart = (event: DragStartEvent) => {
     const isSubtask = event.active.data.current?.isSubtask;
-    console.log("drag start", isSubtask ? "subtask" : "task");
     setActiveId(event.active.id as string);
+    setActiveType(isSubtask ? 'subtask' : 'task');
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -257,10 +259,11 @@ export const TaskList = ({
       isDragging,
     } = useSortable({
       id: task?.id,
-      transition: {
-        duration: 200,
-        easing: "ease"
-      }
+      data: {
+        type: 'task',
+        isSubtask: false
+      },
+      disabled: !editMode   // Disable when not in edit mode
     });
 
     const style = {
@@ -275,7 +278,11 @@ export const TaskList = ({
         style={style}
         {...attributes}
         {...listeners}
-        className="flex items-start gap-1 cursor-grab active:cursor-grabbing transition-all duration-200"
+        className={cn(
+          "flex items-start gap-1 transition-all duration-200",
+          editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
+          (!editMode) && "pointer-events-none"
+        )}
       >
         <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
         <div className="mb-6 p-2 rounded hover:bg-gray-50 border border-gray-200 relative flex-1">
@@ -299,13 +306,23 @@ export const TaskList = ({
                 )}
               </span>
             )}
-            {role === "admin" && editMode && (
-              <EditTaskPopup
-                task={task}
-                projectId={projectId}
-                setTasks={setParentTasks}
-              />
-            )}
+            <div className="flex items-center justify-center">
+              {role === "admin" && editMode && (
+                <EditTaskPopup
+                  task={task}
+                  projectId={projectId}
+                  setTasks={setParentTasks}
+                />
+              )}
+              {role === "admin" && editMode && (
+                <DeleteTask taskId={task?.id}
+                  onSuccess={() => {
+                    setParentTasks((prevTasks) =>
+                      prevTasks.filter((t) => t.id !== task?.id)
+                    );
+                  }} />
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {task?.subtasks.
@@ -378,7 +395,5 @@ export const TaskList = ({
     </DndContext>
   );
 };
-
-
 
 

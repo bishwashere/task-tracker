@@ -129,7 +129,7 @@ export const TaskGrid = ({
       priority === 0 ? 1 : 0,
     );
     if (res.success) {
-      const updatedSubtask = res.updatedSubtask as SubtaskType;
+      const updatedSubtask = res.updatedSubtask as unknown as SubtaskType;
       setParentTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
@@ -213,6 +213,7 @@ const SortableTaskCard = (props: {
     isDragging,
   } = useSortable({
     id: props.task.id,
+    disabled: !props.editMode,
   });
 
   const style = {

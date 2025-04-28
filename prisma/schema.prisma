@@ -157,7 +157,7 @@ model TaskSortIndex {
 }
 
 model Subtask {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   taskId           String             @db.ObjectId
   task             Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -173,6 +173,7 @@ model Subtask {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   subtaskSortIndex SubtaskSortIndex[]
+  completedAt      DateTime?
 }
 
 model SubtaskSortIndex {
