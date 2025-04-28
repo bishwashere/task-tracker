@@ -29,6 +29,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/cn";
 import { sortSubtasks } from "@/actions/subtask";
+import DeleteTask from "./DeleteTask";
 
 interface SubTaskListProps {
   subtasks: SubtaskType[];
@@ -185,7 +186,8 @@ export const SubTaskView = (props: SubTaskViewProps) => {
     data: {
       ...props.subtask,
       isSubtask: true // Important: This flags it as a subtask
-    }
+    },
+    disabled: !props.editMode,
   });
 
   const style: React.CSSProperties = {
@@ -354,6 +356,21 @@ export const SubTaskContent = ({
               subtask={subtask}
               taskId={taskId}
             />
+          )}
+          {role === "admin" && editMode && (
+            <DeleteTask subTaskId={subtask?.id}
+              onSuccess={() => {
+                setTasks((prevTasks) =>
+                  prevTasks.map((task) =>
+                    task.id === taskId
+                      ? {
+                        ...task,
+                        subtasks: task.subtasks.filter((subtask) => subtask.id !== subtask?.id)
+                      }
+                      : task,
+                  ),
+                );
+              }} />
           )}
         </div>
         <div className="text-sm">

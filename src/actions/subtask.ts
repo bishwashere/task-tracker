@@ -106,3 +106,45 @@ export const sortSubtasks = async (
     };
   }
 };
+
+export const deleteSubtask = async (subtaskId: string) => {
+  try {
+    // check for permission
+    const userId = await isUserValid();
+
+    if (!userId) {
+      return { success: false, message: "Unauthorized !" };
+    }
+
+    // check if subtask exists
+    const subtask = await prisma.subtask.findUnique({
+      where: { id: subtaskId },
+    });
+
+    if (!subtask) {
+      return { success: false, message: "Subtask not found" };
+    }
+
+    await prisma.subtask.delete({
+      where: { id: subtaskId },
+    });
+
+    // delete all sort indices associated with the subtask
+    await prisma.subtaskSortIndex.deleteMany({
+      where: { subtaskId: subtaskId },
+    });
+
+    // delete all comments associated with the subtask
+    await prisma.comment.deleteMany({
+      where: { subtaskId: subtaskId },
+    });
+
+    return { success: true, message: "Subtask deleted !" };
+  } catch (error) {
+    console.error("Error deleting subtask:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};

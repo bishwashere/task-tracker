@@ -43,7 +43,7 @@ const EditTaskPopup = ({
   };
   return (
     <>
-      <button onClick={() => setModalIsOpen(true)} className="-mt-3">
+      <button onClick={() => setModalIsOpen(true)} className="p-1">
         <BiEditAlt className="text-red-600" />
       </button>
       <Modal

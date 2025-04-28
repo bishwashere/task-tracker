@@ -14,7 +14,7 @@ import { ProjectType, TaskType } from "@/types/organization";
 import { User } from "@/types/user";
 import { calculateProgressWithStats } from "@/utils/progressUtils";
 import { Session } from "next-auth";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MdEditSquare } from "react-icons/md";
 import {
@@ -24,6 +24,17 @@ import {
 import { saveTask } from "@/actions/task";
 import TaskGenerationLoader from "@/components/common/TaskGenerationLoader";
 import { Separator } from "@/components/ui/separator";
+
+const ProjectContext = React.createContext({
+  tasks: [] as TaskType[],
+  setTasks: (data: TaskType[]) => { },
+});
+
+const useProjectContext = () => {
+  if (!ProjectContext) throw new Error("useProjectContext must be used within a ProjectProvider");
+  return React.useContext(ProjectContext);
+}
+
 
 const Project = ({
   session,
@@ -120,8 +131,8 @@ const Project = ({
   const stats = calculateProgressWithStats(tasks);
 
   const getFilteredTasks = () => {
-    if (!tasks) return [];
-    const filteredTasks = tasks
+    if (!originalTasks) return [];
+    const filteredTasks = originalTasks
       .map((task) => {
         // Ensure task.subtasks is always an array before filtering
         const filteredSubtasks = (task.subtasks || []).filter((subtask) => {
@@ -258,7 +269,7 @@ const Project = ({
   }, [filterByDate, userFilter, originalTasks]);
 
   return (
-    <>
+    <ProjectContext.Provider value={{ tasks: originalTasks, setTasks: setOriginalTasks }}>
       <SuperHeader path="/dashboard" label={project.name} />
       <div className="max-w-7xl mx-auto p-4 space-y-6">
         <ProjectHeader
@@ -462,7 +473,7 @@ const Project = ({
           </>
         )}
       </div>
-    </>
+    </ProjectContext.Provider>
   );
 };
 
