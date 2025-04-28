@@ -398,6 +398,7 @@ export const updateSubtaskStatus = async (
       where: { id: subtaskId },
       data: {
         status: status,
+        completedAt: status === "completed" ? new Date() : null,
       },
       include: {
         assignedUser: {
