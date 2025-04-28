@@ -42,6 +42,8 @@ export type TaskType = {
   createdAt: Date;
   updatedAt: Date;
   taskSortIndex?: [{ sortIndex: number }];
+  assignedUserId?: string | null;
+  assignedUser?: User | null;
 };
 
 export type SubtaskType = {

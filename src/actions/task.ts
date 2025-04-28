@@ -115,7 +115,7 @@ export const saveSubTask = async (
   subTaskName: string,
   dueDate: Date,
   points: number,
-  assignedUserId: string | null
+  assignedUserId?: string | null
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -550,4 +550,3 @@ export const deleteTask = async (taskId: string) => {
     };
   }
 };
-
