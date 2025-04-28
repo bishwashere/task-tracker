@@ -27,16 +27,16 @@ const AddTagPopup = ({
     const res = await saveTaskTag(subtaskId, projectId, tagName, tagColor);
     if (res.success) {
       toast.success(res.message);
-      const updatedSubtask = res.updatedSubtask as SubtaskType;
+      const updatedSubtask = res.updatedSubtask as unknown as SubtaskType;
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                subtasks: task.subtasks.map((subtask) =>
-                  subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
-                ),
-              }
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+              ),
+            }
             : task,
         ),
       );

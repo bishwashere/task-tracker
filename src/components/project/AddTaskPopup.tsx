@@ -24,7 +24,7 @@ const AddTaskPopup = ({
     );
     if (res.success) {
       toast.success(res.message);
-      setTasks((prevTasks) => [...prevTasks, res.task as TaskType]);
+      setTasks((prevTasks) => [...prevTasks, res.task as unknown as TaskType]);
       setModalIsOpen(false);
     } else {
       toast.error(res.message);

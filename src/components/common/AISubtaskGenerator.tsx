@@ -70,7 +70,7 @@ export default function AISubtaskDialog({
     );
     setOpen(false);
     toast.success("Subtasks added successfully!");
-    onSubtaskAdded?.(res.map((task) => task.subTask as SubtaskType));
+    onSubtaskAdded?.(res.map((task) => task.subTask as unknown as SubtaskType));
   };
 
   return (
@@ -129,11 +129,10 @@ export default function AISubtaskDialog({
                 {tasks.map((task) => (
                   <li
                     key={task.id}
-                    className={`flex items-center justify-between rounded-md border p-3 ${
-                      task.selected
-                        ? "border-indigo-500 bg-indigo-50"
-                        : "border-gray-200"
-                    }`}
+                    className={`flex items-center justify-between rounded-md border p-3 ${task.selected
+                      ? "border-indigo-500 bg-indigo-50"
+                      : "border-gray-200"
+                      }`}
                   >
                     <span className="text-sm text-gray-700">
                       {task.content}
@@ -141,11 +140,10 @@ export default function AISubtaskDialog({
                     <div className="flex gap-1">
                       <button
                         onClick={() => toggleTask(task.id)}
-                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${
-                          task.selected
-                            ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                        }`}
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${task.selected
+                          ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          }`}
                         aria-label={
                           task.selected ? "Deselect task" : "Select task"
                         }
@@ -154,11 +152,10 @@ export default function AISubtaskDialog({
                       </button>
                       <button
                         onClick={() => toggleTask(task.id)}
-                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${
-                          !task.selected
-                            ? "bg-red-100 text-red-600 hover:bg-red-200"
-                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                        }`}
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${!task.selected
+                          ? "bg-red-100 text-red-600 hover:bg-red-200"
+                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          }`}
                         aria-label={
                           !task.selected ? "Reject task" : "Unmark as rejected"
                         }
