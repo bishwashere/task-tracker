@@ -111,7 +111,6 @@ export const deleteSubtask = async (subtaskId: string) => {
   try {
     // check for permission
     const userId = await isUserValid();
-
     if (!userId) {
       return { success: false, message: "Unauthorized !" };
     }
@@ -125,26 +124,30 @@ export const deleteSubtask = async (subtaskId: string) => {
       return { success: false, message: "Subtask not found" };
     }
 
+    // Delete in correct order to maintain referential integrity
+    
+    // 1. Delete all comments associated with the subtask
+    await prisma.comment.deleteMany({
+      where: { subtaskId },
+    });
+
+    // 2. Delete all sort indices associated with the subtask
+    await prisma.subtaskSortIndex.deleteMany({
+      where: { subtaskId },
+    });
+
+    // 3. Finally delete the subtask itself
     await prisma.subtask.delete({
       where: { id: subtaskId },
     });
 
-    // delete all sort indices associated with the subtask
-    await prisma.subtaskSortIndex.deleteMany({
-      where: { subtaskId: subtaskId },
-    });
-
-    // delete all comments associated with the subtask
-    await prisma.comment.deleteMany({
-      where: { subtaskId: subtaskId },
-    });
-
-    return { success: true, message: "Subtask deleted !" };
+    return { success: true, message: "Subtask deleted successfully" };
   } catch (error) {
     console.error("Error deleting subtask:", error);
-    return {
-      success: false,
-      message: "Something went wrong. Please try again.",
+    return { 
+      success: false, 
+      message: "An error occurred while deleting the subtask" 
     };
   }
 };
+

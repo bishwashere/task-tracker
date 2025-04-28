@@ -509,45 +509,39 @@ export const sortTasks = async (
 
 export const deleteTask = async (taskId: string) => {
   try {
-    // check for permission
     const userId = await isUserValid();
     if (!userId) {
-      return { success: false, message: "Unauthorized !" };
+      return { success: false, message: "Unauthorized!" };
     }
-    // check if task exists
-    const task = await prisma.task.findUnique({
-      where: { id: taskId },
+
+    // First, delete all subtasks and their related records
+    const subtasks = await prisma.subtask.findMany({
+      where: { taskId },
     });
 
-    if (!task) {
-      return { success: false, message: "Task not found" };
+    for (const subtask of subtasks) {
+      // Delete subtask sort indices
+      await prisma.subtaskSortIndex.deleteMany({
+        where: { subtaskId: subtask.id },
+      });
+
+      // Delete the subtask
+      await prisma.subtask.delete({
+        where: { id: subtask.id },
+      });
     }
 
+    // Delete task sort indices
+    await prisma.taskSortIndex.deleteMany({
+      where: { taskId },
+    });
+
+    // Finally, delete the task
     await prisma.task.delete({
       where: { id: taskId },
     });
 
-    // delete all sort indices associated with the task
-    await prisma.taskSortIndex.deleteMany({
-      where: { taskId: taskId },
-    });
-
-    // delete all subtasks associated with the task
-    const subtasks = await prisma.subtask.findMany({
-      where: { taskId: taskId },
-    });
-
-    // delete all subtask sort indices associated with the task
-    await prisma.subtaskSortIndex.deleteMany({
-      where: { subtaskId: { in: subtasks.map((subtask) => subtask.id) } },
-    });
-
-    // delete all comments associated with the task
-    await prisma.comment.deleteMany({
-      where: { subtaskId: { in: subtasks.map((subtask) => subtask.id) } },
-    });
-
-    return { success: true, message: "Task deleted !" };
+    return { success: true, message: "Task deleted successfully" };
   } catch (error) {
     console.error("Error deleting task:", error);
     return {
@@ -556,3 +550,4 @@ export const deleteTask = async (taskId: string) => {
     };
   }
 };
+
