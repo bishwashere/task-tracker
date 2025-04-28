@@ -237,7 +237,7 @@ export const SubTaskContent = ({
       subtask.priority === 0 ? 1 : 0,
     );
     if (res.success) {
-      const updatedSubtask = res.updatedSubtask as SubtaskType;
+      const updatedSubtask = res.updatedSubtask as unknown as SubtaskType;
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
@@ -264,7 +264,7 @@ export const SubTaskContent = ({
     setLoading(true);
     const res = await updateSubtaskStatus(subtaskId, "done");
     if (res.success) {
-      const updatedSubtask = res.updatedSubtask as SubtaskType;
+      const updatedSubtask = res.updatedSubtask as unknown as SubtaskType;
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId
