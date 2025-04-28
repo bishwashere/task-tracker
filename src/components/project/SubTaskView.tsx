@@ -365,7 +365,7 @@ export const SubTaskContent = ({
                     task.id === taskId
                       ? {
                         ...task,
-                        subtasks: task.subtasks.filter((subtask) => subtask.id !== subtask?.id)
+                        subtasks: task.subtasks.filter((s) => s.id !== subtask.id) // Fixed: using subtask.id instead of subtask?.id
                       }
                       : task,
                   ),
@@ -441,7 +441,5 @@ export const SubTaskViewDragOverlay = (props: SubTaskViewProps) => {
     </div>
   );
 };
-
-
 
 
