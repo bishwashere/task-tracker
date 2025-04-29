@@ -274,10 +274,13 @@ export const TaskList = ({
 
     return (
       <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
+        {
+        ...(activeType === "subtask" ? {} : {
+          ref: setNodeRef,
+          style: style,
+          ...attributes,
+          ...listeners
+        })}
         className={cn(
           "flex items-start gap-1 transition-all duration-200",
           !editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
@@ -333,6 +336,7 @@ export const TaskList = ({
               ).
               map((subtask) => (
                 <SubTaskView
+                  activeType={activeType}
                   key={subtask?.id}
                   subtask={subtask}
                   taskId={task?.id}
@@ -361,7 +365,10 @@ export const TaskList = ({
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      onDragEnd={(event) => {
+        handleDragEnd(event)
+        setActiveType(null)
+      }}
       id="task-dnd-context"
     >
       <SortableContext

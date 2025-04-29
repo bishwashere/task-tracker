@@ -42,6 +42,7 @@ interface SubTaskListProps {
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
   session: Session;
   isNewTask: (createdAt: string | Date) => boolean;
+  activeType: "task" | "subtask" | null
 }
 
 export const SubTaskList = (props: SubTaskListProps) => {
@@ -171,6 +172,8 @@ interface SubTaskViewProps {
   setPointsEarned: React.Dispatch<React.SetStateAction<number>>;
   session: Session;
   isNewTask: (createdAt: string | Date) => boolean;
+  activeType: "task" | "subtask" | null
+
 }
 
 export const SubTaskView = (props: SubTaskViewProps) => {
@@ -198,10 +201,13 @@ export const SubTaskView = (props: SubTaskViewProps) => {
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
+      {
+      ...(props.activeType === "task" ? {} : {
+        ref: setNodeRef,
+        style: style,
+        ...attributes,
+        ...listeners
+      })}
       className={cn(!props.editMode && "cursor-grab active:cursor-grabbing")}
     >
       <SubTaskContent {...props} isDragging={isDragging} />
