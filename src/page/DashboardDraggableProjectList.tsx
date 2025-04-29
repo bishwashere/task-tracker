@@ -180,7 +180,7 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
   const router = useRouter();
-  const progress = calculateProgressWithStats(project.tasks);
+  const progress = calculateProgressWithStats(project?.tasks);
 
   return (
     <div
@@ -194,7 +194,7 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
         <h3 className="text-lg font-semibold">{project.name}</h3>
         <ProgressBar progress={progress.progress} />
       </div>
-      <p className="text-sm text-gray-500">{project.tasks.length} Tasks</p>
+      <p className="text-sm text-gray-500">{project?.tasks?.length} Tasks</p>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { isUserValid } from "./isUserValid";
 export const addProject = async (
   organizationId: string,
   projectName: string,
-  projectDescription: string,
+  projectDescription: string
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -45,6 +45,9 @@ export const addProject = async (
           },
         },
       },
+      include: {
+        projectSortIndex: true,
+      },
     });
 
     return { success: true, message: "Project added !", project };
@@ -58,7 +61,7 @@ export const addProject = async (
 };
 
 export const sortProjects = async (
-  data: { projectId: string; sortIndex: number }[],
+  data: { projectId: string; sortIndex: number }[]
 ) => {
   try {
     const userId = await isUserValid();
@@ -93,7 +96,7 @@ export const sortProjects = async (
             },
           });
         }
-      }),
+      })
     );
     return { success: true, message: "Projects sorted successfully" };
   } catch (error) {
