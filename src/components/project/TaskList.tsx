@@ -263,7 +263,7 @@ export const TaskList = ({
         type: 'task',
         isSubtask: false
       },
-      disabled: !editMode   // Disable when not in edit mode
+      disabled: editMode   // Disable when not in edit mode
     });
 
     const style = {
@@ -274,14 +274,16 @@ export const TaskList = ({
 
     return (
       <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
+        {
+        ...(activeType === "subtask" ? {} : {
+          ref: setNodeRef,
+          style: style,
+          ...attributes,
+          ...listeners
+        })}
         className={cn(
           "flex items-start gap-1 transition-all duration-200",
-          editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
-          (!editMode) && "pointer-events-none"
+          !editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
         )}
       >
         <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
@@ -334,6 +336,7 @@ export const TaskList = ({
               ).
               map((subtask) => (
                 <SubTaskView
+                  activeType={activeType}
                   key={subtask?.id}
                   subtask={subtask}
                   taskId={task?.id}
@@ -362,7 +365,10 @@ export const TaskList = ({
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      onDragEnd={(event) => {
+        handleDragEnd(event)
+        setActiveType(null)
+      }}
       id="task-dnd-context"
     >
       <SortableContext
