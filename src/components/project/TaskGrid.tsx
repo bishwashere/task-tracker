@@ -213,7 +213,7 @@ const SortableTaskCard = (props: {
     isDragging,
   } = useSortable({
     id: props.task.id,
-    disabled: !props.editMode,
+    disabled: props.editMode,
   });
 
   const style = {

@@ -263,7 +263,7 @@ export const TaskList = ({
         type: 'task',
         isSubtask: false
       },
-      disabled: !editMode   // Disable when not in edit mode
+      disabled: editMode   // Disable when not in edit mode
     });
 
     const style = {
@@ -280,8 +280,7 @@ export const TaskList = ({
         {...listeners}
         className={cn(
           "flex items-start gap-1 transition-all duration-200",
-          editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
-          (!editMode) && "pointer-events-none"
+          !editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
         )}
       >
         <span className="text-lg font-bold text-gray-500">{index + 1}.</span>

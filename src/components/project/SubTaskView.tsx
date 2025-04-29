@@ -187,7 +187,7 @@ export const SubTaskView = (props: SubTaskViewProps) => {
       ...props.subtask,
       isSubtask: true // Important: This flags it as a subtask
     },
-    disabled: !props.editMode,
+    disabled: props.editMode,
   });
 
   const style: React.CSSProperties = {
@@ -202,7 +202,7 @@ export const SubTaskView = (props: SubTaskViewProps) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="cursor-grab active:cursor-grabbing"
+      className={cn(!props.editMode && "cursor-grab active:cursor-grabbing")}
     >
       <SubTaskContent {...props} isDragging={isDragging} />
     </div>
