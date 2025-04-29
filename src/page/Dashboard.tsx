@@ -92,6 +92,7 @@ const Dashboard = ({ session }: { session: Session }) => {
         formData.get("projectTitle") as string,
         formData.get("projectDescription") as string,
       );
+      console.log(result)
       if (result.success) {
         toast.success(result.message);
         // fetchOrganizations();
@@ -100,7 +101,7 @@ const Dashboard = ({ session }: { session: Session }) => {
             org.id === selectedOrganization.id
               ? {
                 ...org,
-                projects: [...org.projects, result.project as ProjectType],
+                projects: [...org.projects, result.project as unknown as ProjectType],
               }
               : org,
           ),
@@ -109,7 +110,7 @@ const Dashboard = ({ session }: { session: Session }) => {
           ...selectedOrganization,
           projects: [
             ...selectedOrganization.projects,
-            result.project as ProjectType,
+            result.project as unknown as ProjectType,
           ],
         });
         setAddProjectModalIsOpen(false);
