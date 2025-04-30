@@ -1,8 +1,8 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import RegisterCreds from "./RegisterCreds";
-import RegisterSocial from "./RegisterSocial";
+import RegisterCreds from "./_components/register-creds";
+import RegisterSocial from "./_components/register-social";
 
 const Page = async () => {
   const session = await auth();
