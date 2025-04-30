@@ -49,12 +49,14 @@ const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
     } catch { }
   }
 
-  const onMemberAdd = (e: React.FormEvent<HTMLFormElement>) => {
+  const onMemberAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!addUserToOrg.userEmail.trim()) return
-
-    addMember.mutate(addUserToOrg)
+    try {
+      await addMember.mutateAsync(addUserToOrg)
+      setAddUserToOrg({ ...addUserToOrg, userEmail: "" })
+    } catch { }
   }
 
   return (

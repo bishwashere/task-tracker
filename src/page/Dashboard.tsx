@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import ProfileMenu from "@/components/common/ProfileMenu";
 import ProgressBar from "@/components/common/ProgressBar";
 import { Session } from "next-auth";
-import DashboardDraggableProjectList from "./DashboardDraggableProjectList";
+import DashboardDraggableProjectList from "../app/(protected)/dashboard/_components/draggable-project-list";
 
 const Dashboard = ({ session }: { session: Session }) => {
   const router = useRouter();

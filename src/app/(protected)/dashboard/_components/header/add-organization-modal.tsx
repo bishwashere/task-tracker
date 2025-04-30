@@ -2,12 +2,9 @@ import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
-import { IoIosAddCircleOutline } from 'react-icons/io'
 import { Button } from '@/components/ui/button'
 import toast from 'react-hot-toast'
 import { useCreateOrganization, useListUserOrganizations } from '@/queries/organizations/hooks'
@@ -17,8 +14,14 @@ const defaultFormData: CreateOrganizationProps = {
   name: ""
 }
 
-const AddOrganizationModal = () => {
-  const [isOpen, setIsOpen] = useState(false)
+type Props = {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const AddOrganizationModal = (
+  { isOpen, onOpenChange }: Props
+) => {
   const org = useCreateOrganization()
   const [formData, setFormData] = useState<CreateOrganizationProps>(defaultFormData)
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,20 +33,13 @@ const AddOrganizationModal = () => {
     }
     try {
       await org.mutateAsync({ name: formData.name.trim() })
-      setIsOpen(false)
+      onOpenChange(false)
+      setFormData(defaultFormData)
     } catch { }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button
-          className="tooltip"
-        >
-          <IoIosAddCircleOutline className="text-3xl cursor-pointer opacity-90 hover:opacity-100" />
-          <p className="tooltiptext">Add Organization</p>
-        </button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10">
         <DialogHeader>
           <DialogTitle className='text-2xl'>Add Organization</DialogTitle>
@@ -71,7 +67,7 @@ const AddOrganizationModal = () => {
               type='reset'
               variant={"muted"}
               onClick={() => {
-                setIsOpen(false)
+                onOpenChange(false)
                 setFormData(defaultFormData)
               }}
             >

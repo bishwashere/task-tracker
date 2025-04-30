@@ -1,6 +1,6 @@
 import { Session } from "next-auth";
 import React from "react";
-import ProfileMenu from "../common/ProfileMenu";
+import ProfileMenu from "../common/profile-menu";
 import { HiCurrencyDollar } from "react-icons/hi2";
 import Link from "next/link";
 
