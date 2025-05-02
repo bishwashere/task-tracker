@@ -16,6 +16,7 @@ const Page = async ({
 }) => {
   const { method } = await searchParams;
   const session = await auth();
+
   if (session) redirect("/dashboard");
 
   if (method === "email")

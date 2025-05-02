@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@require "tailwindcss-animate";
+@import "tw-animate-css";
 
 :root {
   --background: #ffffff;
@@ -67,9 +67,6 @@ button {
 button:disabled {
   cursor: default;
 }
-
-@import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 

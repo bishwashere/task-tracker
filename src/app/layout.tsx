@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
+import QueryProvider from "@/providers/query-provider";
+import { cn } from "@/lib/cn";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,11 +43,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          `${geistSans.variable} ${geistMono.variable} antialiased`,
+          "bg-white",
+        )}
       >
-        <SessionProvider>{children}</SessionProvider>
-
-        <Toaster position="top-center" reverseOrder={false} />
+        <QueryProvider>
+          <SessionProvider>{children}</SessionProvider>
+          <Toaster position="top-center" reverseOrder={false} />
+        </QueryProvider>
       </body>
     </html>
   );
