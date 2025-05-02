@@ -6,7 +6,7 @@ export const saveComment = async (
   subtaskId: string,
   projectId: string,
   userComment: string,
-  commentType: string
+  commentType: string,
 ) => {
   const userId = await isUserValid();
   if (!userId) {
@@ -24,7 +24,7 @@ export const saveComment = async (
 
     // Check if the user is an admin in the organization
     const userOrg = project.organization.members.find(
-      (member) => member.userId === userId
+      (member) => member.userId === userId,
     );
     if (!userOrg) {
       return { success: false, message: "Permission denied" };
@@ -60,7 +60,7 @@ export const saveComment = async (
 };
 
 export const sortSubtasks = async (
-  data: { subtaskId: string; sortIndex: number }[]
+  data: { subtaskId: string; sortIndex: number }[],
 ) => {
   try {
     const userId = await isUserValid();
@@ -94,7 +94,7 @@ export const sortSubtasks = async (
             },
           });
         }
-      })
+      }),
     );
 
     return { success: true, message: "Subtasks sorted successfully" };
@@ -125,7 +125,7 @@ export const deleteSubtask = async (subtaskId: string) => {
     }
 
     // Delete in correct order to maintain referential integrity
-    
+
     // 1. Delete all comments associated with the subtask
     await prisma.comment.deleteMany({
       where: { subtaskId },
@@ -144,10 +144,9 @@ export const deleteSubtask = async (subtaskId: string) => {
     return { success: true, message: "Subtask deleted successfully" };
   } catch (error) {
     console.error("Error deleting subtask:", error);
-    return { 
-      success: false, 
-      message: "An error occurred while deleting the subtask" 
+    return {
+      success: false,
+      message: "An error occurred while deleting the subtask",
     };
   }
 };
-

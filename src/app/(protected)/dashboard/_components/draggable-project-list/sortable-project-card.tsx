@@ -36,5 +36,4 @@ const SortableProjectCard = ({ project }: { project: Project }) => {
   );
 };
 
-
-export default SortableProjectCard
+export default SortableProjectCard;

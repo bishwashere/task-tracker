@@ -1,7 +1,7 @@
 import { SubtaskType, TaskType } from "@/types/organization";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import AddSubtask from "./AddSubtaskPopup";
+import AddSubtask from "../../app/(protected)/project/[id]/_components/dialogs/add-subtask-dialog.tsx";
 import toast from "react-hot-toast";
 import { togglePriority, sortTasks } from "@/actions/task";
 import AISubtaskDialog from "../common/AISubtaskGenerator";
@@ -33,7 +33,7 @@ export const TaskGrid = ({
   role,
   editMode,
   originalTasks,
-  users
+  users,
 }: {
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
@@ -41,7 +41,7 @@ export const TaskGrid = ({
   role: "admin" | "member";
   editMode: boolean;
   originalTasks: TaskType[];
-  users: User[]
+  users: User[];
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ export const TaskGrid = ({
     const sorted = [...initialTasks].sort(
       (a, b) =>
         (b?.taskSortIndex?.[0]?.sortIndex || 0) -
-        (a?.taskSortIndex?.[0]?.sortIndex || 0)
+        (a?.taskSortIndex?.[0]?.sortIndex || 0),
     );
     setSortedTasks(sorted);
   }, [initialTasks]);
@@ -70,7 +70,7 @@ export const TaskGrid = ({
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -89,9 +89,9 @@ export const TaskGrid = ({
         (task, index) => ({
           ...task,
           taskSortIndex: [{ sortIndex: initialTasks.length - 1 - index }] as [
-            { sortIndex: number }
+            { sortIndex: number },
           ],
-        })
+        }),
       );
 
       setSortedTasks(updatedTasks);
@@ -200,9 +200,13 @@ const SortableTaskCard = (props: {
   editMode: boolean;
   projectId: string;
   loading: boolean;
-  priorityToggle: (taskId: string, subtaskId: string, priority: number) => Promise<void>;
+  priorityToggle: (
+    taskId: string,
+    subtaskId: string,
+    priority: number,
+  ) => Promise<void>;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
-  users: User[]
+  users: User[];
 }) => {
   const {
     attributes,
@@ -227,7 +231,10 @@ const SortableTaskCard = (props: {
       style={style}
       {...attributes}
       {...listeners}
-      className={cn("cursor-grab active:cursor-grabbing", isDragging && "opacity-50")}
+      className={cn(
+        "cursor-grab active:cursor-grabbing",
+        isDragging && "opacity-50",
+      )}
     >
       <TaskCard {...props} isDragging={isDragging} users={props.users} />
     </div>
@@ -243,17 +250,21 @@ const TaskCard = ({
   priorityToggle,
   setTasks,
   isDragging,
-  users
+  users,
 }: {
   task: TaskType;
   role: "admin" | "member";
   editMode: boolean;
   projectId: string;
   loading: boolean;
-  priorityToggle: (taskId: string, subtaskId: string, priority: number) => Promise<void>;
+  priorityToggle: (
+    taskId: string,
+    subtaskId: string,
+    priority: number,
+  ) => Promise<void>;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   isDragging?: boolean;
-  users: User[]
+  users: User[];
 }) => {
   const router = useRouter();
 
@@ -261,13 +272,11 @@ const TaskCard = ({
     <div
       className={cn(
         "mb-6 p-4 rounded hover:bg-gray-50 border border-gray-200 relative",
-        isDragging && "border-blue-500 shadow-lg"
+        isDragging && "border-blue-500 shadow-lg",
       )}
     >
       <div className="flex justify-between items-start gap-4">
-        <h3 className="text-lg font-bold cursor-pointer flex-1">
-          {task.name}
-        </h3>
+        <h3 className="text-lg font-bold cursor-pointer flex-1">{task.name}</h3>
 
         {role === "admin" && editMode && (
           <AddSubtask
@@ -323,4 +332,3 @@ const TaskCard = ({
     </div>
   );
 };
-

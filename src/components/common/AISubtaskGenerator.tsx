@@ -14,7 +14,7 @@ import { getAISuggestedSubtasks } from "@/actions/ai-sugested-task";
 import { saveSubTask } from "@/actions/task";
 import toast from "react-hot-toast";
 import { SubtaskType } from "@/types/organization";
-import TaskGenerationLoader from "./TaskGenerationLoader";
+import TaskGenerationLoader from "./task-generation-loader";
 
 type Task = {
   id: number;
@@ -130,8 +130,8 @@ export default function AISubtaskDialog({
                   <li
                     key={task.id}
                     className={`flex items-center justify-between rounded-md border p-3 ${task.selected
-                      ? "border-indigo-500 bg-indigo-50"
-                      : "border-gray-200"
+                        ? "border-indigo-500 bg-indigo-50"
+                        : "border-gray-200"
                       }`}
                   >
                     <span className="text-sm text-gray-700">
@@ -141,8 +141,8 @@ export default function AISubtaskDialog({
                       <button
                         onClick={() => toggleTask(task.id)}
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${task.selected
-                          ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                            ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                           }`}
                         aria-label={
                           task.selected ? "Deselect task" : "Select task"
@@ -153,8 +153,8 @@ export default function AISubtaskDialog({
                       <button
                         onClick={() => toggleTask(task.id)}
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${!task.selected
-                          ? "bg-red-100 text-red-600 hover:bg-red-200"
-                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                            ? "bg-red-100 text-red-600 hover:bg-red-200"
+                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                           }`}
                         aria-label={
                           !task.selected ? "Reject task" : "Unmark as rejected"

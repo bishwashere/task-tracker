@@ -1,0 +1,191 @@
+import { useParams, useRouter } from "next/navigation";
+import { SubTaskViewProps } from ".";
+import { useState } from "react";
+import { cn } from "@/lib/cn";
+import { useProjectContext } from "../../../../_context";
+import { Avatar } from "@/components/ui/avatar";
+import { useDeleteSubtask, useToggleSubtaskPriority, useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
+import { confirm } from "@/components/ui/alert-dialog";
+import { MdDelete } from "react-icons/md";
+import EditSubtaskDialog from "./edit-subtask-dialog";
+import AddTagPopup from "./add-tag-dialog";
+
+interface SubTaskContentProps extends SubTaskViewProps {
+  isDragging?: boolean;
+}
+
+export const SubTaskContent = ({
+  subtask,
+  isNew,
+  isDragging,
+  taskId,
+}: SubTaskContentProps) => {
+  const router = useRouter();
+  const { role, editMode } = useProjectContext()
+  const del = useDeleteSubtask()
+  const dueRemaining = (dueDate: Date) => {
+    const currentDate = new Date();
+    const dueDateObj = new Date(dueDate);
+    currentDate.setHours(0, 0, 0, 0);
+    dueDateObj.setHours(0, 0, 0, 0);
+    const timeDiff = dueDateObj.getTime() - currentDate.getTime();
+    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    if (dayDiff === 0) {
+      return "Today";
+    } else if (dayDiff === 1) {
+      return "1 day";
+    } else if (dayDiff === 2) {
+      return "2 days";
+    } else if (dayDiff === 3) {
+      return "3 days";
+    } else if (dayDiff < 0) {
+      return "Past due";
+    } else {
+      const options: Intl.DateTimeFormatOptions = {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      };
+      return dueDateObj.toLocaleDateString("en-US", options);
+    }
+  };
+  const update = useUpdateSubtaskStatus()
+
+  const togglePriority = useToggleSubtaskPriority()
+
+  const { id } = useParams() as {
+    id: string
+  }
+  const onDelete = async () => {
+    const should = await confirm({
+      title: undefined,
+      description: "Are you sure you want to delete this subtask?",
+    })
+    if (!should) return
+    try {
+      await del.mutateAsync({
+        subtaskId: subtask.id,
+        projectId: id,
+        taskId
+      })
+    } catch { }
+  }
+
+  return (
+    <div
+      key={subtask.id}
+      className={cn(
+        `p-2 rounded shadow-md flex justify-between items-center`,
+        subtask.status === "done"
+          ? "bg-green-200 text-green-700 hover:bg-green-300"
+          : "bg-white hover:bg-gray-100",
+        isDragging && "border-blue-500 shadow-lg",
+      )}
+    >
+      <div>
+        <div className="flex flex-row gap-2 items-center">
+          <span
+            className="cursor-pointer hover:underline text-lg font-semibold"
+            onClick={() => router.push(`/project/subtask/${subtask.id}`)}
+          >
+            {subtask.name}
+          </span>
+          {subtask.createdAt && (
+            <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
+              {isNew(subtask.createdAt) ? (
+                <span className="w-2.5 h-2.5 bg-green-500 rounded-full mr-1"></span>
+              ) : (
+                ""
+              )}
+            </span>
+          )}
+          {/* //todo */}
+          {(subtask.issueCount || 0) > 0 && (
+            <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
+              {subtask.issueCount}
+            </span>
+          )}
+          {role.toLowerCase() === "admin" && editMode && (
+            <EditSubtaskDialog
+              projectId={id}
+              taskId={taskId}
+              subtaskId={subtask.id}
+              defaultValue={{
+                subtaskName: subtask.name,
+                dueDate: subtask.dueDate?.toISOString().split("T")[0] || "",
+                points: subtask.points,
+                assignedUserId: subtask.assignedUserId || "",
+              }}
+            />
+          )}
+          {role.toLowerCase() === "admin" && editMode && (
+            <button className="px-1 w-4" onClick={onDelete}>
+              <MdDelete className="text-red-600 " />
+            </button>
+          )}
+        </div>
+        <div className="text-sm">
+          {subtask.status} •{" "}
+          {subtask.assignedUserId && subtask.assignedUser ? (
+            <div className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-background">
+              <Avatar
+                className="border-foreground"
+                src={subtask.assignedUser?.image || ""}
+                alt={subtask.assignedUser?.name || ""}
+                size="xs"
+              />{" "}
+              {subtask.assignedUser?.name}
+            </div>
+          ) : (
+            "Unassigned"
+          )}{" "}
+          • {subtask.points} points{" "}
+          {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}
+        </div>
+      </div>
+      {editMode && (
+        <div className="flex items-center gap-2">
+          {subtask.tagName ? (
+            <span
+              className="px-2 py-1 rounded text-sm"
+              style={{
+                backgroundColor: subtask.tagColor || "transparent",
+                color: "#FFF",
+              }}
+            >
+              {subtask.tagName}
+            </span>
+          ) : (
+            <AddTagPopup
+              taskId={taskId}
+              subtaskId={subtask.id}
+              projectId={id}
+            />
+          )}
+          <button
+            onClick={() => togglePriority.mutate({
+              projectId: id,
+              subtaskId: subtask.id,
+              priority: subtask.priority === 0 ? 1 : 0,
+              taskId: taskId
+            })}
+            className={`text-sm rounded ${subtask.priority
+              ? "text-yellow-500 hover:text-yellow-600"
+              : "text-gray-500 hover:text-gray-600"
+              }`}
+          >
+            {subtask.priority ? "⭐" : "☆"}
+          </button>
+          {subtask.status !== "done" && (
+            <button
+              onClick={() => update.mutate({ subtaskId: subtask.id, status: "done", projectId: id, taskId })}
+              className="bg-green-100 text-white px-4 py-2 rounded hover:bg-green-200 disabled:opacity-75"
+            >
+              &#10003;
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};

@@ -75,7 +75,7 @@ export type UpdateOrganizationNameProps = {
 };
 
 export const updateOrganizationName = async (
-  data: UpdateOrganizationNameProps
+  data: UpdateOrganizationNameProps,
 ) => {
   const user = await auth();
 

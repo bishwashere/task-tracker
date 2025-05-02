@@ -1,15 +1,15 @@
-"use server"
-import { auth } from '@/lib/auth'
-import React from 'react'
-import { redirect } from 'next/navigation'
-import Home from './_components'
+"use server";
+import { auth } from "@/lib/auth";
+import React from "react";
+import { redirect } from "next/navigation";
+import Home from "./_components";
 
 const Page = async () => {
-  const user = await auth()
+  const user = await auth();
   if (user) {
-    redirect("/dashboard")
+    redirect("/dashboard");
   }
-  return <Home />
-}
+  return <Home />;
+};
 
-export default Page
+export default Page;

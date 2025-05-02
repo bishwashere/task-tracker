@@ -25,6 +25,6 @@ Fixed revisions like error message placement, login page restructuring, etc as w
 
 ### 2025-04-22
 
-
 ### 2025-04-24
+
 Fixed edit button for admin

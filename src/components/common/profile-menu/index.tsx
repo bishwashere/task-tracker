@@ -12,14 +12,14 @@ import { IoSettingsOutline } from "react-icons/io5";
 
 const ProfileMenu = ({
   showSettings,
-  onEditButtonClick
+  onEditButtonClick,
 }: {
   showSettings: boolean;
   onEditButtonClick?: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: session } = useSession()
-  const { selectedOrg, setSelectedOrg } = useDashboardContext()
+  const { data: session } = useSession();
+  const { selectedOrg, setSelectedOrg } = useDashboardContext();
   const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] =
     useState(false);
 
@@ -43,7 +43,6 @@ const ProfileMenu = ({
     setIsOpen((prev) => !prev);
   };
 
-
   return (
     <div className="relative mt-2 w-fit" ref={menuRef}>
       <div className="flex items-center justify-center gap-2 mb-2">
@@ -60,7 +59,11 @@ const ProfileMenu = ({
           style={{ boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px" }}
         >
           <div className="px-3 p-2  flex gap-2.5">
-            <Avatar src={session?.user?.image || ""} alt={session?.user?.name || ""} size="sm" />
+            <Avatar
+              src={session?.user?.image || ""}
+              alt={session?.user?.name || ""}
+              size="sm"
+            />
             <div className="flex flex-col">
               <p className="text-md font-semibold">{session?.user?.name}</p>
               <p className="text-sm font-semibold text-gray-500">
@@ -73,8 +76,8 @@ const ProfileMenu = ({
               <hr className="border border-gray-300 my-1" />
               <button
                 onClick={() => {
-                  onEditButtonClick()
-                  setIsOpen(false)
+                  onEditButtonClick();
+                  setIsOpen(false);
                 }}
                 className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
               >
@@ -84,20 +87,18 @@ const ProfileMenu = ({
             </Fragment>
           )}
           <hr className="border border-gray-300 my-1" />
-          {showSettings &&
-            selectedOrg &&
-            selectedOrg?.role === "ADMIN" && (
-              <button
-                className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
-                onClick={() => {
-                  setEditOrganizationModalIsOpen(true)
-                  setIsOpen(false)
-                }}
-              >
-                <IoSettingsOutline />
-                Settings
-              </button>
-            )}
+          {showSettings && selectedOrg && selectedOrg?.role === "ADMIN" && (
+            <button
+              className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
+              onClick={() => {
+                setEditOrganizationModalIsOpen(true);
+                setIsOpen(false);
+              }}
+            >
+              <IoSettingsOutline />
+              Settings
+            </button>
+          )}
           <button
             onClick={() => logOut()}
             className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
@@ -107,7 +108,10 @@ const ProfileMenu = ({
           </button>
         </div>
       )}
-      <EditOrganizationModal isOpen={editOrganizationModalIsOpen} onOpenChange={setEditOrganizationModalIsOpen} />
+      <EditOrganizationModal
+        isOpen={editOrganizationModalIsOpen}
+        onOpenChange={setEditOrganizationModalIsOpen}
+      />
     </div>
   );
 };

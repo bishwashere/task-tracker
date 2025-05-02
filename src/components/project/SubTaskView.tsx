@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SubtaskType, TaskType } from "@/types/organization";
 import { User } from "@/types/user";
-import AddTagPopup from "./AddTagPopup";
+import AddTagPopup from "../../app/(protected)/project/[id]/_components/task-view/task-list/subtask-view/add-tag-dialog";
 import { togglePriority, updateSubtaskStatus } from "@/actions/task";
 import toast from "react-hot-toast";
 import { useConfirmModal } from "../Modal/useConfirmModal";
@@ -30,6 +30,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/cn";
 import { sortSubtasks } from "@/actions/subtask";
 import DeleteTask from "./DeleteTask";
+import { useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
 
 interface SubTaskListProps {
   subtasks: SubtaskType[];
@@ -60,18 +61,17 @@ export const SubTaskList = (props: SubTaskListProps) => {
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
-    console.log("drag start")
+    console.log("drag start");
     // Stop event propagation to parent DnD context
     setActiveId(event.active.id as string);
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-
-    console.log("drag end")
+    console.log("drag end");
 
     // Stop event propagation to parent DnD context
     const { active, over } = event;
@@ -79,19 +79,17 @@ export const SubTaskList = (props: SubTaskListProps) => {
 
     if (over && active.id !== over.id) {
       const oldIndex = subtasks.findIndex(
-        (subtask) => subtask.id === active.id
+        (subtask) => subtask.id === active.id,
       );
-      const newIndex = subtasks.findIndex(
-        (subtask) => subtask.id === over.id
-      );
+      const newIndex = subtasks.findIndex((subtask) => subtask.id === over.id);
 
       const updatedSubtasks = arrayMove(subtasks, oldIndex, newIndex).map(
         (subtask, index) => ({
           ...subtask,
           subtaskSortIndex: [{ sortIndex: subtasks.length - 1 - index }] as [
-            { sortIndex: number }
+            { sortIndex: number },
           ],
-        })
+        }),
       );
 
       // Save the previous state in case of error
@@ -136,14 +134,10 @@ export const SubTaskList = (props: SubTaskListProps) => {
               .sort(
                 (a, b) =>
                   (b?.subtaskSortIndex?.[0]?.sortIndex || 0) -
-                  (a?.subtaskSortIndex?.[0]?.sortIndex || 0)
+                  (a?.subtaskSortIndex?.[0]?.sortIndex || 0),
               )
               .map((subtask) => (
-                <SubTaskView
-                  key={subtask.id}
-                  subtask={subtask}
-                  {...props}
-                />
+                <SubTaskView key={subtask.id} subtask={subtask} {...props} />
               ))}
           </div>
         </SortableContext>
@@ -185,7 +179,7 @@ export const SubTaskView = (props: SubTaskViewProps) => {
     id: props.subtask.id,
     data: {
       ...props.subtask,
-      isSubtask: true // Important: This flags it as a subtask
+      isSubtask: true, // Important: This flags it as a subtask
     },
     disabled: !props.editMode,
   });
@@ -230,7 +224,7 @@ export const SubTaskContent = ({
   const issueCount = subtask.issueCount || 0;
   const [loading, setLoading] = useState(false);
   const { confirmAction, ConfirmationModal } = useConfirmModal();
-
+  const update = useUpdateSubtaskStatus()
   const priorityToggle = async () => {
     setLoading(true);
     const res = await togglePriority(
@@ -322,7 +316,7 @@ export const SubTaskContent = ({
         subtask.status === "done"
           ? "bg-green-200 text-green-700 hover:bg-green-300"
           : "bg-white hover:bg-gray-100",
-        isDragging && "border-blue-500 shadow-lg"
+        isDragging && "border-blue-500 shadow-lg",
       )}
     >
       <div>
@@ -358,26 +352,36 @@ export const SubTaskContent = ({
             />
           )}
           {role === "admin" && editMode && (
-            <DeleteTask subTaskId={subtask?.id}
+            <DeleteTask
+              subTaskId={subtask?.id}
               onSuccess={() => {
                 setTasks((prevTasks) =>
                   prevTasks.map((task) =>
                     task.id === taskId
                       ? {
                         ...task,
-                        subtasks: task.subtasks.filter((s) => s.id !== subtask.id) // Fixed: using subtask.id instead of subtask?.id
+                        subtasks: task.subtasks.filter(
+                          (s) => s.id !== subtask.id,
+                        ), // Fixed: using subtask.id instead of subtask?.id
                       }
                       : task,
                   ),
                 );
-              }} />
+              }}
+            />
           )}
         </div>
         <div className="text-sm">
           {subtask.status} •{" "}
           {subtask.assignedUserId && subtask.assignedUser ? (
             <div className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-background">
-              <Avatar className="border-foreground" src={subtask.assignedUser?.image || ""} alt={subtask.assignedUser?.name || ""} size="xs" />  {subtask.assignedUser?.name}
+              <Avatar
+                className="border-foreground"
+                src={subtask.assignedUser?.image || ""}
+                alt={subtask.assignedUser?.name || ""}
+                size="xs"
+              />{" "}
+              {subtask.assignedUser?.name}
             </div>
           ) : (
             "Unassigned"
@@ -441,5 +445,3 @@ export const SubTaskViewDragOverlay = (props: SubTaskViewProps) => {
     </div>
   );
 };
-
-

@@ -1,7 +1,7 @@
 "use client";
 
 import ProfileMenu from "@/components/common/ProfileMenu";
-import SuperHeader from "@/components/headers/SuperHeader";
+import SuperHeader from "@/components/common/block/super-header";
 import { getPoints } from "@/data/points";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";

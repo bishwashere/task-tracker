@@ -1,21 +1,21 @@
-"use client"
-import React, { useState } from 'react'
-import Header from './header'
-import { useDashboardContext } from '@/context/dashboard-context'
-import AddOrganizationModal from './header/add-organization-modal'
-import AddProject from './add-project'
-import { useListUserOrganizations } from '@/queries/organizations/hooks'
-import Loading from '@/components/ui/loading'
-import ProjectsList from './projects-list'
+"use client";
+import React, { useState } from "react";
+import Header from "./header";
+import { useDashboardContext } from "@/context/dashboard-context";
+import AddOrganizationModal from "./header/add-organization-modal";
+import AddProject from "./add-project";
+import { useListUserOrganizations } from "@/queries/organizations/hooks";
+import Loading from "@/components/ui/loading";
+import ProjectsList from "./projects-list";
 
 const Dashboard = () => {
-  const { selectedOrg } = useDashboardContext()
+  const { selectedOrg } = useDashboardContext();
   const [addOrganizationModalIsOpen, setAddOrganizationModalIsOpen] =
-    useState(false)
-  const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false)
-  const org = useListUserOrganizations()
+    useState(false);
+  const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
+  const org = useListUserOrganizations();
 
-  if (org.isLoading) return <Loading />
+  if (org.isLoading) return <Loading />;
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -38,21 +38,24 @@ const Dashboard = () => {
         </div>
       )}
 
-      {selectedOrg && selectedOrg.role == "ADMIN" && <>
-        <button
-          className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer"
-          onClick={() => setAddProjectModalIsOpen(true)}
-        >
-          Add a project
-        </button>
-        <AddProject isOpen={addProjectModalIsOpen} onOpenChange={setAddProjectModalIsOpen} />
-      </>
-      }
+      {selectedOrg && selectedOrg.role == "ADMIN" && (
+        <>
+          <button
+            className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer"
+            onClick={() => setAddProjectModalIsOpen(true)}
+          >
+            Add a project
+          </button>
+          <AddProject
+            isOpen={addProjectModalIsOpen}
+            onOpenChange={setAddProjectModalIsOpen}
+          />
+        </>
+      )}
 
       <ProjectsList />
-
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

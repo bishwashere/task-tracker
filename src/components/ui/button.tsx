@@ -10,13 +10,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600",
+        default: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600",
         muted: "bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600",
         destructive:
           "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        blue: "bg-blue-500 text-white rounded hover:bg-blue-600"
       },
       size: {
         default: "h-10 px-4 py-2 has-[>svg]:px-3",
@@ -57,7 +57,6 @@ function Button({
       {loading ? (
         <>
           <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          Loading...
         </>
       ) : (
         props.children

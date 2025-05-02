@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addProject,
   AddProjectProps,
+  getProjectById,
   listAllUserProjectByOrganizationId,
   sortProjects,
 } from "./action";
@@ -45,17 +46,27 @@ export const useListUserProjectByOrganizationId = (organizationId: string) => {
 };
 
 export const useSortProjects = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: { projectId: string; sortIndex: number }[]) => {
       const res = await sortProjects(data);
       if (res.success) {
-        await queryClient.invalidateQueries({
-          queryKey: ["projects"],
-        });
         return res.message;
       } else {
         throw new Error(res.message);
+      }
+    },
+  });
+};
+
+export const useGetProjectById = (projectId: string) => {
+  return useQuery({
+    queryKey: ["project", projectId],
+    queryFn: async () => {
+      const res = await getProjectById(projectId);
+      if (res.success) {
+        return res;
+      } else {
+        return null;
       }
     },
   });

@@ -34,7 +34,7 @@ export type Project = P & {
   updatedAt: Date;
   description: string | null;
   hasAiSuggestTasks: boolean;
-}
+};
 
 type Props = {
   projects: Project[];
@@ -43,7 +43,7 @@ type Props = {
 const DashboardDraggableProjectList = ({ projects: p }: Props) => {
   const [projects, setProjects] = useState(p);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const sort = useSortProjects()
+  const sort = useSortProjects();
 
   useEffect(() => {
     setProjects(p);
@@ -145,7 +145,4 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
   );
 };
 
-
-
 export default DashboardDraggableProjectList;
-

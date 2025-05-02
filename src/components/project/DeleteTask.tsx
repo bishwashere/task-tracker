@@ -1,21 +1,23 @@
-import React from 'react'
-import { useConfirmModal } from '../Modal/useConfirmModal';
-import { MdDelete } from 'react-icons/md';
-import { deleteTask } from '@/actions/task';
-import { deleteSubtask } from '@/actions/subtask';
-import toast from 'react-hot-toast';
+import React from "react";
+import { useConfirmModal } from "../Modal/useConfirmModal";
+import { MdDelete } from "react-icons/md";
+import { deleteTask } from "@/actions/task";
+import { deleteSubtask } from "@/actions/subtask";
+import toast from "react-hot-toast";
 
 type Props = {
   taskId?: string;
   subTaskId?: string;
   onSuccess?: () => void;
-}
+};
 
 const DeleteTask = (props: Props) => {
   const { confirmAction, ConfirmationModal } = useConfirmModal();
 
   const onClick = async () => {
-    const confirmed = await confirmAction(`Are you sure you want to delete this ${props.taskId ? "task" : "subtask"}`);
+    const confirmed = await confirmAction(
+      `Are you sure you want to delete this ${props.taskId ? "task" : "subtask"}`,
+    );
 
     if (!confirmed) return;
     if (props.taskId) {
@@ -36,14 +38,16 @@ const DeleteTask = (props: Props) => {
         toast.error(res.message);
       }
     }
-  }
+  };
 
-  return <>
-    <button className='px-1 w-4' onClick={onClick}>
-      <MdDelete className="text-red-600 " />
-    </button>
-    <ConfirmationModal />
-  </>
-}
+  return (
+    <>
+      <button className="px-1 w-4" onClick={onClick}>
+        <MdDelete className="text-red-600 " />
+      </button>
+      <ConfirmationModal />
+    </>
+  );
+};
 
-export default DeleteTask
+export default DeleteTask;

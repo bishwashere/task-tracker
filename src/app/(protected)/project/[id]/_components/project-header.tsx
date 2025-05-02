@@ -1,18 +1,16 @@
 import { Session } from "next-auth";
 import React from "react";
-import ProfileMenu from "../common/profile-menu";
 import { HiCurrencyDollar } from "react-icons/hi2";
 import Link from "next/link";
+import ProfileMenu from "@/components/common/profile-menu";
 
 export const ProjectHeader = ({
-  session,
   projectName,
   projectId,
   points,
   showPoints = false,
   onEditButtonClick,
 }: {
-  session: Session;
   projectName: string;
   projectId?: string;
   points?: number;
@@ -33,7 +31,6 @@ export const ProjectHeader = ({
           </Link>
         )}
         <ProfileMenu
-          session={session}
           showSettings={false}
           onEditButtonClick={onEditButtonClick}
         />

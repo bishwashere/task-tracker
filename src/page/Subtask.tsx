@@ -2,7 +2,7 @@
 import { saveComment } from "@/actions/subtask";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
 import ProfileMenu from "@/components/common/ProfileMenu";
-import SuperHeader from "@/components/headers/SuperHeader";
+import SuperHeader from "@/components/common/block/super-header";
 import { fetchSubtaskData, resolveComment } from "@/data/subtask";
 import { cn } from "@/lib/cn";
 import { CommentType, SubtaskType } from "@/types/organization";
@@ -105,10 +105,10 @@ const Subtask = ({
             <span className="font-semibold">
               {subtask.dueDate
                 ? new Date(subtask.dueDate).toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "2-digit",
-                  year: "numeric",
-                })
+                    month: "long",
+                    day: "2-digit",
+                    year: "numeric",
+                  })
                 : "No due date"}
             </span>
           </p>
@@ -199,9 +199,9 @@ const Subtask = ({
                                   comments.map((comment) =>
                                     comment.id === c.id
                                       ? ({
-                                        ...comment,
-                                        resolved: true,
-                                      } as CommentType)
+                                          ...comment,
+                                          resolved: true,
+                                        } as CommentType)
                                       : comment,
                                   ),
                                 );

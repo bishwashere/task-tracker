@@ -9,7 +9,6 @@ import {
   UpdateOrganizationNameProps,
 } from "./action";
 import toast from "react-hot-toast";
-import { Organization } from "@prisma/client";
 import { Org } from "@/context/dashboard-context";
 
 export const useCreateOrganization = () => {
@@ -18,10 +17,9 @@ export const useCreateOrganization = () => {
     mutationFn: async (props: CreateOrganizationProps) => {
       const res = await createOrganization(props);
       if (res.success) {
-        await queryClient.setQueryData(
-          ["organizations"],
-          (oldData: unknown[] | undefined) => [res.data, ...(oldData ?? [])]
-        );
+        await queryClient.invalidateQueries({
+          queryKey: ["organizations"],
+        });
         return res.message;
       } else {
         throw new Error(res.message);
@@ -72,7 +70,7 @@ export const useUpdateOrganizationName = () => {
             }
             return org;
           });
-        }
+        },
       );
 
       const res = await updateOrganizationName(props);
@@ -98,7 +96,7 @@ export const useUpdateOrganizationName = () => {
             }
             return org;
           });
-        }
+        },
       );
     },
   });
@@ -110,28 +108,9 @@ export const useAddUserToOrganization = () => {
     mutationFn: async (props: AddUserToOrganizationProps) => {
       const res = await addUserToOrganization(props);
       if (res.success) {
-        await queryClient.setQueryData(
-          ["organizations"],
-          (oldData: Org[] | undefined) => {
-            return oldData?.map((org) => {
-              if (org.id === props.organizationId) {
-                return {
-                  ...org,
-                  organization: {
-                    ...org.organization,
-                    members: [
-                      ...org.organization.members,
-                      {
-                        user: res.data,
-                      },
-                    ],
-                  },
-                };
-              }
-              return org;
-            });
-          }
-        );
+        await queryClient.invalidateQueries({
+          queryKey: ["organizations"],
+        });
 
         return res.message;
       } else {

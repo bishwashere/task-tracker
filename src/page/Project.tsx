@@ -5,7 +5,7 @@
 import ProgressBar from "@/components/common/ProgressBar";
 import { ViewToggle } from "@/components/common/ViewToggle";
 import { ProjectHeader } from "@/components/headers/ProjectHeader";
-import SuperHeader from "@/components/headers/SuperHeader";
+import SuperHeader from "@/components/common/block/super-header";
 import AddTaskPopup from "@/components/project/AddTaskPopup";
 import { TaskGrid } from "@/components/project/TaskGrid";
 import { TaskList } from "@/components/project/TaskList";
@@ -22,7 +22,7 @@ import {
   deleteAISuggestedTask,
 } from "@/actions/ai-sugested-task";
 import { saveTask } from "@/actions/task";
-import TaskGenerationLoader from "@/components/common/TaskGenerationLoader";
+import TaskGenerationLoader from "@/components/common/task-generation-loader";
 import { Separator } from "@/components/ui/separator";
 
 const Project = ({

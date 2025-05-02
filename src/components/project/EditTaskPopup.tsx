@@ -30,10 +30,10 @@ const EditTaskPopup = ({
       setTasks((prevTasks) =>
         prevTasks.some((task) => task.id === res.task?.id)
           ? prevTasks.map((task) =>
-            task.id === res.task?.id
-              ? (res.task as unknown as TaskType)
-              : task,
-          )
+              task.id === res.task?.id
+                ? (res.task as unknown as TaskType)
+                : task,
+            )
           : [...prevTasks, res.task as unknown as TaskType],
       );
       setModalIsOpen(false);

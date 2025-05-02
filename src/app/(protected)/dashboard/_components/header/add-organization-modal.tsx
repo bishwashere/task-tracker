@@ -1,48 +1,50 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button'
-import toast from 'react-hot-toast'
-import { useCreateOrganization, useListUserOrganizations } from '@/queries/organizations/hooks'
-import { CreateOrganizationProps } from '@/queries/organizations/action'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
+import {
+  useCreateOrganization,
+  useListUserOrganizations,
+} from "@/queries/organizations/hooks";
+import { CreateOrganizationProps } from "@/queries/organizations/action";
 
 const defaultFormData: CreateOrganizationProps = {
-  name: ""
-}
+  name: "",
+};
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-}
+};
 
-const AddOrganizationModal = (
-  { isOpen, onOpenChange }: Props
-) => {
-  const org = useCreateOrganization()
-  const [formData, setFormData] = useState<CreateOrganizationProps>(defaultFormData)
+const AddOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
+  const org = useCreateOrganization();
+  const [formData, setFormData] =
+    useState<CreateOrganizationProps>(defaultFormData);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.name.trim()) {
-      toast.error("Organization name is required")
-      return
+      toast.error("Organization name is required");
+      return;
     }
     try {
-      await org.mutateAsync({ name: formData.name.trim() })
-      onOpenChange(false)
-      setFormData(defaultFormData)
-    } catch { }
-  }
+      await org.mutateAsync({ name: formData.name.trim() });
+      onOpenChange(false);
+      setFormData(defaultFormData);
+    } catch {}
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10">
         <DialogHeader>
-          <DialogTitle className='text-2xl'>Add Organization</DialogTitle>
+          <DialogTitle className="text-2xl">Add Organization</DialogTitle>
         </DialogHeader>
         {/* <hr className='border border-gray-300 my-6' /> */}
         <form onSubmit={onSubmit}>
@@ -58,17 +60,15 @@ const AddOrganizationModal = (
           />
           {/* <hr className='border border-gray-300 my-6' /> */}
           <div className="flex mt-6 gap-2.5">
-            <Button
-              loading={org.isPending}
-              type='submit' className='min-w-28'>
+            <Button loading={org.isPending} type="submit" className="min-w-28">
               Save
             </Button>
             <Button
-              type='reset'
+              type="reset"
               variant={"muted"}
               onClick={() => {
-                onOpenChange(false)
-                setFormData(defaultFormData)
+                onOpenChange(false);
+                setFormData(defaultFormData);
               }}
             >
               Cancel
@@ -77,8 +77,7 @@ const AddOrganizationModal = (
         </form>
       </DialogContent>
     </Dialog>
+  );
+};
 
-  )
-}
-
-export default AddOrganizationModal
+export default AddOrganizationModal;

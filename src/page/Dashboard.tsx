@@ -92,7 +92,7 @@ const Dashboard = ({ session }: { session: Session }) => {
         formData.get("projectTitle") as string,
         formData.get("projectDescription") as string,
       );
-      console.log(result)
+      console.log(result);
       if (result.success) {
         toast.success(result.message);
         // fetchOrganizations();
@@ -100,9 +100,12 @@ const Dashboard = ({ session }: { session: Session }) => {
           prevOrganizations.map((org) =>
             org.id === selectedOrganization.id
               ? {
-                ...org,
-                projects: [...org.projects, result.project as unknown as ProjectType],
-              }
+                  ...org,
+                  projects: [
+                    ...org.projects,
+                    result.project as unknown as ProjectType,
+                  ],
+                }
               : org,
           ),
         );

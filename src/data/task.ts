@@ -106,7 +106,7 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0
+        0,
       );
       return {
         success: true,
@@ -149,8 +149,8 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const tasksWithSubtasks = Array.from(
         new Map(
-          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task])
-        ).values()
+          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task]),
+        ).values(),
       );
       //Fetch points for that project
       const pointsData = await prisma.pointsEarned.findMany({
@@ -161,7 +161,7 @@ export const fetchProjectData = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0
+        0,
       );
       return {
         success: true,

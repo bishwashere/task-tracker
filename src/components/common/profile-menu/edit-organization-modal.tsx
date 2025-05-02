@@ -1,63 +1,77 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog"
-import { AddUserToOrganizationProps, UpdateOrganizationNameProps } from '@/queries/organizations/action'
-import { useDashboardContext } from '@/context/dashboard-context'
-import { Button } from '@/components/ui/button'
-import { useAddUserToOrganization, useUpdateOrganizationName } from '@/queries/organizations/hooks'
+  AddUserToOrganizationProps,
+  UpdateOrganizationNameProps,
+} from "@/queries/organizations/action";
+import { useDashboardContext } from "@/context/dashboard-context";
+import { Button } from "@/components/ui/button";
+import {
+  useAddUserToOrganization,
+  useUpdateOrganizationName,
+} from "@/queries/organizations/hooks";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-}
+};
 
 const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
-  const { selectedOrg } = useDashboardContext()
-  const oldName = useRef(selectedOrg?.organization.name)
+  const { selectedOrg } = useDashboardContext();
+  const oldName = useRef(selectedOrg?.organization?.name);
 
   const [addUserToOrg, setAddUserToOrg] = useState<AddUserToOrganizationProps>({
     organizationId: selectedOrg?.organizationId as string,
     userEmail: "",
     role: "MEMBER",
-  })
-  const [editOrgFormData, setEditOrgFormData] = useState<UpdateOrganizationNameProps>({
-    organizationId: selectedOrg?.organizationId as string,
-    newName: selectedOrg?.organization.name as string,
-  })
+  });
+  const [editOrgFormData, setEditOrgFormData] =
+    useState<UpdateOrganizationNameProps>({
+      organizationId: selectedOrg?.organizationId as string,
+      newName: selectedOrg?.organization?.name as string,
+    });
 
   useEffect(() => {
     if (selectedOrg) {
       setEditOrgFormData({
         organizationId: selectedOrg?.organizationId as string,
-        newName: selectedOrg?.organization.name as string,
-      })
+        newName: selectedOrg?.organization?.name as string,
+      });
     }
-  }, [selectedOrg])
+  }, [selectedOrg]);
 
-  const changeName = useUpdateOrganizationName()
-  const addMember = useAddUserToOrganization()
+  const changeName = useUpdateOrganizationName();
+  const addMember = useAddUserToOrganization();
   const onNameChange = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (editOrgFormData.newName === oldName.current || !editOrgFormData.newName.trim()) return
+    if (
+      editOrgFormData.newName === oldName.current ||
+      !editOrgFormData.newName.trim()
+    )
+      return;
 
     try {
-      await changeName.mutateAsync(editOrgFormData)
-      oldName.current = editOrgFormData.newName
-    } catch { }
-  }
+      await changeName.mutateAsync({
+        ...editOrgFormData,
+        organizationId: selectedOrg?.organizationId as string,
+      });
+      oldName.current = editOrgFormData.newName;
+    } catch {}
+  };
 
   const onMemberAdd = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!addUserToOrg.userEmail.trim()) return
+    if (!addUserToOrg.userEmail.trim()) return;
     try {
-      await addMember.mutateAsync(addUserToOrg)
-      setAddUserToOrg({ ...addUserToOrg, userEmail: "" })
-    } catch { }
-  }
+      await addMember.mutateAsync({
+        ...addUserToOrg,
+        organizationId: selectedOrg?.organizationId as string,
+      });
+      setAddUserToOrg({ ...addUserToOrg, userEmail: "" });
+    } catch {}
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -75,11 +89,14 @@ const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
             className="w-[95%] md:w-[80%] h-10 px-2 py-1 mx-2 my-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
             required
             value={editOrgFormData.newName}
-            onChange={(e) => setEditOrgFormData({ ...editOrgFormData, newName: e.target.value })}
+            onChange={(e) =>
+              setEditOrgFormData({
+                ...editOrgFormData,
+                newName: e.target.value,
+              })
+            }
           />
-          <Button
-            loading={changeName.isPending}
-            className="ml-auto">
+          <Button loading={changeName.isPending} className="ml-auto">
             Change
           </Button>
         </form>
@@ -94,11 +111,11 @@ const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
             className="w-[95%] md:w-[80%] px-2 py-1 mx-2 my-2 h-10 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
             required
             value={addUserToOrg.userEmail}
-            onChange={(e) => setAddUserToOrg({ ...addUserToOrg, userEmail: e.target.value })}
+            onChange={(e) =>
+              setAddUserToOrg({ ...addUserToOrg, userEmail: e.target.value })
+            }
           />
-          <Button
-            loading={addMember.isPending}
-            className="ml-auto">
+          <Button loading={addMember.isPending} className="ml-auto">
             Add
           </Button>
         </form>
@@ -114,8 +131,7 @@ const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
         </ul>
       </DialogContent>
     </Dialog>
+  );
+};
 
-  )
-}
-
-export default EditOrganizationModal
+export default EditOrganizationModal;

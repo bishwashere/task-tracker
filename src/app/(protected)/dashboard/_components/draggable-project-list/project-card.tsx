@@ -18,7 +18,7 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
       )}
       onClick={() => router.push(`/project/${project.id}`)}
     >
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 gap-6">
         <h3 className="text-lg font-semibold">{project.name}</h3>
         <ProgressBar progress={project.progress} />
       </div>
@@ -27,5 +27,4 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
   );
 };
 
-
-export default ProjectCard
+export default ProjectCard;
