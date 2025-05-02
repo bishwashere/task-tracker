@@ -401,3 +401,227 @@ export const saveSubTaskTag = async ({
     return { success: false, message: "An error occurred." };
   }
 };
+
+export const resolveComment = async (commentId: string) => {
+  try {
+    const comment = await prisma.comment.update({
+      where: { id: commentId },
+      data: {
+        resolved: true,
+      },
+    });
+    return { success: true, comment };
+  } catch (error) {
+    console.error("Error while resolving comment", error);
+    return { success: false, message: "An error occurred." };
+  }
+};
+
+export const fetchSubtaskData = async (subtaskId: string) => {
+  const user = await auth();
+  if (!user || !user.user || !user.user.id) {
+    return { success: false, error: "Unauthorized !" };
+  }
+
+  const userId = user.user.id;
+
+  try {
+    // Fetch the subtask along with its related task and organization
+    const subtask = await prisma.subtask.findUnique({
+      where: { id: subtaskId },
+      include: {
+        task: {
+          select: {
+            project: {
+              select: {
+                organization: {
+                  select: {
+                    id: true,
+                    members: {
+                      select: {
+                        userId: true,
+                        role: true,
+                      },
+                    },
+                  },
+                },
+                id: true,
+              },
+            },
+            name: true,
+          },
+        },
+        comments: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+            comment: true,
+            createdAt: true,
+            commentType: true,
+            resolved: true,
+            id: true,
+          },
+        },
+        assignedUser: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    // Check if the subtask exists
+    if (!subtask) {
+      return { success: false, error: "No Subtask found!" };
+    }
+    // Get organization and members
+    const organization = subtask.task?.project?.organization;
+    if (!organization) {
+      return { success: false, message: "Organization not found" };
+    }
+    // Fetch organization members
+    const isAdmin = organization.members.some(
+      (member) => member.userId === userId && member.role === "ADMIN"
+    );
+    const isAssignedUser = subtask.assignedUserId === userId;
+    // Check if the user is authorized
+    if (!(isAdmin || isAssignedUser)) {
+      return {
+        success: false,
+        message: "Forbidden: You do not have permission to view this subtask",
+      };
+    }
+
+    return {
+      success: true,
+      subtask,
+      comments: subtask.comments,
+    };
+  } catch (error) {
+    console.error("Error fetching project data:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export type SaveCommentProps = {
+  subtaskId: string;
+  projectId: string;
+  userComment: string;
+  commentType: string;
+};
+export const saveComment = async ({
+  subtaskId,
+  projectId,
+  userComment,
+  commentType,
+}: SaveCommentProps) => {
+  const user = await auth();
+  if (!user || !user.user || !user.user.id) {
+    return { success: false, message: "Unauthorized !" };
+  }
+
+  const userId = user.user.id;
+
+  try {
+    // Fetch project and organization
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { organization: { include: { members: true } } },
+    });
+    if (!project) {
+      return { success: false, message: "Project not found" };
+    }
+
+    // Check if the user is an admin in the organization
+    const userOrg = project.organization.members.find(
+      (member) => member.userId === userId
+    );
+    if (!userOrg) {
+      return { success: false, message: "Permission denied" };
+    }
+
+    const comment = await prisma.comment.create({
+      data: {
+        subtaskId: subtaskId,
+        userId: userId,
+        comment: userComment,
+        commentType: commentType,
+      },
+      select: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        comment: true,
+        createdAt: true,
+        commentType: true,
+        resolved: true,
+        id: true,
+      },
+    });
+
+    return { success: true, message: "Success", comment };
+  } catch (error) {
+    console.error("Error while commenting", error);
+    return { success: false, message: "An error occurred." };
+  }
+};
+
+export const sortSubtasks = async (
+  data: { subtaskId: string; sortIndex: number }[]
+) => {
+  try {
+    const user = await auth();
+    if (!user || !user.user || !user.user.id) {
+      return { success: false, message: "Unauthorized !" };
+    }
+
+    const userId = user.user.id;
+
+    await Promise.all(
+      data.map(async ({ subtaskId, sortIndex }) => {
+        const p = await prisma.subtaskSortIndex.findFirst({
+          where: {
+            subtaskId,
+            userId,
+          },
+        });
+        if (p) {
+          await prisma.subtaskSortIndex.update({
+            where: {
+              id: p.id,
+            },
+            data: {
+              sortIndex,
+            },
+          });
+        } else {
+          await prisma.subtaskSortIndex.create({
+            data: {
+              subtaskId,
+              userId,
+              sortIndex,
+            },
+          });
+        }
+      })
+    );
+
+    return { success: true, message: "Subtasks sorted successfully" };
+  } catch (error) {
+    console.error("Error sorting subtasks:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};

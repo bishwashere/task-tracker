@@ -1,4 +1,3 @@
-import { TaskType } from "@/types/organization";
 import { Subtask, Task } from "@prisma/client";
 
 export function calculateProgressWithStats(
@@ -6,17 +5,17 @@ export function calculateProgressWithStats(
     Task & {
       subtasks: Subtask[];
     }
-  >,
+  >
 ) {
   const totalSubtasks = tasks?.reduce(
     (sum, task) => sum + task.subtasks?.length,
-    0,
+    0
   );
   const completedSubtasks = tasks?.reduce(
     (sum, task) =>
       sum +
       task.subtasks?.filter((subtask) => subtask.status === "done").length,
-    0,
+    0
   );
   const pendingSubtasks = totalSubtasks - completedSubtasks;
 
@@ -38,7 +37,7 @@ export function calculateProgressWithStats(
   const assignedSubtasks = tasks?.reduce(
     (sum, task) =>
       sum + task.subtasks?.filter((subtask) => subtask.assignedUserId).length,
-    0,
+    0
   );
   const unassignedSubtasks = totalSubtasks - assignedSubtasks;
 

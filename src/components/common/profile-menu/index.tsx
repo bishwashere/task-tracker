@@ -1,12 +1,12 @@
 "use client";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { MdLogout } from "react-icons/md";
-import logOut from "@/actions/logOut";
+import logOut from "@/queries/auth/action";
 import { Edit2Icon, SettingsIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useDashboardContext } from "@/context/dashboard-context";
 import EditOrganizationModal from "./edit-organization-modal";
-import SubscriptionStatus from "../SubscriptionStatus";
+import SubscriptionStatus from "../subsrription-status";
 import { Avatar } from "@/components/ui/avatar";
 import { IoSettingsOutline } from "react-icons/io5";
 

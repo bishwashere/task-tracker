@@ -48,7 +48,7 @@ const EditSubtaskDialog = ({
     e.preventDefault();
     if (!formData.subtaskName.trim()) return;
     try {
-      edit.mutate({
+      await edit.mutateAsync({
         projectId,
         subTaskName: formData.subtaskName,
         dueDate: new Date(formData.dueDate),

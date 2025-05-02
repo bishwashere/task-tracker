@@ -302,3 +302,53 @@ export const deleteTask = async (taskId: string) => {
     };
   }
 };
+
+export const sortTasks = async (
+  data: { taskId: string; sortIndex: number }[]
+) => {
+  try {
+    const user = await auth();
+
+    if (!user || !user.user || !user.user.id) {
+      return { success: false, message: "Unauthorized !" };
+    }
+
+    const userId = user.user.id;
+
+    await Promise.all(
+      data.map(async ({ taskId, sortIndex }) => {
+        const p = await prisma.taskSortIndex.findFirst({
+          where: {
+            taskId,
+            userId,
+          },
+        });
+        if (p) {
+          await prisma.taskSortIndex.update({
+            where: {
+              id: p.id,
+            },
+            data: {
+              sortIndex,
+            },
+          });
+        } else {
+          await prisma.taskSortIndex.create({
+            data: {
+              taskId,
+              userId,
+              sortIndex,
+            },
+          });
+        }
+      })
+    );
+    return { success: true, message: "Tasks sorted successfully" };
+  } catch (error) {
+    console.error("Error sorting tasks:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};

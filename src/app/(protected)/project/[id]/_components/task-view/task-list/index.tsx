@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TaskListContextProvider, TaskListProps, useTaskListContext } from './context'
 import {
   DndContext,
@@ -18,12 +18,13 @@ import {
 } from "@dnd-kit/sortable";
 import TaskDragOverlay from './task-drag-overlay';
 import SortableTaskItem from './sortable-task-item';
-import { sortSubtasks } from '@/actions/subtask';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { Project } from '@prisma/client';
-import { sortTasks } from '@/actions/task';
+import { sortSubtasks } from '@/queries/subtask/action';
+import { sortTasks } from '@/queries/tasks/actions';
+import { useProjectContext } from '../../../_context';
 
 type Props = TaskListProps
 
@@ -56,8 +57,16 @@ const Comp = (props: Props) => {
   const { id } = useParams() as {
     id: string
   }
+
+  const [wasSubTaskVisible, setWasSubTaskVisible] = useState(false)
+
+  const { showSubtasks, setShowSubtasks } = useProjectContext()
   const handleDragStart = (event: DragStartEvent) => {
     const isSubtask = event.active.data.current?.isSubtask;
+    if (!isSubtask) {
+      setWasSubTaskVisible(showSubtasks)
+      setShowSubtasks(false)
+    }
     setActiveDragging({
       type: isSubtask ? 'subtask' : 'task',
       id: event.active.id as string,
@@ -134,6 +143,7 @@ const Comp = (props: Props) => {
         });
       }
     } else {
+      setShowSubtasks(wasSubTaskVisible)
       // Handle task reordering (your existing task reordering logic)
       const oldIndex = props.tasks.findIndex(task => task.id === activeId);
       const newIndex = props.tasks.findIndex(task => task.id === overId);

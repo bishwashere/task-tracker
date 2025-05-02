@@ -1,7 +1,5 @@
 import { IoMdClose } from "react-icons/io";
-import { editTask } from "@/actions/task";
 import toast from "react-hot-toast";
-import { TaskType } from "@/types/organization";
 import { BiEditAlt } from "react-icons/bi";
 import { useState } from "react";
 import {

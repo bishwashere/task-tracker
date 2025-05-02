@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import { useSaveSubtask } from "@/queries/subtask/hooks";
+import AISubtaskDialog from "./ai-subtask-generator";
 
 const AddSubtaskDialog = ({
   taskId,
@@ -53,22 +54,12 @@ const AddSubtaskDialog = ({
 
   return (
     <div className="absolute top-2 right-2 space-x-2 flex">
-      {/* {showAiSuggestion && (
+      {showAiSuggestion && (
         <AISubtaskDialog
           taskId={taskId}
           projectId={projectId}
-          onSubtaskAdded={(subtasks) => {
-            setTasks((prevTasks) =>
-              prevTasks.map((task) =>
-                task.id === taskId
-                  ? { ...task, subtasks: [...task.subtasks, ...subtasks] }
-                  : task,
-              ),
-            );
-            setShowAiSuggestion(false);
-          }}
         />
-      )} */}
+      )}
 
       <Dialog
         open={modalIsOpen}

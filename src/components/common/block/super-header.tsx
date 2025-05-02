@@ -5,9 +5,11 @@ import { FaArrowLeft } from "react-icons/fa6";
 export default function SuperHeader({
   path,
   label,
+  onBackClick
 }: {
-  path: string;
+  path?: string;
   label?: string;
+  onBackClick?: () => void;
 }) {
   const router = useRouter();
 
@@ -19,7 +21,7 @@ export default function SuperHeader({
       )}
     >
       <button
-        onClick={() => router.push(path)}
+        onClick={() => path ? router.push(path) : onBackClick?.()}
         className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
       >
         <FaArrowLeft className="h-6 w-6" />

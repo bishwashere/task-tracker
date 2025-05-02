@@ -17,6 +17,9 @@ const AiSuggestions = ({ loading, completed, tasks, showGenerationLoader }: Prop
   const del = useDeleteAiSuggestedTask()
   const { id } = useParams() as { id: string }
   const [active, setActive] = React.useState([""])
+
+  console.log(loading, showGenerationLoader)
+
   if (loading && showGenerationLoader)
     return (
       <TaskGenerationLoader

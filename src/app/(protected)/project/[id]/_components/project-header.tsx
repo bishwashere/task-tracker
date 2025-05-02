@@ -3,6 +3,7 @@ import React from "react";
 import { HiCurrencyDollar } from "react-icons/hi2";
 import Link from "next/link";
 import ProfileMenu from "@/components/common/profile-menu";
+import { useDashboardContext } from "@/context/dashboard-context";
 
 export const ProjectHeader = ({
   projectName,
@@ -17,13 +18,14 @@ export const ProjectHeader = ({
   showPoints?: boolean;
   onEditButtonClick?: () => void;
 }) => {
+  const { selectedOrg } = useDashboardContext()
   return (
     <div className="flex justify-between items-center mb-5 flex-col sm:flex-row">
       <h1 className="text-2xl font-bold max-sm:hidden">{projectName}</h1>
       <div className="flex flex-row justify-center items-center gap-5">
         {showPoints && projectId && (
           <Link
-            href={`/points?fromProject=${projectId}`}
+            href={selectedOrg?.role.toLowerCase() === "admin" ? "/allpoints" : `/points`}
             className="flex flex-row justify-center items-center gap-1"
           >
             <HiCurrencyDollar className="text-3xl text-[#fbbc05]" />

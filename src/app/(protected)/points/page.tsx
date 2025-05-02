@@ -1,7 +1,7 @@
 "use server";
 import { auth } from "@/lib/auth";
-import Points from "@/page/Points";
 import { redirect } from "next/navigation";
+import Points from "./_components";
 
 export default async function Page({
   searchParams,
@@ -9,10 +9,10 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const session = await auth();
-  const { fromProject } = await searchParams;
-  let projectId: string | null = null;
-  if (typeof fromProject === "string") projectId = fromProject;
+  const { user } = await searchParams as {
+    user: string;
+  }
   if (!session) redirect("/login");
 
-  return <Points projectId={projectId} session={session} />;
+  return <Points user={user} />;
 }

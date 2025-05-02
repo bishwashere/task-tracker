@@ -1,8 +1,12 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteSubtask,
   editSubTask,
   EditSubTaskProps,
+  fetchSubtaskData,
+  resolveComment,
+  saveComment,
+  SaveCommentProps,
   saveSubTask,
   SaveSubtaskProps,
   saveSubTaskTag,
@@ -136,48 +140,45 @@ export const useEditSubtask = () => {
   let old: any;
   return useMutation({
     mutationFn: async (props: EditSubTaskProps) => {
-      queryClient.setQueryData(
-        ["project", props.projectId],
-        (
-          oldData:
-            | (Project & {
-                tasks: Array<
-                  Task & {
-                    subtasks: Subtask[];
-                  }
-                >;
-              })
-            | undefined
-        ) => {
-          old = oldData;
-          return {
-            ...oldData,
-            tasks: oldData?.tasks.map((task) => {
-              if (task.id === props.taskId) {
-                return {
-                  ...task,
-                  subtasks: task.subtasks.map((subtask) => {
-                    if (subtask.id === props.subTaskId) {
-                      return {
-                        ...subtask,
-                        name: props.subTaskName,
-                        dueDate: props.dueDate,
-                        points: props.points,
-                        assignedUserId: props.assignedUserId,
-                      };
-                    }
-                    return subtask;
-                  }),
-                };
-              }
-              return task;
-            }),
-          };
-        }
-      );
-
       const res = await editSubTask(props);
       if (res.success) {
+        queryClient.setQueryData(
+          ["project", props.projectId],
+          (
+            oldData:
+              | (Project & {
+                  tasks: Array<
+                    Task & {
+                      subtasks: Subtask[];
+                    }
+                  >;
+                })
+              | undefined
+          ) => {
+            old = oldData;
+            return {
+              ...oldData,
+              tasks: oldData?.tasks.map((task) => {
+                if (task.id === props.taskId) {
+                  return {
+                    ...task,
+                    subtasks: task.subtasks.map((subtask) => {
+                      if (subtask.id === props.subTaskId) {
+                        return {
+                          ...subtask,
+                          ...res.subTask,
+                        };
+                      }
+                      return subtask;
+                    }),
+                  };
+                }
+                return task;
+              }),
+            };
+          }
+        );
+
         return res.message;
       } else {
         throw new Error(res.message);
@@ -433,6 +434,60 @@ export const useSaveSubtaskTag = () => {
           return old;
         }
       );
+    },
+  });
+};
+
+export const useFetchSubtaskData = (subtaskId: string) => {
+  return useQuery({
+    queryKey: ["subtask", subtaskId],
+    queryFn: async () => {
+      const res = await fetchSubtaskData(subtaskId);
+      if (res.success) {
+        return res.subtask as any;
+      } else {
+        return [];
+      }
+    },
+  });
+};
+
+export const useSaveComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (props: SaveCommentProps) => {
+      const res = await saveComment(props);
+      if (res.success) {
+        await queryClient.invalidateQueries({
+          queryKey: ["subtask", props.subtaskId],
+        });
+        return res.comment as any;
+      } else {
+        return [];
+      }
+    },
+  });
+};
+
+export const useResolveComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      commentId,
+      subtaskId,
+    }: {
+      commentId: string;
+      subtaskId: string;
+    }) => {
+      const res = await resolveComment(commentId);
+      if (res.success) {
+        queryClient.invalidateQueries({
+          queryKey: ["subtask", subtaskId],
+        });
+        return res.comment as any;
+      } else {
+        return [];
+      }
     },
   });
 };

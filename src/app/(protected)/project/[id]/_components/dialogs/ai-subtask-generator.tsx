@@ -10,11 +10,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getAISuggestedSubtasks } from "@/actions/ai-sugested-task";
-import { saveSubTask } from "@/actions/task";
 import toast from "react-hot-toast";
-import { SubtaskType } from "@/types/organization";
-import TaskGenerationLoader from "./task-generation-loader";
+import { getAISuggestedSubtasks } from "@/queries/tasks/actions";
+import { saveSubTask } from "@/queries/subtask/action";
+import { useQueryClient } from "@tanstack/react-query";
+import TaskGenerationLoader from "@/components/common/task-generation-loader";
 
 type Task = {
   id: number;
@@ -25,19 +25,17 @@ type Task = {
 type Props = {
   taskId: string;
   projectId: string;
-  onSubtaskAdded?: (subtasks: SubtaskType[]) => void;
 };
 
 export default function AISubtaskDialog({
   taskId,
   projectId,
-  onSubtaskAdded,
 }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isMockLoading, setIsMockLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const queryClient = useQueryClient()
   const generateTasks = async () => {
     setIsGenerating(true);
     setIsMockLoading(true);
@@ -63,14 +61,23 @@ export default function AISubtaskDialog({
   const saveTasks = async () => {
     const selectedTasks = tasks.filter((task) => task.selected);
 
-    const res = await Promise.all(
+    await Promise.all(
       selectedTasks.map((task) =>
-        saveSubTask(taskId, projectId, task.content, new Date(), 1),
+        saveSubTask({
+          projectId,
+          taskId,
+          subTaskName: task.content,
+          dueDate: new Date(),
+          points: 1,
+          assignedUserId: null,
+        }),
       ),
     );
-    setOpen(false);
     toast.success("Subtasks added successfully!");
-    onSubtaskAdded?.(res.map((task) => task.subTask as unknown as SubtaskType));
+    await queryClient.invalidateQueries({
+      queryKey: ["project", projectId],
+    });
+    setOpen(false);
   };
 
   return (
@@ -130,8 +137,8 @@ export default function AISubtaskDialog({
                   <li
                     key={task.id}
                     className={`flex items-center justify-between rounded-md border p-3 ${task.selected
-                        ? "border-indigo-500 bg-indigo-50"
-                        : "border-gray-200"
+                      ? "border-indigo-500 bg-indigo-50"
+                      : "border-gray-200"
                       }`}
                   >
                     <span className="text-sm text-gray-700">
@@ -141,8 +148,8 @@ export default function AISubtaskDialog({
                       <button
                         onClick={() => toggleTask(task.id)}
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${task.selected
-                            ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                           }`}
                         aria-label={
                           task.selected ? "Deselect task" : "Select task"
@@ -153,8 +160,8 @@ export default function AISubtaskDialog({
                       <button
                         onClick={() => toggleTask(task.id)}
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${!task.selected
-                            ? "bg-red-100 text-red-600 hover:bg-red-200"
-                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          ? "bg-red-100 text-red-600 hover:bg-red-200"
+                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                           }`}
                         aria-label={
                           !task.selected ? "Reject task" : "Unmark as rejected"

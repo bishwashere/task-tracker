@@ -1,8 +1,10 @@
 import { Task } from "@prisma/client";
 import { useTaskListContext } from "./context";
+import { SubTaskContent } from "./subtask-view/subtask-content";
 
 const TaskDragOverlay = () => {
   const { activeDragging, tasks } = useTaskListContext()
+  if (!activeDragging?.id) return null;
   if (activeDragging?.type === "task") {
     return (
       <TaskItem
@@ -13,28 +15,22 @@ const TaskDragOverlay = () => {
     );
   }
 
-  // // Look for subtask
-  // for (const task of tasks) {
-  //   const subtask = task.subtasks.find((s) => s.id === activeId);
-  //   if (subtask) {
-  //     return (
-  //       <SubTaskContent
-  //         subtask={subtask}
-  //         taskId={task.id}
-  //         isDragging={true}
-  //         projectId={task.projectId}
-  //         role="member"
-  //         users={[]}
-  //         setTasks={() => { }}
-  //         editMode={false}
-  //         setPointsEarned={() => { }}
-  //         //@ts-expect-error:...........
-  //         session={null}
-  //         isNewTask={() => false}
-  //       />
-  //     );
-  //   }
-  // }
+  // Look for subtask
+  for (const task of tasks) {
+    const subtask = task.subtasks.find((s) => s.id === activeDragging.id);
+    if (subtask) {
+      return (
+        <SubTaskContent
+          //@ts-expect-error: ....
+          subtask={subtask}
+          isNew={() => false}
+          taskId={task.id}
+          isDragging={true}
+
+        />
+      );
+    }
+  }
 
   return null;
 };

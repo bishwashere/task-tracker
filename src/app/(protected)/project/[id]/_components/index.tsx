@@ -23,7 +23,7 @@ const Project = () => {
   const stats = calculateProgressWithStats(data?.tasks || []);
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const ai = useGetAISuggestedTasks(id)
-  const [mockLoading, setMockLoading] = useState(false);
+  const [mockLoading, setMockLoading] = useState(true);
 
 
 
@@ -75,12 +75,11 @@ const Project = () => {
             setModalIsOpen={setAddTaskModalOpen}
           />
         </div>
-        {ai.isPending || mockLoading || (ai.data?.length || 0) > 0 && <AiSuggestions
+        <AiSuggestions
           showGenerationLoader={!data?.project?.hasAiSuggestTasks}
-          loading={ai.isPending} tasks={ai.data || []} completed={() => {
+          loading={ai.isPending || mockLoading} tasks={ai.data || []} completed={() => {
             setMockLoading(false);
           }} />
-        }
 
         {
           !isPending && filteredTasks?.length === 0 ? (

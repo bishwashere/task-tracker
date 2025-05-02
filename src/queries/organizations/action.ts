@@ -2,16 +2,12 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ActionResponse } from "@/types/action";
-import { Organization } from "@prisma/client";
-
+ 
 export type CreateOrganizationProps = {
   name: string;
 };
 
-export const createOrganization = async ({
-  name,
-}: CreateOrganizationProps): Promise<ActionResponse<Organization>> => {
+export const createOrganization = async ({ name }: CreateOrganizationProps) => {
   try {
     const user = await auth();
     if (!user || !user.user || !user.user.id) {
@@ -75,7 +71,7 @@ export type UpdateOrganizationNameProps = {
 };
 
 export const updateOrganizationName = async (
-  data: UpdateOrganizationNameProps,
+  data: UpdateOrganizationNameProps
 ) => {
   const user = await auth();
 
