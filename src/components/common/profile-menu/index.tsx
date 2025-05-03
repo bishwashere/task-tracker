@@ -6,7 +6,7 @@ import { Edit2Icon, SettingsIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useDashboardContext } from "@/context/dashboard-context";
 import EditOrganizationModal from "./edit-organization-modal";
-import SubscriptionStatus from "../subsrription-status";
+import SubscriptionStatus from "../subscription-status";
 import { Avatar } from "@/components/ui/avatar";
 import { IoSettingsOutline } from "react-icons/io5";
 

@@ -10,6 +10,7 @@ import { useParams } from "next/navigation";
 import DeleteTask from "../../dialogs/delete-task-dialog";
 import AddSubtaskDialog from "../../dialogs/add-subtask-dialog";
 import SubTaskView from "./subtask-view";
+import { useTaskListContext } from "./context";
 
 const SortableTaskItem = ({
   task,
@@ -30,6 +31,7 @@ const SortableTaskItem = ({
   const { id } = useParams() as {
     id: string
   }
+  const { activeDragging } = useTaskListContext()
   const { editMode, role, showSubtasks } = useProjectContext()
   const {
     attributes,
@@ -66,10 +68,13 @@ const SortableTaskItem = ({
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
+      {
+      ...(activeDragging?.type === "subtask" ? {} : {
+        ref: setNodeRef,
+        style,
+        ...attributes,
+        ...listeners,
+      })}
       className={cn(
         "flex items-start gap-1 transition-all duration-200",
         !editMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
