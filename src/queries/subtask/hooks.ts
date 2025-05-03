@@ -461,6 +461,9 @@ export const useSaveComment = () => {
         await queryClient.invalidateQueries({
           queryKey: ["subtask", props.subtaskId],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["project", props.projectId],
+        });
         return res.comment as any;
       } else {
         return [];

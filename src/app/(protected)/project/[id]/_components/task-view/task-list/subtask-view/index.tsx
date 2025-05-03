@@ -4,6 +4,7 @@ import { Subtask } from '@prisma/client';
 import React from 'react'
 import { useProjectContext } from '../../../../_context';
 import { SubTaskContent } from './subtask-content';
+import { useTaskListContext } from '../context';
 
 export interface SubTaskViewProps {
   subtask: Subtask & {
@@ -21,6 +22,7 @@ export interface SubTaskViewProps {
 
 const SubTaskView = (props: SubTaskViewProps) => {
   const { editMode } = useProjectContext()
+  const { activeDragging } = useTaskListContext()
   const {
     attributes,
     listeners,
@@ -45,10 +47,12 @@ const SubTaskView = (props: SubTaskViewProps) => {
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
+      {...(activeDragging?.type === "task" ? {} : {
+        ref: setNodeRef,
+        style,
+        ...attributes,
+        ...listeners,
+      })}
       className="cursor-grab active:cursor-grabbing"
     >
       <SubTaskContent {...props} isDragging={isDragging} />

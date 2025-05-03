@@ -41,7 +41,7 @@ export type ProjectContextType = {
   setViewMode: React.Dispatch<React.SetStateAction<"list" | "grid">>;
   role: string;
   setRole: React.Dispatch<React.SetStateAction<string>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   filteredTasks: any;
 };
 
@@ -103,7 +103,7 @@ export const ProjectContextProvider = ({
       // Special cases where we want to keep tasks with no subtasks
       const isEmptyTask = task.subtasks.length === 0;
       const showEmptyTask = (
-        (tab === "all" || tab === "pending") &&
+        (tab === "all") &&
         (userFilter === "all" || userFilter === "unassigned") &&
         filterByDate === "all"
       );
@@ -153,7 +153,7 @@ export const ProjectContextProvider = ({
       // Keep tasks with no subtasks in the specified cases
       const isEmptyTask = task.subtasks.length === 0;
       const showEmptyTask = (
-        (tab === "all" || tab === "pending") &&
+        (tab === "all") &&
         (userFilter === "all" || userFilter === "unassigned") &&
         filterByDate === "all"
       );
@@ -170,7 +170,7 @@ export const ProjectContextProvider = ({
       // Keep empty tasks as is in the specified cases
       const isEmptyTask = task.subtasks.length === 0;
       const showEmptyTask = (
-        (tab === "all" || tab === "pending") &&
+        (tab === "all") &&
         (userFilter === "all" || userFilter === "unassigned") &&
         filterByDate === "all"
       );
@@ -192,7 +192,7 @@ export const ProjectContextProvider = ({
       // Keep empty tasks in the specified cases
       const isEmptyTask = task.subtasks.length === 0;
       const showEmptyTask = (
-        (tab === "all" || tab === "pending") &&
+        (tab === "all") &&
         (userFilter === "all" || userFilter === "unassigned") &&
         filterByDate === "all"
       );

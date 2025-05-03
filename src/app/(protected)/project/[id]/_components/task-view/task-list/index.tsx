@@ -58,15 +58,15 @@ const Comp = (props: Props) => {
     id: string
   }
 
-  const [wasSubTaskVisible, setWasSubTaskVisible] = useState(false)
+  // const [wasSubTaskVisible, setWasSubTaskVisible] = useState(false)
 
   const { showSubtasks, setShowSubtasks } = useProjectContext()
   const handleDragStart = (event: DragStartEvent) => {
     const isSubtask = event.active.data.current?.isSubtask;
-    if (!isSubtask) {
-      setWasSubTaskVisible(showSubtasks)
-      setShowSubtasks(false)
-    }
+    // if (!isSubtask) {
+    //   setWasSubTaskVisible(showSubtasks)
+    //   setShowSubtasks(false)
+    // }
     setActiveDragging({
       type: isSubtask ? 'subtask' : 'task',
       id: event.active.id as string,
@@ -143,7 +143,7 @@ const Comp = (props: Props) => {
         });
       }
     } else {
-      setShowSubtasks(wasSubTaskVisible)
+      // setShowSubtasks(wasSubTaskVisible)
       // Handle task reordering (your existing task reordering logic)
       const oldIndex = props.tasks.findIndex(task => task.id === activeId);
       const newIndex = props.tasks.findIndex(task => task.id === overId);

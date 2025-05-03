@@ -1,6 +1,5 @@
 "use client";
 import { getUserSubscription } from "@/actions/subscription";
-import { useFetch } from "@/hooks/useFetch";
 import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/cn";
@@ -22,13 +21,17 @@ import { Badge } from "../ui/badge";
 import { Calendar1Icon, CreditCardIcon, ShieldCheckIcon } from "lucide-react";
 import { formatDate } from "@/lib/format-date";
 import { MdSubscriptions } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
 
 const SubscriptionStatus = () => {
-  const { data, loading } = useFetch(getUserSubscription);
+  const { data, isLoading } = useQuery({
+    queryFn: getUserSubscription,
+    queryKey: ["subscription"],
+  });
   const [isSubModalOpen, setIsSubModalOpen] = React.useState(false);
   const router = useRouter();
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
     const sub = data;
 
     if (
@@ -53,14 +56,14 @@ const SubscriptionStatus = () => {
         setIsSubModalOpen(false);
       }
     }
-  }, [data, loading]);
+  }, [data, isLoading]);
 
   return (
     <>
       <Button
         onClick={() => setIsSubModalOpen(true)}
         size={"sm"}
-        loading={loading}
+        loading={isLoading}
         variant={"outline"}
         className={cn(
           data?.status === "trial" ? "border-destructive text-destructive" : "",
@@ -151,8 +154,8 @@ const SubscriptionStatus = () => {
                         ).isExpired
                           ? "Expired"
                           : isSubscriptionExpired(
-                                data?.currentPeriodEnd?.toString() || "",
-                              ).expiringSoon
+                            data?.currentPeriodEnd?.toString() || "",
+                          ).expiringSoon
                             ? `Expiring in ${isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").remainingDays} days`
                             : "Running"}
                       </Badge>
@@ -224,24 +227,24 @@ const SubscriptionStatus = () => {
                   {isSubscriptionExpired(
                     data?.currentPeriodEnd?.toString() || "",
                   ).isExpired && (
-                    <Button
-                      onClick={async (e) => {
-                        e.currentTarget.disabled = true;
+                      <Button
+                        onClick={async (e) => {
+                          e.currentTarget.disabled = true;
 
-                        if (data?.status === "trial") {
-                          const res = await createStripeSession("plan:1");
-                          if (res) router.push(res);
-                        } else {
-                          const res = await createCustomerPortal();
-                          if (res) router.push(res);
-                        }
-                      }}
-                      className="w-full sm:w-auto"
-                    >
-                      <MdSubscriptions className="mr-2 h-4 w-4" />
-                      Renew
-                    </Button>
-                  )}
+                          if (data?.status === "trial") {
+                            const res = await createStripeSession("plan:1");
+                            if (res) router.push(res);
+                          } else {
+                            const res = await createCustomerPortal();
+                            if (res) router.push(res);
+                          }
+                        }}
+                        className="w-full sm:w-auto"
+                      >
+                        <MdSubscriptions className="mr-2 h-4 w-4" />
+                        Renew
+                      </Button>
+                    )}
                 </CardFooter>
               </Card>
             </div>
