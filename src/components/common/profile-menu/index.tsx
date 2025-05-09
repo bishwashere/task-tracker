@@ -9,19 +9,22 @@ import EditOrganizationModal from "./edit-organization-modal";
 import SubscriptionStatus from "../subscription-status";
 import { Avatar } from "@/components/ui/avatar";
 import { IoSettingsOutline } from "react-icons/io5";
+import DesiredOutcomeDialog from "@/app/(protected)/project/[id]/_components/dialogs/desired-outcome-dialog";
 
 const ProfileMenu = ({
   showSettings,
   onEditButtonClick,
+  showInsightsOption,
 }: {
   showSettings: boolean;
   onEditButtonClick?: () => void;
+  showInsightsOption?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const { selectedOrg, setSelectedOrg } = useDashboardContext();
-  const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] =
-    useState(false);
+  const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] = useState(false);
+  const [isDesiredOutcomeDialogOpen, setIsDesiredOutcomeDialogOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +89,19 @@ const ProfileMenu = ({
               </button>
             </Fragment>
           )}
+          {showInsightsOption && selectedOrg && selectedOrg?.role === "ADMIN" && <Fragment>
+            <hr className="border border-gray-300 my-1" />
+            <button
+              onClick={() => {
+                setIsDesiredOutcomeDialogOpen(true);
+                setIsOpen(false);
+              }}
+              className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
+            >
+              <Edit2Icon className="size-4" />
+              Insights
+            </button>
+          </Fragment>}
           <hr className="border border-gray-300 my-1" />
           {showSettings && selectedOrg && selectedOrg?.role === "ADMIN" && (
             <button
@@ -99,6 +115,7 @@ const ProfileMenu = ({
               Settings
             </button>
           )}
+
           <button
             onClick={() => logOut()}
             className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
@@ -112,6 +129,10 @@ const ProfileMenu = ({
         isOpen={editOrganizationModalIsOpen}
         onOpenChange={setEditOrganizationModalIsOpen}
       />
+      {isDesiredOutcomeDialogOpen && <DesiredOutcomeDialog
+        modalIsOpen={isDesiredOutcomeDialogOpen}
+        setModalIsOpen={setIsDesiredOutcomeDialogOpen}
+      />}
     </div>
   );
 };

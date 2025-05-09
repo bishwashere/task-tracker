@@ -125,6 +125,7 @@ model Project {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   projectSortIndex  ProjectSortIndex[]
+  insight           Insight[]
 }
 
 model ProjectSortIndex {
@@ -217,5 +218,14 @@ model Subscription {
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
   createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Insight {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId          String    @unique @db.ObjectId
+  project            Project   @relation(fields: [projectId], references: [id])
+  insights           String[]
+  desiredOutcome     String[]
   updatedAt          DateTime  @updatedAt
 }

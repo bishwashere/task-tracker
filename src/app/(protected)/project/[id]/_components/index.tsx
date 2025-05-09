@@ -13,6 +13,7 @@ import { useGetAISuggestedTasks } from "@/queries/tasks/hooks";
 import AiSuggestions from "./ai-suggestions";
 import TaskList from "./task-view/task-list";
 import { TaskGrid } from "./task-view/task-grid";
+import { ProjectInsights } from "./project-insights";
 
 const Project = () => {
   const { id } = useParams() as {
@@ -90,7 +91,7 @@ const Project = () => {
         }
 
       </div>
-
+        <ProjectInsights id={id} />
     </>
   );
 };
