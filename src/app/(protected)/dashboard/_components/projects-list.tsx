@@ -14,7 +14,11 @@ const ProjectsList = () => {
   return (
     <>
       {selectedOrg && projects.data?.length ? (
-        <DashboardDraggableProjectList projects={projects.data || []} />
+
+        <DashboardDraggableProjectList projects={projects.data?.map((p) => ({
+          ...p,
+          projectSummary: p.projectSummary[0],
+        })) || []} />
       ) : (
         <div className="h-48 flex flex-col items-center justify-center">
           <p className="text-center text-xl">No projects found, add one !</p>

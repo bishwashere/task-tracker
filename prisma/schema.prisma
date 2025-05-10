@@ -125,6 +125,7 @@ model Project {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   projectSortIndex  ProjectSortIndex[]
+  projectSummary    ProjectSummary[]
 }
 
 model ProjectSortIndex {
@@ -218,4 +219,16 @@ model Subscription {
   currentPeriodEnd   DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+}
+
+model ProjectSummary {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String   @unique @db.ObjectId
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  prompt    String?
+  response  String?
+  done      String[]
+  pending   String[]
 }
