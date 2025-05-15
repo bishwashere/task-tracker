@@ -133,6 +133,7 @@ model Project {
   updatedAt         DateTime           @updatedAt
   projectSortIndex  ProjectSortIndex[]
   insight           Insight[]
+  projectSummary    ProjectSummary[]
 }
 
 model ProjectSortIndex {
@@ -235,4 +236,16 @@ model Insight {
   insights           String[]
   desiredOutcome     String[]
   updatedAt          DateTime  @updatedAt
+}
+
+model ProjectSummary {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String   @unique @db.ObjectId
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  prompt    String?
+  response  String?
+  done      String[]
+  pending   String[]
 }

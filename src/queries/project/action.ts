@@ -1,8 +1,10 @@
 "use server";
 
+import { ai } from "@/lib/ai";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateProgressWithStats } from "@/lib/progress";
+import { z } from "zod";
 
 export type AddProjectProps = {
   organizationId: string;
@@ -83,7 +85,7 @@ export const addProject = async ({
 };
 
 export const listAllUserProjectByOrganizationId = async (
-  organizationId: string,
+  organizationId: string
 ) => {
   try {
     const user = await auth();
@@ -126,7 +128,13 @@ export const listAllUserProjectByOrganizationId = async (
           where: { userId },
           select: { sortIndex: true },
         },
+        projectSummary: true, 
       },
+    });
+
+    // save summary, just trigger it
+    projects.map(async (project) => {
+      saveProjectSummary(project.id);
     });
 
     const projectWithProgress = projects.map(({ tasks, ...project }) => {
@@ -145,7 +153,7 @@ export const listAllUserProjectByOrganizationId = async (
 };
 
 export const sortProjects = async (
-  data: { projectId: string; sortIndex: number }[],
+  data: { projectId: string; sortIndex: number }[]
 ) => {
   try {
     const user = await auth();
@@ -183,7 +191,7 @@ export const sortProjects = async (
             },
           });
         }
-      }),
+      })
     );
     return { success: true, message: "Projects sorted successfully" };
   } catch (error) {
@@ -299,7 +307,7 @@ export const getProjectById = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0,
+        0
       );
       return {
         success: true,
@@ -343,8 +351,8 @@ export const getProjectById = async (projectId: string) => {
       });
       const tasksWithSubtasks = Array.from(
         new Map(
-          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task]),
-        ).values(),
+          assignedSubtasks.map((subtask) => [subtask.task.id, subtask.task])
+        ).values()
       );
       //Fetch points for that project
       const pointsData = await prisma.pointsEarned.findMany({
@@ -355,7 +363,7 @@ export const getProjectById = async (projectId: string) => {
       });
       const pointsEarned = pointsData.reduce(
         (total, data) => total + data.points,
-        0,
+        0
       );
       return {
         success: true,
@@ -364,6 +372,99 @@ export const getProjectById = async (projectId: string) => {
         pointsEarned: pointsEarned,
         project: project,
       };
+    }
+  } catch (error) {
+    console.error("Error fetching project data:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export const saveProjectSummary = async (projectId: string) => {
+  const user = await auth();
+  if (!user || !user.user || !user.user.id) {
+    return { success: false, message: "Unauthorized !" };
+  }
+
+  const summary = await prisma.projectSummary.findFirst({
+    where: { projectId },
+  });
+
+  // if summary is generated 1 hour ago continue
+  if (
+    summary?.updatedAt &&
+    summary.updatedAt > new Date(Date.now() - 1000 * 60 * 60)
+  ) {
+    return { success: true, message: "Summary already generated" };
+  }
+
+  try {
+    // Fetch project and organization
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        tasks: {
+          include: {
+            subtasks: true,
+          },
+        },
+      },
+    });
+
+    const prompt = `
+    Summarize this project content into two sections.
+    1. "done" - max 3 short points
+    2. "pending" - max 3 short points
+
+    user short paraphrase only no full sentences. Avoid generic or repeated items.
+
+    output as 
+    \`\`\`json
+    {
+      "done": [],
+      "pending": []
+    }
+    \`\`\`
+
+    Strictly follow the format. Do not include any additional messages, explanations, or formatting—just return the JSON response in the specified format."
+    ${JSON.stringify(project)}
+    `;
+
+    const resp = (await ai.generate(prompt)) as {
+      done: string[];
+      pending: string[];
+    };
+
+    const schema = z.object({
+      done: z.array(z.string()),
+      pending: z.array(z.string()),
+    });
+
+    console.log("resp", resp);
+
+    const validated = schema.parse(resp);
+
+    await prisma.projectSummary.upsert({
+      where: { projectId },
+      update: {
+        prompt,
+        response: JSON.stringify(resp),
+        done: validated.done,
+        pending: validated.pending,
+      },
+      create: {
+        projectId,
+        prompt,
+        response: JSON.stringify(resp),
+        done: validated.done,
+        pending: validated.pending,
+      },
+    });
+
+    if (!project) {
+      return { success: false, message: "Project not found" };
     }
   } catch (error) {
     console.error("Error fetching project data:", error);
