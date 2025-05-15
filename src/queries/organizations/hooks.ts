@@ -20,13 +20,13 @@ export const useCreateOrganization = () => {
         await queryClient.invalidateQueries({
           queryKey: ["organizations"],
         });
-        return res.message;
+        return {message: res.message, ...res.data};
       } else {
         throw new Error(res.message);
       }
     },
-    onSuccess: (msg) => {
-      toast.success(msg);
+    onSuccess: (data) => {
+      toast.success(data.message);
     },
     onError: (error) => {
       toast.error(error.message);

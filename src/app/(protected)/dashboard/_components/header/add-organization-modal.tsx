@@ -12,6 +12,7 @@ import {
   useListUserOrganizations,
 } from "@/queries/organizations/hooks";
 import { CreateOrganizationProps } from "@/queries/organizations/action";
+import { useDashboardContext } from "@/context/dashboard-context";
 
 const defaultFormData: CreateOrganizationProps = {
   name: "",
@@ -24,8 +25,7 @@ type Props = {
 
 const AddOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
   const org = useCreateOrganization();
-  const [formData, setFormData] =
-    useState<CreateOrganizationProps>(defaultFormData);
+  const [formData, setFormData] = useState<CreateOrganizationProps>(defaultFormData);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 

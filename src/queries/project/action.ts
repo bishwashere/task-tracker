@@ -8,6 +8,9 @@ export type AddProjectProps = {
   organizationId: string;
   projectName: string;
   projectDescription: string;
+  goal?: string;
+  focusArea?: string;
+  mainGoal?: string;
 };
 
 // todo non admin are able to add project
@@ -15,6 +18,9 @@ export const addProject = async ({
   organizationId,
   projectName,
   projectDescription,
+  goal,
+  focusArea,
+  mainGoal,
 }: AddProjectProps) => {
   try {
     const user = await auth();
@@ -51,6 +57,9 @@ export const addProject = async ({
         name: projectName,
         description: projectDescription,
         organizationId,
+        goal,
+        focusArea,
+        mainGoal,
         projectSortIndex: {
           create: {
             sortIndex: totalProjects,
