@@ -60,6 +60,7 @@ model User {
   sessions      Session[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  guidedMode    Boolean   @default(true)
 
   organizations    UserOrganization[]
   assignedSubtasks Subtask[]          @relation("AssignedSubtasks")
@@ -71,6 +72,9 @@ model User {
 model Organization {
   id        String             @id @default(auto()) @map("_id") @db.ObjectId
   name      String
+  type      String?
+  field     String?
+  need      String?
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
   projects  Project[]
@@ -117,6 +121,9 @@ model Project {
   id                String             @id @default(auto()) @map("_id") @db.ObjectId
   name              String
   description       String?
+  goal              String?
+  focusArea         String?
+  mainGoal          String?
   organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId    String             @db.ObjectId
   hasAiSuggestTasks Boolean            @default(false)
@@ -125,6 +132,7 @@ model Project {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   projectSortIndex  ProjectSortIndex[]
+  insight           Insight[]
   projectSummary    ProjectSummary[]
 }
 
@@ -218,6 +226,15 @@ model Subscription {
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
   createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Insight {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId          String    @unique @db.ObjectId
+  project            Project   @relation(fields: [projectId], references: [id])
+  insights           String[]
+  desiredOutcome     String[]
   updatedAt          DateTime  @updatedAt
 }
 

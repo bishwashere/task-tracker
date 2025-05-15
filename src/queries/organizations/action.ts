@@ -5,9 +5,12 @@ import { prisma } from "@/lib/prisma";
  
 export type CreateOrganizationProps = {
   name: string;
+  type?: string;
+  field?: string;
+  need?: string;
 };
 
-export const createOrganization = async ({ name }: CreateOrganizationProps) => {
+export const createOrganization = async ({ name, type, field, need }: CreateOrganizationProps) => {
   try {
     const user = await auth();
     if (!user || !user.user || !user.user.id) {
@@ -16,6 +19,8 @@ export const createOrganization = async ({ name }: CreateOrganizationProps) => {
       const organization = await prisma.organization.create({
         data: {
           name,
+          type,
+          field,
           members: {
             create: {
               userId: user.user.id,

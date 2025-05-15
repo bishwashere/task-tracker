@@ -1,5 +1,6 @@
 "use client";
 import { useListUserOrganizations } from "@/queries/organizations/hooks";
+import { useGetGuidedInfo } from "@/queries/toggle-guided/hooks";
 import { Organization, UserOrganization } from "@prisma/client";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -21,11 +22,15 @@ export type Org = UserOrganization & {
 type DashboardContext = {
   selectedOrg: Org | null;
   setSelectedOrg: (org: Org) => void;
+  guidedMode: boolean;
+  setGuidedMode: (value: boolean) => void
 };
 
 export const DashboardContext = createContext<DashboardContext>({
   selectedOrg: null,
-  setSelectedOrg: () => {},
+  setSelectedOrg: () => { },
+  guidedMode: true,
+  setGuidedMode: () => { },
 });
 
 export const DashboardContextProvider = ({
@@ -59,8 +64,17 @@ export const DashboardContextProvider = ({
     }
   }, [selectedOrg]);
 
+  //GuidedMode
+  const [guidedMode, setGuidedMode] = useState<boolean>(true);
+  const guidedModeRes = useGetGuidedInfo();
+  useEffect(() => {
+    if (guidedModeRes.isLoading) return;
+    if (typeof guidedModeRes.data === "boolean") setGuidedMode(guidedModeRes?.data)
+  }, [guidedModeRes.data, guidedModeRes.data])
+
+
   return (
-    <DashboardContext.Provider value={{ selectedOrg, setSelectedOrg }}>
+    <DashboardContext.Provider value={{ selectedOrg, setSelectedOrg, guidedMode, setGuidedMode }}>
       {children}
     </DashboardContext.Provider>
   );

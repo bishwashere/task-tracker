@@ -40,3 +40,11 @@ Task Title: ${taskTitle}
 Task Description: ${taskDescription}
 Project Description: ${projectDescription}
 `;
+
+type ProjectInsightsPromptProps = {
+  data: { projectName: string; projectDescription: string; task: { name: string; description: string; subtask: { name: string; status: string; }[]; }[]; }
+}
+
+export const projectInsightsPrompt = ({ data }: ProjectInsightsPromptProps) => `
+Project Information: ${JSON.stringify(data)}
+`;
