@@ -10,11 +10,9 @@ const Page = async () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="p-6 bg-transparent border border-gray-300 rounded-xl shadow-lg text-center w-96">
-        <RegisterCreds>
-          <RegisterSocial />
-        </RegisterCreds>
-      </div>
+      <RegisterCreds>
+        <RegisterSocial />
+      </RegisterCreds>
     </div>
   );
 };

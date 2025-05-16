@@ -1,5 +1,5 @@
 "use client";
-import Head from "next/head";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
   FaList,
@@ -63,13 +63,6 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Azent.io | Streamlined Task Mastery</title>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
       <div className="bg-gray-50 min-h-screen font-inter text-gray-900 relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
@@ -82,11 +75,14 @@ export default function Home() {
         />
 
         {/* Revised Hero Section with Added Text */}
-        <header className="py-28 px-6 text-center bg-white/90 backdrop-blur-sm relative z-10">
+        <header className="py-20 px-6 text-center bg-white/90 backdrop-blur-sm relative z-10">
           <div className="absolute top-0 left-1/2 w-20 h-1 bg-emerald-200 transform -translate-x-1/2" />
-          <h1 className="text-5xl md:text-6xl font-bold text-emerald-600 animate-fade-in">
-            Azent.io
-          </h1>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <Image src="/logo.png" width="90" height="90" alt="Logo" />
+            <h1 className="text-5xl md:text-6xl font-bold text-emerald-600 animate-fade-in">
+              Azent.io
+            </h1>
+          </div>
           <p
             className="text-xl md:text-2xl mt-4 text-gray-700 max-w-xl mx-auto animate-fade-in"
             style={{ animationDelay: "0.2s" }}
@@ -123,8 +119,10 @@ export default function Home() {
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => !isExpanded && setIsPaused(false)}
             >
-              <img
-                src={photos[activePhoto]}
+              <Image
+                src={`/${photos[activePhoto]}`}
+                width={1920}
+                height={880}
                 alt={`Azent.io Screenshot ${activePhoto + 1}`}
                 className="w-full h-48 lg:h-[36rem] object-cover rounded-lg cursor-pointer hover:opacity-95 transition-all duration-300"
                 onClick={handleImageClick}
@@ -151,8 +149,10 @@ export default function Home() {
             onClick={handleCloseExpandedlots}
           >
             <div className="relative max-w-[90%] max-h-[90%] flex items-center justify-center">
-              <img
-                src={photos[activePhoto]}
+              <Image
+                src={`/${photos[activePhoto]}`}
+                width={1920}
+                height={880}
                 alt={`Azent.io Screenshot ${activePhoto + 1} Expanded`}
                 className="w-full h-full object-contain rounded-xl shadow-xl"
               />
@@ -228,18 +228,55 @@ export default function Home() {
         </section>
 
         {/* Optional Testimonials Section - Uncomment to Use */}
-        {/*
-        <section className="py-16 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">
-          <div className="max-w-3xl mx-auto">
-            <p className="text-lg text-gray-600 italic animate-fade-in">
-              "Azent.io turned my chaotic to-do list into a calm, clear plan."
-            </p>
-            <p className="text-sm text-gray-500 mt-2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              - Sarah K., Freelancer
-            </p>
+
+        <section className="py-20 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-12 animate-fade-in">
+              What Our Users Say
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "Sara Michaels",
+                  title: "Product Manager",
+                  image: "/avatars/avatar1.jpg",
+                  quote:
+                    "Azent.io transformed the way I handle my daily workflow. It's fast, beautiful, and makes my life easier.",
+                },
+                {
+                  name: "David Kim",
+                  title: "Startup Founder",
+                  image: "/avatars/avatar2.jpg",
+                  quote:
+                    "I tried many task tools, but nothing clicked until Azent.io. Simple, clean, and super effective!",
+                },
+                {
+                  name: "Emily Rodriguez",
+                  title: "UX Designer",
+                  image: "/avatars/avatar3.jpg",
+                  quote:
+                    "The UI is fantastic! I love how intuitive and snappy everything feels. Huge productivity boost.",
+                },
+              ].map((testimonial, i) => (
+                <div
+                  key={i}
+                  className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 animate-fade-in"
+                  style={{ animationDelay: `${0.2 + i * 0.2}s` }}
+                >
+                  <p className="text-gray-600 italic">“{testimonial.quote}”</p>
+                  <div className="text-center mt-5">
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      {testimonial.name}
+                    </h4>
+                    <p className="text-sm text-gray-500">{testimonial.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
-        */}
+
+
 
         {/* Revised Final Call-to-Action */}
         <section className="py-20 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">

@@ -17,14 +17,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Task Tracker",
-  description: "Task Management Finally Done Right.",
+  title: "Azent.io | Streamlined Task Mastery",
+  description: "Task Tracking with ease and clarity.",
   keywords:
-    "task management, productivity, task tracker, project management, to-do list, task organizer",
+    "azent, azent.io, task management, productivity, task tracker, project management, to-do list, task organizer",
   authors: [{ name: "Binit KC" }],
   openGraph: {
-    title: "Task Tracker",
-    description: "Task Management Finally Done Right.",
+    title: "Azent.io | Streamlined Task Mastery",
+    description: "Task Tracking with ease and clarity.",
     type: "website",
     locale: "en_US",
     siteName: "azent.io",
@@ -42,6 +42,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+      <link rel="manifest" href="/site.webmanifest" />
       <body
         className={cn(
           `${geistSans.variable} ${geistMono.variable} antialiased`,
