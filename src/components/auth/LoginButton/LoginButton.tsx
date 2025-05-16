@@ -7,7 +7,7 @@ export default function LoginButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full text-blue-500 border border-blue-500 bg-white py-2 rounded-lg hover:bg-blue-500 hover:text-white transition"
+      className="w-full text-emerald-500 border border-emerald-500 bg-white py-2 rounded-lg hover:bg-emerald-500 hover:text-white transition"
     >
       {pending ? "Signing in..." : "Sign in"}
     </button>
