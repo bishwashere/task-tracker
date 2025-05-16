@@ -3,8 +3,13 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Project } from "./index";
 import ProjectCard from "./project-card";
+import { ProjectSummary } from "@prisma/client";
 
-const SortableProjectCard = ({ project }: { project: Project }) => {
+const SortableProjectCard = ({ project }: {
+  project: Project & {
+    projectSummary: ProjectSummary | null;
+  }
+}) => {
   const {
     attributes,
     listeners,

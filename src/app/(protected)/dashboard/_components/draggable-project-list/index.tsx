@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import toast from "react-hot-toast";
-import { Project as P, ProjectSortIndex } from "@prisma/client";
+import { Project as P, ProjectSortIndex, ProjectSummary } from "@prisma/client";
 import { useSortProjects } from "@/queries/project/hooks";
 import SortableProjectCard from "./sortable-project-card";
 import ProjectCard from "./project-card";
@@ -37,7 +37,9 @@ export type Project = P & {
 };
 
 type Props = {
-  projects: Project[];
+  projects: (Project & {
+    projectSummary: ProjectSummary | null;
+  })[];
 };
 
 const DashboardDraggableProjectList = ({ projects: p }: Props) => {
@@ -93,7 +95,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
       // save this to use later if error occurred
       const prevProjectData = projects;
 
-      setProjects(updatedProjects as unknown as Project[]);
+      setProjects(updatedProjects);
 
       // Send updated sort indices to the backend
       const sortData = updatedProjects.map((project) => ({
