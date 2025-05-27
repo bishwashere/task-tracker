@@ -1,32 +1,34 @@
 import React from "react";
 import ProjectPage from "./_components";
-import { Metadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
 import { ProjectContextProvider } from "./_context";
 
-export const metadata: Metadata = {
-  title: "Pending tasks and subtasks | azent.io",
-  description: "",
-  openGraph: {
+export async function generateMetadata(parent: ResolvingMetadata): Promise<Metadata> {
+  return {
     title: "Pending tasks and subtasks | azent.io",
     description: "",
-    images: [
-      {
-        url: "https://www.azent.io/logo.png",
-        alt: "azent.io",
-      }
-    ]
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Pending tasks and subtasks | azent.io",
-    description: "",
-    images: [
-      {
-        url: "https://www.azent.io/logo.png",
-        alt: "azent.io",
-      }
-    ]
-  },
+    openGraph: {
+      title: "Pending tasks and subtasks | azent.io",
+      description: "",
+      images: [
+        {
+          url: "https://www.azent.io/logo.png",
+          alt: "azent.io",
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Pending tasks and subtasks | azent.io",
+      description: "",
+      images: [
+        {
+          url: "https://www.azent.io/logo.png",
+          alt: "azent.io",
+        }
+      ]
+    },
+  }
 };
 
 const Project = async ({ params, }: { params: Promise<{ id: string }> }) => {
