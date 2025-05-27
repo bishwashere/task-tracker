@@ -11,55 +11,55 @@ import {
 } from "react-icons/fa";
 
 export default function Home() {
-  const [activePhoto, setActivePhoto] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const photos = ["ss-1.png", "ss-2.png", "ss-3.png"];
+  // const [activePhoto, setActivePhoto] = useState(0);
+  // const [isPaused, setIsPaused] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(false);
+  // const photos = ["ss-1.png", "ss-2.png", "ss-3.png"];
 
-  useEffect(() => {
-    if (!isPaused) {
-      const timer = setInterval(() => {
-        setActivePhoto((prev) => (prev + 1) % photos.length);
-      }, 3000);
-      return () => clearInterval(timer);
-    }
-  }, [isPaused, photos.length]);
+  // useEffect(() => {
+  //   if (!isPaused) {
+  //     const timer = setInterval(() => {
+  //       setActivePhoto((prev) => (prev + 1) % photos.length);
+  //     }, 3000);
+  //     return () => clearInterval(timer);
+  //   }
+  // }, [isPaused, photos.length]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent): void => {
-      if (e.key === "ArrowRight") {
-        setActivePhoto((prev) => (prev + 1) % photos.length);
-        setIsPaused(true);
-      } else if (e.key === "ArrowLeft") {
-        setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
-        setIsPaused(true);
-      } else if (isExpanded && e.key === "Escape") {
-        setIsExpanded(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeyDown = (e: KeyboardEvent): void => {
+  //     if (e.key === "ArrowRight") {
+  //       setActivePhoto((prev) => (prev + 1) % photos.length);
+  //       setIsPaused(true);
+  //     } else if (e.key === "ArrowLeft") {
+  //       setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
+  //       setIsPaused(true);
+  //     } else if (isExpanded && e.key === "Escape") {
+  //       setIsExpanded(false);
+  //     }
+  //   };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isExpanded, photos.length]);
+  //   window.addEventListener("keydown", handleKeyDown);
+  //   return () => window.removeEventListener("keydown", handleKeyDown);
+  // }, [isExpanded, photos.length]);
 
-  const handleImageClick = () => {
-    setIsExpanded(true);
-    setIsPaused(true);
-  };
+  // const handleImageClick = () => {
+  //   setIsExpanded(true);
+  //   setIsPaused(true);
+  // };
 
-  const handleExpandedClick = (direction: "left" | "right") => {
-    if (direction === "left") {
-      setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
-    } else {
-      setActivePhoto((prev) => (prev + 1) % photos.length);
-    }
-    setIsPaused(true);
-  };
+  // const handleExpandedClick = (direction: "left" | "right") => {
+  //   if (direction === "left") {
+  //     setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
+  //   } else {
+  //     setActivePhoto((prev) => (prev + 1) % photos.length);
+  //   }
+  //   setIsPaused(true);
+  // };
 
-  const handleCloseExpandedlots = () => {
-    setIsExpanded(false);
-    setIsPaused(false);
-  };
+  // const handleCloseExpandedlots = () => {
+  //   setIsExpanded(false);
+  //   setIsPaused(false);
+  // };
 
   return (
     <>
@@ -111,10 +111,15 @@ export default function Home() {
             (7-day free trial. No Stripe info needed upfront.)
           </p>
           <div
-            className="mt-12 max-w-md lg:max-w-4xl mx-auto animate-fade-in"
+            className="mt-12 w-full lg:max-w-4xl mx-auto animate-fade-in"
             style={{ animationDelay: "0.6s" }}
           >
-            <div
+              <iframe
+                src="https://drive.google.com/file/d/1VBNiIiKyKx_4o4u1xKHBrAROhfdIfnKu/preview"
+                allow="autoplay"
+                className="rounded-2xl mx-auto w-full h-[300px] md:h-[600px]"
+              />
+            {/* <div
               className="bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-md"
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => !isExpanded && setIsPaused(false)}
@@ -138,12 +143,12 @@ export default function Home() {
               <p className="text-gray-600 text-sm mt-2">
                 Preview. Click to explore.
               </p>
-            </div>
+            </div> */}
           </div>
         </header>
 
         {/* Expanded Image Overlay with Arrows */}
-        {isExpanded && (
+        {/* {isExpanded && (
           <div
             className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
             onClick={handleCloseExpandedlots}
@@ -176,7 +181,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Revised Features Section */}
         <section className="py-20 px-6 bg-gray-50 relative z-10">

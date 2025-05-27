@@ -28,6 +28,23 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "azent.io",
+    images: [
+      {
+        url: "https://www.azent.io/logo.png",
+        alt: "azent.io",
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Azent.io | Streamlined Task Mastery",
+    description: "Task Tracking with ease and clarity.",
+    images: [
+      {
+        url: "https://www.azent.io/logo.png",
+        alt: "azent.io",
+      }
+    ]
   },
   robots: {
     index: true,

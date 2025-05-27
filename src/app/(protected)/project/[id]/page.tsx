@@ -6,6 +6,33 @@ import React from "react";
 import ProjectPage from "./_components";
 import Link from "next/link";
 import { ProjectContextProvider } from "./_context";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Azent.io | Streamlined Task Mastery",
+  description: "",
+  openGraph: {
+    title: "Pending tasks and subtasks | azent.io",
+    description: "",
+    images: [
+      {
+        url: "https://www.azent.io/logo.png",
+        alt: "azent.io",
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pending tasks and subtasks | azent.io",
+    description: "",
+    images: [
+      {
+        url: "https://www.azent.io/logo.png",
+        alt: "azent.io",
+      }
+    ]
+  },
+};
 
 const Project = () => {
   const { id } = useParams() as {
