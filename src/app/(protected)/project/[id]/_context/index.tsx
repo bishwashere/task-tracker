@@ -1,3 +1,4 @@
+"use client";
 import { useGetProjectById } from "@/queries/project/hooks";
 import { useParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
