@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { ProjectContextProvider } from "./_context";
 
 export const metadata: Metadata = {
-  title: "Azent.io | Streamlined Task Mastery",
+  title: "Pending tasks and subtasks | azent.io",
   description: "",
   openGraph: {
     title: "Pending tasks and subtasks | azent.io",
