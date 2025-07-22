@@ -351,8 +351,9 @@ const Home: NextPage = () => {
           {/* Contact Info */}
           <div className="text-center lg:text-left">
             <h4 className="text-md mb-2">STAY IN TOUCH</h4>
-            <p className="text-sm">📧 info@agdigitalharesch.com</p>
-            <p className="text-sm">📞 +91 89016 56605</p>
+            <p className="text-sm">📧 bishwas@unclesamstech.com</p>
+            <p className="text-sm">📞 +1 (223) 279-9248</p>
+            <p className="text-sm">📍 Mechanicsburg, PA, USA</p>
           </div>
         </div>
 
