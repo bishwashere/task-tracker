@@ -3,28 +3,28 @@ import ProjectPage from "./_components";
 import { Metadata, ResolvingMetadata } from "next";
 import { ProjectContextProvider } from "./_context";
 
-export async function generateMetadata(parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Pending tasks and subtasks | azent.io",
+    title: "Pending tasks and subtasks | taskmentor.io",
     description: "",
     openGraph: {
-      title: "Pending tasks and subtasks | azent.io",
+      title: "Pending tasks and subtasks | taskmentor.io",
       description: "",
       images: [
         {
-          url: "https://www.azent.io/logo.png",
-          alt: "azent.io",
+          url: "https://taskmentor.io/logo.png",
+          alt: "taskmentor.io",
         }
       ]
     },
     twitter: {
       card: "summary_large_image",
-      title: "Pending tasks and subtasks | azent.io",
+      title: "Pending tasks and subtasks | taskmentor.io",
       description: "",
       images: [
         {
-          url: "https://www.azent.io/logo.png",
-          alt: "azent.io",
+          url: "https://taskmentor.io/logo.png",
+          alt: "taskmentor.io",
         }
       ]
     },
