@@ -1,341 +1,374 @@
-"use client";
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import {
-  FaList,
-  FaPen,
-  FaEye,
-  FaCheckSquare,
-  FaArrowLeft,
-  FaArrowRight,
-} from "react-icons/fa";
+import type { NextPage } from 'next';
+import Head from 'next/head';
 
-export default function Home() {
-  // const [activePhoto, setActivePhoto] = useState(0);
-  // const [isPaused, setIsPaused] = useState(false);
-  // const [isExpanded, setIsExpanded] = useState(false);
-  // const photos = ["ss-1.png", "ss-2.png", "ss-3.png"];
-
-  // useEffect(() => {
-  //   if (!isPaused) {
-  //     const timer = setInterval(() => {
-  //       setActivePhoto((prev) => (prev + 1) % photos.length);
-  //     }, 3000);
-  //     return () => clearInterval(timer);
-  //   }
-  // }, [isPaused, photos.length]);
-
-  // useEffect(() => {
-  //   const handleKeyDown = (e: KeyboardEvent): void => {
-  //     if (e.key === "ArrowRight") {
-  //       setActivePhoto((prev) => (prev + 1) % photos.length);
-  //       setIsPaused(true);
-  //     } else if (e.key === "ArrowLeft") {
-  //       setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
-  //       setIsPaused(true);
-  //     } else if (isExpanded && e.key === "Escape") {
-  //       setIsExpanded(false);
-  //     }
-  //   };
-
-  //   window.addEventListener("keydown", handleKeyDown);
-  //   return () => window.removeEventListener("keydown", handleKeyDown);
-  // }, [isExpanded, photos.length]);
-
-  // const handleImageClick = () => {
-  //   setIsExpanded(true);
-  //   setIsPaused(true);
-  // };
-
-  // const handleExpandedClick = (direction: "left" | "right") => {
-  //   if (direction === "left") {
-  //     setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length);
-  //   } else {
-  //     setActivePhoto((prev) => (prev + 1) % photos.length);
-  //   }
-  //   setIsPaused(true);
-  // };
-
-  // const handleCloseExpandedlots = () => {
-  //   setIsExpanded(false);
-  //   setIsPaused(false);
-  // };
-
+const Home: NextPage = () => {
   return (
     <>
-      <div className="bg-gray-50 min-h-screen font-inter text-gray-900 relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, #10B981 1px, transparent 1px)",
-            backgroundSize: "25px 25px",
-          }}
-          aria-hidden="true"
-        />
+      <Head>
+        <title>TaskMentor.io</title>
+        <meta name="description" content="Your Personal Productivity Mentor" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-        {/* Revised Hero Section with Added Text */}
-        <header className="py-20 px-6 text-center bg-white/90 backdrop-blur-sm relative z-10">
-          <div className="absolute top-0 left-1/2 w-20 h-1 bg-emerald-200 transform -translate-x-1/2" />
-          <div className="flex flex-col items-center justify-center gap-4">
-            <Image src="/logo.png" width="90" height="90" alt="Logo" />
-            <h1 className="text-5xl md:text-6xl font-bold text-emerald-600 animate-fade-in">
-              Azent.io
-            </h1>
-          </div>
-          <p
-            className="text-xl md:text-2xl mt-4 text-gray-700 max-w-xl mx-auto animate-fade-in"
-            style={{ animationDelay: "0.2s" }}
-          >
-            Task Tracking with ease and clarity.
-          </p>
-          <p
-            className="text-md text-gray-600 mt-2 animate-fade-in"
-            style={{ animationDelay: "0.3s" }}
-          >
-            Master your day in 60 seconds or less.
-          </p>
-          <a
-            href="./login"
-            className="mt-10 inline-block animate-fade-in"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <button className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
-              🚀 Try Azent.io Free
-            </button>
-          </a>
-          <p
-            className="text-sm text-gray-500 mt-4 animate-fade-in"
-            style={{ animationDelay: "0.5s" }}
-          >
-            (7-day free trial. No Stripe info needed upfront.)
-          </p>
-          <div
-            className="mt-12 w-full lg:max-w-4xl mx-auto animate-fade-in"
-            style={{ animationDelay: "0.6s" }}
-          >
-              <iframe
-                src="https://drive.google.com/file/d/1VBNiIiKyKx_4o4u1xKHBrAROhfdIfnKu/preview"
-                allow="autoplay"
-                className="rounded-2xl mx-auto w-full h-[300px] md:h-[600px]"
-              />
-            {/* <div
-              className="bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-md"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => !isExpanded && setIsPaused(false)}
-            >
-              <Image
-                src={`/${photos[activePhoto]}`}
-                width={1920}
-                height={880}
-                alt={`Azent.io Screenshot ${activePhoto + 1}`}
-                className="w-full h-48 lg:h-[36rem] object-cover rounded-lg cursor-pointer hover:opacity-95 transition-all duration-300"
-                onClick={handleImageClick}
-              />
-              <div className="flex justify-center space-x-2 mt-2">
-                {photos.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full ${activePhoto === index ? "bg-emerald-500" : "bg-emerald-200"}`}
-                  />
-                ))}
-              </div>
-              <p className="text-gray-600 text-sm mt-2">
-                Preview. Click to explore.
-              </p>
-            </div> */}
-          </div>
-        </header>
+      {/* Dark top section */}
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-2">
+        <main className="relative">
+          <p className="text-blue-400 text-lg mb-2 text-left">Welcome to</p>
+          <h1 className="text-7xl font-extrabold mb-2 text-center text-white">TaskMentor.io</h1>
+          <p className="text-blue-400 text-3xl mb-4 text-center">Your Personal Productivity Mentor</p>
+          <p className="text-blue-400 text-xl mb-8 text-left">A task manager so clear and simple, it feels like it reads your mind.</p>
 
-        {/* Expanded Image Overlay with Arrows */}
-        {/* {isExpanded && (
-          <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
-            onClick={handleCloseExpandedlots}
-          >
-            <div className="relative max-w-[90%] max-h-[90%] flex items-center justify-center">
-              <Image
-                src={`/${photos[activePhoto]}`}
-                width={1920}
-                height={880}
-                alt={`Azent.io Screenshot ${activePhoto + 1} Expanded`}
-                className="w-full h-full object-contain rounded-xl shadow-xl"
-              />
-              <div
-                className="absolute left-0 top-0 h-full w-1/2 flex items-center justify-start opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExpandedClick("left");
-                }}
-              >
-                <FaArrowLeft className="text-black text-4xl ml-4 drop-shadow-md" />
-              </div>
-              <div
-                className="absolute right-0 top-0 h-full w-1/2 flex items-center justify-end opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExpandedClick("right");
-                }}
-              >
-                <FaArrowRight className="text-black text-4xl mr-4 drop-shadow-md" />
-              </div>
-            </div>
-          </div>
-        )} */}
+          <h2 className="text-5xl font-bold mb-4 text-center">Master Your Day in 60 Seconds</h2>
+          <p className="text-blue-400 mb-2 text-left">No clutter. No meetings. Just pure focus.</p>
+          <p className="text-white mb-8 text-left">Capture. Prioritize. Succeed.</p>
 
-        {/* Revised Features Section */}
-        <section className="py-20 px-6 bg-gray-50 relative z-10">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-6 animate-fade-in">
-              Why Choose Azent.io?
-            </h2>
-            <p
-              className="text-lg text-gray-600 mb-12 animate-fade-in"
-              style={{ animationDelay: "0.2s" }}
-            >
-              Streamline your workflow with tools designed for clarity and ease.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div
-                className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in"
-                style={{ animationDelay: "0.2s" }}
-              >
-                <FaPen className="text-emerald-500 text-3xl mb-4 mx-auto" />
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Capture Tasks Instantly
-                </h3>
-                <p className="text-gray-600">
-                  Jot down ideas without the clutter.
-                </p>
-              </div>
-              <div
-                className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in"
-                style={{ animationDelay: "0.4s" }}
-              >
-                <FaEye className="text-emerald-500 text-3xl mb-4 mx-auto" />
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Focus on Priorities
-                </h3>
-                <p className="text-gray-600">See what matters at a glance.</p>
-              </div>
-              <div
-                className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in"
-                style={{ animationDelay: "0.6s" }}
-              >
-                <FaCheckSquare className="text-emerald-500 text-3xl mb-4 mx-auto" />
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Finish with Ease
-                </h3>
-                <p className="text-gray-600">Mark tasks done in one click.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Optional Testimonials Section - Uncomment to Use */}
-
-        <section className="py-20 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-12 animate-fade-in">
-              What Our Users Say
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[
-                {
-                  name: "Sara Michaels",
-                  title: "Product Manager",
-                  image: "/avatars/avatar1.jpg",
-                  quote:
-                    "Azent.io transformed the way I handle my daily workflow. It's fast, beautiful, and makes my life easier.",
-                },
-                {
-                  name: "David Kim",
-                  title: "Startup Founder",
-                  image: "/avatars/avatar2.jpg",
-                  quote:
-                    "I tried many task tools, but nothing clicked until Azent.io. Simple, clean, and super effective!",
-                },
-                {
-                  name: "Emily Rodriguez",
-                  title: "UX Designer",
-                  image: "/avatars/avatar3.jpg",
-                  quote:
-                    "The UI is fantastic! I love how intuitive and snappy everything feels. Huge productivity boost.",
-                },
-              ].map((testimonial, i) => (
-                <div
-                  key={i}
-                  className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 animate-fade-in"
-                  style={{ animationDelay: `${0.2 + i * 0.2}s` }}
-                >
-                  <p className="text-gray-600 italic">“{testimonial.quote}”</p>
-                  <div className="text-center mt-5">
-                    <h4 className="text-lg font-semibold text-gray-800">
-                      {testimonial.name}
-                    </h4>
-                    <p className="text-sm text-gray-500">{testimonial.title}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-
-
-        {/* Revised Final Call-to-Action */}
-        <section className="py-20 px-6 text-center bg-white/70 backdrop-blur-sm relative z-10">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-emerald-600 mb-6 animate-fade-in">
-              Take Control Today
-            </h2>
-            <p
-              className="text-lg text-gray-600 mb-8 animate-fade-in"
-              style={{ animationDelay: "0.2s" }}
-            >
-              Start now and simplify your tasks with Azent.io’s elegant design.
-            </p>
-            <div
-              className="flex justify-center gap-4 animate-fade-in"
-              style={{ animationDelay: "0.4s" }}
-            >
-              <a href="./login">
-                <button className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
-                  Get Started Free
-                </button>
-              </a>
-              <a href="./features">
-                <button className="px-8 py-3 bg-transparent text-emerald-600 font-semibold rounded-full border border-emerald-500 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
-                  Learn More
-                </button>
-              </a>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-1/2 w-20 h-1 bg-emerald-200 transform -translate-x-1/2" />
-        </section>
-
-        <style>{`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-15px); }
-            to { opacity: 1; transform: translateX(0); }
-          }
-          .animate-fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-            opacity: 0;
-          }
-          .animate-slide-in {
-            animation: slideIn 0.8s ease-out forwards;
-            opacity: 0;
-          }
-          .font-inter {
-            font-family: 'Inter', sans-serif;
-          }
-        `}</style>
+          <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition mb-8 text-center">
+            Get Started Free →
+          </button>
+        </main>
       </div>
+
+      {/* Full-width white section */}
+      <div className="w-full bg-white text-gray-900 py-12">
+        <main className="max-w-6xl mx-auto px-4 flex flex-col lg:flex-row items-center justify-between">
+          {/* Left text block */}
+          <div className="lg:w-1/2">
+            <h1 className="text-7xl font-extrabold mb-2 text-gray-900">Why</h1>
+            <h2 className="text-5xl font-bold mb-4 text-blue-600">TaskMentor.io?</h2>
+
+            <ul className="text-left mb-4">
+              <li className="mb-4 flex items-start">
+                <span className="text-blue-600 mr-2 mt-1">🔵</span>
+                <div>
+                  <strong>Instant Task Capture</strong><br />
+                  Open the app, jot it down, and move on—no overload, no distractions.
+                </div>
+              </li>
+              <li className="mb-4 flex items-start">
+                <span className="text-blue-600 mr-2 mt-1">🔵</span>
+                <div>
+                  <strong>Priority-First Organization</strong><br />
+                  Focus on what truly matters. Clear visuals help you see your top tasks at a glance.
+                </div>
+              </li>
+              <li className="mb-4 flex items-start">
+                <span className="text-blue-600 mr-2 mt-1">🔵</span>
+                <div>
+                  <strong>One-Click Completion</strong><br />
+                  Satisfying. Simple. Structured. Complete your tasks and stay on track.
+                </div>
+              </li>
+            </ul>
+
+            <p className="text-gray-600 italic text-left">
+              "It's a simple tool to organize tasks fast and keep you productive."
+            </p>
+          </div>
+
+          {/* Right image block (placeholder or background image) */}
+          <div className="hidden lg:block lg:w-1/2">
+            <img src="/question-mark.png" alt="Why illustration" className="max-w-full h-auto" />
+          </div>
+        </main>
+      </div>
+
+      <div className="w-full bg-gray-900 text-white py-16 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-5xl font-bold mb-12">
+            <span className="text-white">How It Works</span>
+            <span className="text-gray-300"> (3 Simple Steps)</span>
+          </h2>
+
+          <div className="bg-white rounded-2xl p-8 flex flex-col lg:flex-row justify-around items-center text-gray-900 shadow-md">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center mb-12 lg:mb-0">
+              <img src="/add-task.png" alt="Add a Task" className="h-32 mb-4" />
+              <h3 className="text-lg font-semibold">Add a Task</h3>
+              <p className="text-sm text-center">Quick input box—no learning curve.</p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex flex-col items-center mb-12 lg:mb-0">
+              <img src="/prioritize.png" alt="Prioritize" className="h-32 mb-4" />
+              <h3 className="text-lg font-semibold">Prioritize</h3>
+              <p className="text-sm text-center">Drag-and-drop in your daily queue.</p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex flex-col items-center">
+              <img src="/finish-repeat.png" alt="Finish & Repeat" className="h-32 mb-4" />
+              <h3 className="text-lg font-semibold">Finish & Repeat</h3>
+              <p className="text-sm text-center">Tap done. Celebrate progress. Repeat.</p>
+            </div>
+          </div>
+
+          <button className="mt-12 bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition">
+            Start For Free →
+          </button>
+        </div>
+      </div>
+
+
+      <div className="w-full bg-white text-gray-900 py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Top Title */}
+          <h2 className="text-5xl font-bold text-center mb-12">How It Works</h2>
+
+          {/* Use Cases */}
+          <div className="flex flex-col lg:flex-row justify-between text-center mb-16">
+            <div className="mb-8 lg:mb-0 lg:w-1/3 px-4">
+              <div className="text-blue-600 text-xl mb-2">🔵</div>
+              <h3 className="font-semibold text-lg">Freelancers & Creators</h3>
+              <p className="text-sm text-gray-600">Keep side hustles and client projects organized.</p>
+            </div>
+            <div className="mb-8 lg:mb-0 lg:w-1/3 px-4">
+              <div className="text-blue-600 text-xl mb-2">🔵</div>
+              <h3 className="font-semibold text-lg">Students & Busy Learners</h3>
+              <p className="text-sm text-gray-600">Simplify assignments and study timelines.</p>
+            </div>
+            <div className="lg:w-1/3 px-4">
+              <div className="text-blue-600 text-xl mb-2">🔵</div>
+              <h3 className="font-semibold text-lg">Solo Professionals & Founders</h3>
+              <p className="text-sm text-gray-600">Manage your schedule without bloat.</p>
+            </div>
+          </div>
+
+          {/* Action Section */}
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            {/* Text Side */}
+            <div className="lg:w-1/2 mb-12 lg:mb-0">
+              <h3 className="text-5xl font-bold mb-4 leading-tight">See<br /><span className="text-blue-600">TaskMentor</span><br />in Action</h3>
+              <ul className="list-disc list-inside text-gray-800 mt-6 space-y-2 text-lg">
+                <li>Instant task addition</li>
+                <li>Natural drag-and-drop reordering</li>
+                <li>Crisp priority and timeline views</li>
+                <li>Light and dark themes</li>
+                <li>Fully mobile-responsive</li>
+              </ul>
+            </div>
+
+            {/* Image Side */}
+            <div className="lg:w-1/2">
+              <img src="/taskmentor-dashboard.png" alt="TaskMentor Dashboard" className="w-full max-w-md mx-auto" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div className="w-full bg-gray-900 text-white py-20 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          {/* Section Header */}
+          <p className="uppercase text-sm tracking-widest text-gray-400 mb-2">Testimonials</p>
+          <h2 className="text-5xl font-bold text-blue-500 mb-12">Loved by Real Users</h2>
+
+          {/* Testimonials */}
+          <div className="flex flex-col lg:flex-row justify-center gap-8 mb-16">
+            {/* Testimonial 1 */}
+            <div className="bg-white text-gray-900 p-6 rounded-2xl shadow-md max-w-md mx-auto lg:mx-0">
+              <div className="flex items-center mb-4">
+                <img src="/user-david.jpg" alt="David Kim" className="w-10 h-10 rounded-full mr-3" />
+                <div>
+                  <p className="font-bold">David Kim</p>
+                  <p className="text-sm text-gray-600">(Startup Founder)</p>
+                </div>
+              </div>
+              <p className="text-yellow-500 text-lg mb-2">★★★★★</p>
+              <p className="italic">“Simple, clean, and super effective!”</p>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-white text-gray-900 p-6 rounded-2xl shadow-md max-w-md mx-auto lg:mx-0">
+              <div className="flex items-center mb-4">
+                <img src="/user-sara.jpg" alt="Sara Michaels" className="w-10 h-10 rounded-full mr-3" />
+                <div>
+                  <p className="font-bold">Sara Michaels</p>
+                  <p className="text-sm text-gray-600">(Product Manager)</p>
+                </div>
+              </div>
+              <p className="text-yellow-500 text-lg mb-2">★★★★★</p>
+              <p className="italic">
+                “Azent.io transformed the way I handle my daily workflow. It's fast, beautiful, and makes my life easier.”
+              </p>
+            </div>
+          </div>
+
+          {/* Call to Action */}
+          <p className="text-gray-400 mb-4 text-lg">Ready to get started?</p>
+          <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition">
+            Start Using TaskMentor →
+          </button>
+        </div>
+      </div>
+
+
+      <div className="w-full bg-white text-gray-900 py-20 px-4">
+        <div className="max-w-6xl mx-auto space-y-24">
+          {/* Privacy Section */}
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            <div className="lg:w-1/2 mb-12 lg:mb-0">
+              <img src="/privacy-shield.png" alt="Privacy Shield" className="w-full max-w-sm mx-auto" />
+            </div>
+            <div className="lg:w-1/2 px-4">
+              <h3 className="text-4xl font-bold mb-4 leading-tight">
+                Privacy & Security<br /><span className="text-blue-600">You Can Trust</span>
+              </h3>
+              <ul className="list-disc list-inside text-lg text-gray-800 space-y-2">
+                <li>Encrypted storage</li>
+                <li>No ads, no tracking</li>
+                <li>Data stays with you – forever</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <hr className="border-gray-200" />
+
+          {/* Growth Section */}
+          <div className="flex flex-col-reverse lg:flex-row items-center justify-between">
+            <div className="lg:w-1/2 px-4">
+              <h3 className="text-4xl font-bold mb-4 leading-tight">
+                Start for Free<br /><span className="text-blue-600">& Grow at Your Pace</span>
+              </h3>
+              <ul className="list-disc list-inside text-lg text-gray-800 space-y-2">
+                <li>100% free to start – no credit card required</li>
+                <li>Upgrade later for pro features</li>
+                <li>Stay with the free version if that’s all you need</li>
+                <li>30-second signup, full productivity support</li>
+              </ul>
+            </div>
+            <div className="lg:w-1/2 mb-12 lg:mb-0">
+              <img src="/rocket-launch.png" alt="Rocket Launch" className="w-full max-w-sm mx-auto" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      {/* Bonus Resources Section */}
+      <div className="w-full bg-gray-900 text-white py-20 px-4 text-center">
+        <h2 className="text-4xl font-bold mb-6">Bonus Productivity Resources</h2>
+        <ul className="text-white text-lg list-disc list-inside space-y-2 mb-10">
+          <li>Free Starter Guide (PDF)</li>
+          <li>Weekly planning template</li>
+          <li>30-day task completion challenge</li>
+        </ul>
+        <p className="text-gray-400 mb-4 text-lg">Ready to get started?</p>
+        <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition">
+          Start Using TaskMentor →
+        </button>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="w-full bg-white text-gray-900 py-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-10">Frequently<br />Asked Questions</h2>
+          <div className="space-y-4">
+            <details className="bg-gray-700 text-white rounded-md px-4 py-3">
+              <summary className="cursor-pointer font-medium">
+                Question 1: Do I need to install anything?
+              </summary>
+              <p className="mt-2 text-sm text-gray-200">Nope! TaskMentor is fully web-based and works on any modern browser.</p>
+            </details>
+            <details className="bg-gray-700 text-white rounded-md px-4 py-3">
+              <summary className="cursor-pointer font-medium">
+                Question 2: What makes TaskMentor different from Todoist or Notion?
+              </summary>
+              <p className="mt-2 text-sm text-gray-200">Simplicity, instant task capture, and focus-first layout. It's built to reduce friction and save time.</p>
+            </details>
+            <details className="bg-gray-700 text-white rounded-md px-4 py-3">
+              <summary className="cursor-pointer font-medium">
+                Question 3: Are team features available?
+              </summary>
+              <p className="mt-2 text-sm text-gray-200">Team functionality is coming soon! Right now, it's perfect for personal or solo professional use.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+
+
+      {/* CTA Blue Box Section */}
+      <div className="w-full bg-gray-900 py-20 px-4">
+        <div className="max-w-3xl mx-auto bg-blue-600 text-white text-center py-12 px-6 rounded-2xl shadow-lg">
+          <p className="text-xl mb-2">Don’t Spend Another Day</p>
+          <p className="text-xl mb-4">Managing Your Tasks, Instead of Doing Them</p>
+          <p className="font-semibold mb-6">Find your flow. Get stuff done.</p>
+          <button className="bg-white text-blue-700 px-8 py-3 rounded-full text-lg hover:bg-gray-100 transition font-medium">
+            👉 Try TaskMentor Free →
+          </button>
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <footer className="w-full bg-gray-900 text-white py-12 px-4">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between gap-12">
+          {/* Branding */}
+          <div className="text-center lg:text-left">
+            <h3 className="text-2xl font-bold mb-2">
+              <span className="text-blue-500">TaskMentor.io</span> - Your Productivity, Mentored
+            </h3>
+            <p className="text-sm text-gray-400">Less clutter. More clarity. More done</p>
+          </div>
+
+          {/* Newsletter Form */}
+          <div className="text-center lg:text-left">
+            <h4 className="text-md mb-2">STAY UP TO DATE</h4>
+            <form className="flex flex-col items-center lg:items-start space-y-2">
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-64 px-3 py-2 rounded-md text-gray-900"
+                required
+              />
+              <button
+                type="submit"
+                className="w-64 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition"
+              >
+                SUBMIT
+              </button>
+            </form>
+          </div>
+
+          {/* Contact Info */}
+          <div className="text-center lg:text-left">
+            <h4 className="text-md mb-2">STAY IN TOUCH</h4>
+            <p className="text-sm">📧 info@agdigitalharesch.com</p>
+            <p className="text-sm">📞 +91 89016 56605</p>
+          </div>
+        </div>
+
+        <hr className="my-6 border-gray-700" />
+
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between items-center text-sm text-gray-500">
+          <div className="mb-4 lg:mb-0 space-x-4">
+            <a href="#" className="hover:underline">PRIVACY POLICY</a>
+            <a href="#" className="hover:underline">TERMS & CONDITIONS</a>
+          </div>
+          <p>Copyright © 2025. All rights reserved. Haresch Y's Account</p>
+          <div className="space-x-3 mt-4 lg:mt-0">
+            {/* Replace with real social links if needed */}
+            <a href="#" className="hover:text-white">📘</a>
+            <a href="#" className="hover:text-white">📸</a>
+            <a href="#" className="hover:text-white">🐦</a>
+          </div>
+        </div>
+      </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </>
   );
-}
+};
+
+export default Home;
