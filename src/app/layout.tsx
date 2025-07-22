@@ -17,32 +17,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Azent.io | Streamlined Task Mastery",
-  description: "Task Tracking with ease and clarity.",
+  title: "TaskMentor.io",
+  description: "Your Personal Productivity Mentor",
   keywords:
-    "azent, azent.io, task management, productivity, task tracker, project management, to-do list, task organizer",
+    "azent, taskmentor.io, taskmentor, task management, productivity, task tracker, project management, to-do list, task organizer",
   authors: [{ name: "Binit KC" }],
   openGraph: {
-    title: "Azent.io | Streamlined Task Mastery",
-    description: "Task Tracking with ease and clarity.",
+    title: "TaskMentor.io",
+    description: "Your Personal Productivity Mentor",
     type: "website",
     locale: "en_US",
-    siteName: "azent.io",
+    siteName: "taskmentor.io",
     images: [
       {
-        url: "https://www.azent.io/logo.png",
-        alt: "azent.io",
+        url: "https://taskmentor.io/logo.png",
+        alt: "taskmentor.io",
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Azent.io | Streamlined Task Mastery",
-    description: "Task Tracking with ease and clarity.",
+    title: "TaskMentor.io",
+    description: "Your Personal Productivity Mentor",
     images: [
       {
-        url: "https://www.azent.io/logo.png",
-        alt: "azent.io",
+        url: "https://taskmentor.io/logo.png",
+        alt: "taskmentor.io",
       }
     ]
   },
@@ -59,14 +59,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-        rel="stylesheet"
-      />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-      <link rel="manifest" href="/site.webmanifest" />
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+      </head>
       <body
         className={cn(
           `${geistSans.variable} ${geistMono.variable} antialiased`,
