@@ -18,7 +18,7 @@ const Home: NextPage = () => {
               <h1 className="text-5xl sm:text-8xl xl:text-9xl font-extrabold mb-2 text-white">TaskMentor.io</h1>
             </div>
           </div>
-          <p className="text-blue-600 font-bold text-xl sm:text-4xl xl:text-6xl mb-4 text-center">Your Personal Productivity Mentor</p>
+          <p className="text-blue-600 font-bold text-xl sm:text-4xl xl:text-5xl mb-4 text-center">Your Personal Productivity Mentor</p>
           <p className="text-base md:text-lg xl:text-xl mb-8 text-center">A task manager so clear and simple, it feels like it reads your mind.</p>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-5 place-items-center mt-10 md:mt-16'>
             <div>
