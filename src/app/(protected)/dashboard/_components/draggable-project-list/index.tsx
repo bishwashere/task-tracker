@@ -113,37 +113,40 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={projects.map((p) => p.id)}
-        strategy={verticalListSortingStrategy}
+    <div className="space-y-4">
+      {/* Projects List */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       >
-        <div className="space-y-4">
-          {projects
-            .sort(
-              (a, b) =>
-                (b?.projectSortIndex?.[0]?.sortIndex || 0) -
-                (a?.projectSortIndex?.[0]?.sortIndex || 0),
-            ) // Reverse sort order
-            .map((project) => (
-              <SortableProjectCard key={project.id} project={project} />
-            ))}
-        </div>
-      </SortableContext>
-      <DragOverlay>
-        {activeId ? (
-          <ProjectCard
-            project={projects.find((p) => p.id === activeId)!}
-            isDragging={true}
-          />
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+        <SortableContext
+          items={projects.map((p) => p.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-4">
+            {projects
+              .sort(
+                (a, b) =>
+                  (b?.projectSortIndex?.[0]?.sortIndex || 0) -
+                  (a?.projectSortIndex?.[0]?.sortIndex || 0),
+              ) // Reverse sort order
+              .map((project) => (
+                <SortableProjectCard key={project.id} project={project} />
+              ))}
+          </div>
+        </SortableContext>
+        <DragOverlay>
+          {activeId ? (
+            <ProjectCard
+              project={projects.find((p) => p.id === activeId)!}
+              isDragging={true}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </div>
   );
 };
 

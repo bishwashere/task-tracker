@@ -45,22 +45,22 @@ export const DashboardContextProvider = ({
     if (orgs.isLoading || !orgs.data?.length) return;
     const storedId = localStorage.getItem("selectedOrganizationId");
     if (storedId) {
-      const selectedOrg = orgs.data?.find((org) => org.id === storedId);
+      const selectedOrg = orgs.data?.find((org) => org.organization.id === storedId);
       if (selectedOrg) {
         setSelectedOrg(selectedOrg);
       } else {
         setSelectedOrg(orgs.data[0]);
-        localStorage.setItem("selectedOrganizationId", orgs.data[0].id);
+        localStorage.setItem("selectedOrganizationId", orgs.data[0].organization.id);
       }
     } else {
       setSelectedOrg(orgs.data[0]);
-      localStorage.setItem("selectedOrganizationId", orgs.data[0].id);
+      localStorage.setItem("selectedOrganizationId", orgs.data[0].organization.id);
     }
   }, [orgs.data, orgs.isLoading]);
 
   useEffect(() => {
     if (selectedOrg) {
-      localStorage.setItem("selectedOrganizationId", selectedOrg.id);
+      localStorage.setItem("selectedOrganizationId", selectedOrg.organization.id);
     }
   }, [selectedOrg]);
 

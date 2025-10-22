@@ -5,10 +5,11 @@ import { Project } from "./index";
 import ProjectCard from "./project-card";
 import { ProjectSummary } from "@prisma/client";
 
-const SortableProjectCard = ({ project }: {
+const SortableProjectCard = ({ project, isDragDisabled = false }: {
   project: Project & {
     projectSummary: ProjectSummary | null;
-  }
+  };
+  isDragDisabled?: boolean;
 }) => {
   const {
     attributes,
@@ -20,6 +21,7 @@ const SortableProjectCard = ({ project }: {
   } = useSortable({
     id: project.id,
     data: project,
+    disabled: isDragDisabled,
   });
 
   const style: React.CSSProperties = {
@@ -33,8 +35,8 @@ const SortableProjectCard = ({ project }: {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      className="cursor-grab active:cursor-grabbing"
+      {...(isDragDisabled ? {} : listeners)}
+      className={isDragDisabled ? "cursor-default" : "cursor-grab active:cursor-grabbing"}
     >
       <ProjectCard project={project} isDragging={isDragging} />
     </div>

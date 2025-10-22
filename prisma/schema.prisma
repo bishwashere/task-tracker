@@ -89,7 +89,7 @@ model UserOrganization {
   organizationId String           @db.ObjectId
   role           OrganizationRole // "ADMIN" or "MEMBER"
   createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  updatedAt      DateTime?        @updatedAt
 
   @@unique([userId, organizationId]) // Ensure a user is in an org only once
 }
