@@ -414,7 +414,7 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                         ) : (
                             <div>
                                 <p className="mb-4">✓ Project created successfully!</p>
-                                <p className="text-sm text-gray-500">You're all set! Welcome to your dashboard.</p>
+                                <p className="text-sm text-gray-500">You&apos;re all set! Welcome to your dashboard.</p>
                             </div>
                         )}
                     </div>
