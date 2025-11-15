@@ -217,10 +217,10 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
     const getTitle = () => {
         if (currentPhase === 'organization') {
             if (orgSubmitted) return "Organization Created!";
-            return "Welcome! Let's Set Up Your Organization";
+            return "Welcome! Let&apos;s Set Up Your Organization";
         } else {
             if (projectSubmitted) return "Project Created!";
-            return "Now Let's Create Your First Project";
+            return "Now Let&apos;s Create Your First Project";
         }
     };
 
