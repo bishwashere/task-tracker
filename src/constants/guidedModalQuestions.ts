@@ -2,7 +2,7 @@ export const guidedOrganizationQuestions = [
     {
         id: 1,
         name: "name",
-        question: "What is the name of your organization?",
+        question: "What is the name of your organization? (not project)",
         examples: ["TechBridge Solutions", "Green Future Foundation", "Bright Minds Academy"],
         answer: "",
     },

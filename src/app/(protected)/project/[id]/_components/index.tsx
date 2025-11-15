@@ -51,10 +51,15 @@ const Project = ({ id }: { id: string }) => {
             onEditButtonClick={() => setEditMode((prev) => !prev)}
           />
           <div className="mb-4">
-            <ProgressBar progress={stats.progress} />
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold text-gray-800">Project Progress</h3>
+              <span className="text-2xl font-bold text-green-600">
+                {Math.round(stats.progress)}%
+              </span>
+            </div>
+            <ProgressBar progress={stats.progress} className="h-6" showPercentage={false} />
             <p className="text-sm text-gray-600 mt-2">
-              {stats.progress}% Complete • {stats.totalSubtasks} subtasks •{" "}
-              {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
+              {stats.totalSubtasks} subtasks • {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
             </p>
           </div>
           <ProjectFilters

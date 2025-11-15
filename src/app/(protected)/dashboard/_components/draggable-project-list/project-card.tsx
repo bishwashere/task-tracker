@@ -23,7 +23,7 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
     >
       <div className="flex justify-between items-center mb-4 gap-6">
         <h3 className="text-lg font-semibold">{project.name}</h3>
-        <ProgressBar progress={project.progress} />
+        <ProgressBar progress={project.progress} className="w-24" />
       </div>
       <p className="text-sm text-gray-500">{project?.tasksCount} Tasks</p>
       {/* project summary done and pending */}
