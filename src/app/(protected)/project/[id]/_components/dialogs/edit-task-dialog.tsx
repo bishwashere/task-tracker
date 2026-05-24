@@ -1,15 +1,17 @@
 import { IoMdClose } from "react-icons/io";
-import toast from "react-hot-toast";
 import { BiEditAlt } from "react-icons/bi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Task } from "@prisma/client";
 import { useEditTask } from "@/queries/tasks/hooks";
+import { useGetActiveSprint, useToggleSprintTask } from "@/queries/sprint/hooks";
+import { formatSprintName } from "@/lib/sprint";
 
 const EditTaskDialog = ({
   task,
@@ -19,11 +21,29 @@ const EditTaskDialog = ({
   projectId: string;
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const edit = useEditTask()
+  const edit = useEditTask();
+  const toggleSprint = useToggleSprintTask(projectId);
+  const { data: sprintData } = useGetActiveSprint(projectId);
+  const activeSprint = sprintData?.sprint;
+
   const [formData, setFormData] = useState({
     taskTitle: task.name,
     taskDescription: task.description || "",
   });
+  const [inSprint, setInSprint] = useState(false);
+  const [initialInSprint, setInitialInSprint] = useState(false);
+
+  useEffect(() => {
+    if (!modalIsOpen) return;
+
+    const currentlyInSprint = activeSprint?.taskIds.includes(task.id) ?? false;
+    setFormData({
+      taskTitle: task.name,
+      taskDescription: task.description || "",
+    });
+    setInSprint(currentlyInSprint);
+    setInitialInSprint(currentlyInSprint);
+  }, [modalIsOpen, task, activeSprint]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,14 +51,21 @@ const EditTaskDialog = ({
     if (!formData.taskTitle.trim()) return;
 
     try {
-      edit.mutate({
+      await edit.mutateAsync({
         ...formData,
         projectId,
         taskId: task.id,
-      })
+      });
+
+      if (activeSprint && inSprint !== initialInSprint) {
+        await toggleSprint.mutateAsync(task.id);
+      }
+
       setModalIsOpen(false);
     } catch { }
   };
+
+  const isSaving = edit.isPending || toggleSprint.isPending;
 
   return (
     <>
@@ -55,7 +82,6 @@ const EditTaskDialog = ({
           <div className="w-full flex">
             <h3 className="text-2xl font-semibold">Edit Task</h3>
           </div>
-          {/* <hr className='border border-gray-300 my-6' /> */}
           <form className="mt-8" onSubmit={onSubmit}>
             <input
               type="text"
@@ -79,9 +105,22 @@ const EditTaskDialog = ({
               }
               value={formData.taskDescription}
             />
+            {activeSprint && (
+              <label className="flex items-center gap-2 mb-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={inSprint}
+                  onChange={(e) => setInSprint(e.target.checked)}
+                  className="size-4 rounded border-gray-300"
+                />
+                <Label className="cursor-pointer font-normal">
+                  Include in active sprint: {formatSprintName(activeSprint.name)}
+                </Label>
+              </label>
+            )}
             <div className="flex justify-end mt-5">
               <Button
-                loading={edit.isPending}
+                loading={isSaving}
                 className="mr-2"
               >
                 Edit Task
@@ -94,7 +133,6 @@ const EditTaskDialog = ({
                 Cancel
               </Button>
             </div>
-            {/* <hr className='border border-gray-300 my-6' /> */}
           </form>
         </DialogContent>
       </Dialog>

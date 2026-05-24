@@ -1,5 +1,6 @@
 "use client";
 import { useGetProjectById } from "@/queries/project/hooks";
+import { useGetActiveSprint } from "@/queries/sprint/hooks";
 import { useParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -57,6 +58,7 @@ export const ProjectContextProvider = ({
     id: string;
   };
   const { data, isPending } = useGetProjectById(id);
+  const { data: sprintData } = useGetActiveSprint(id);
   const [editMode, setEditMode] =
     useState<ProjectContextType["editMode"]>(false);
   const [tab, setTab] = useState<ProjectContextType["tab"]>("pending");
@@ -70,6 +72,9 @@ export const ProjectContextProvider = ({
 
   useEffect(() => {
     if (isPending) return;
+
+    const isAdmin = data?.role?.toLowerCase() === "admin";
+    const activeSprint = sprintData?.sprint;
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -97,19 +102,18 @@ export const ProjectContextProvider = ({
       return date.getFullYear() === today.getFullYear();
     };
 
+    const shouldShowEmptyTask = () => {
+      if (filterByDate !== "all") return false;
+      if (userFilter !== "all" && userFilter !== "unassigned") return false;
+      return tab === "all" || tab === "pending";
+    };
+
     // Apply all filters to tasks
     const filteredTasks = data?.tasks?.map(task => {
       if (!task) return task;
 
-      // Special cases where we want to keep tasks with no subtasks
       const isEmptyTask = task.subtasks.length === 0;
-      const showEmptyTask = (
-        (tab === "all") &&
-        (userFilter === "all" || userFilter === "unassigned") &&
-        filterByDate === "all"
-      );
-
-      if (isEmptyTask && showEmptyTask) {
+      if (isEmptyTask && shouldShowEmptyTask()) {
         return task;
       }
 
@@ -151,15 +155,8 @@ export const ProjectContextProvider = ({
     }).filter(task => {
       if (!task) return false;
 
-      // Keep tasks with no subtasks in the specified cases
       const isEmptyTask = task.subtasks.length === 0;
-      const showEmptyTask = (
-        (tab === "all") &&
-        (userFilter === "all" || userFilter === "unassigned") &&
-        filterByDate === "all"
-      );
-
-      if (isEmptyTask && showEmptyTask) {
+      if (isEmptyTask && shouldShowEmptyTask()) {
         return true;
       }
 
@@ -168,15 +165,8 @@ export const ProjectContextProvider = ({
 
     // Apply tab filter (all, pending, done)
     const filteredByTab = filteredTasks?.map(task => {
-      // Keep empty tasks as is in the specified cases
       const isEmptyTask = task.subtasks.length === 0;
-      const showEmptyTask = (
-        (tab === "all") &&
-        (userFilter === "all" || userFilter === "unassigned") &&
-        filterByDate === "all"
-      );
-
-      if (isEmptyTask && showEmptyTask) return task;
+      if (isEmptyTask && shouldShowEmptyTask()) return task;
 
       if (tab === "all") return task;
       if (tab === "done") return {
@@ -190,23 +180,26 @@ export const ProjectContextProvider = ({
     }).filter(task => {
       if (!task) return false;
 
-      // Keep empty tasks in the specified cases
       const isEmptyTask = task.subtasks.length === 0;
-      const showEmptyTask = (
-        (tab === "all") &&
-        (userFilter === "all" || userFilter === "unassigned") &&
-        filterByDate === "all"
-      );
-
-      if (isEmptyTask && showEmptyTask) return true;
+      if (isEmptyTask && shouldShowEmptyTask()) return true;
 
       if (tab === "done" && task.subtasks.length === 0) return false;
-      if (tab === "pending" && task.subtasks.length === 0) return false;
-      return true;
+      return task.subtasks.length > 0;
     }) || [];
 
-    setFilteredTasks(filteredByTab?.filter(task => task !== undefined));
-  }, [data?.tasks, isPending, tab, userFilter, filterByDate]);
+    let result = filteredByTab.filter((task) => task !== undefined);
+
+    if (!isAdmin && tab === "pending") {
+      if (!activeSprint) {
+        result = [];
+      } else {
+        const sprintTaskIds = new Set(activeSprint.taskIds);
+        result = result.filter((task) => sprintTaskIds.has(task.id));
+      }
+    }
+
+    setFilteredTasks(result);
+  }, [data?.tasks, data?.role, isPending, tab, userFilter, filterByDate, sprintData?.sprint]);
 
 
 
