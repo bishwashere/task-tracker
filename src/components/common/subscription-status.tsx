@@ -31,7 +31,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const SubscriptionStatus = () => {
   const { data, isLoading, isFetching } = useQuery({
-    queryFn: getUserSubscription,
+    queryFn: () => getUserSubscription(),
     queryKey: ["subscription"],
     staleTime: 0,
     gcTime: 0,

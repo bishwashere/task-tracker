@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useProjectContext } from "../../_context";
 import { useToggleSubtaskPriority } from "@/queries/subtask/hooks";
 import { Circle, CircleCheck, ListChecks, MessageSquare, Star } from "lucide-react";
+import SprintTaskToggle, { taskHasPendingWork } from "../sprint-task-toggle";
+import { useGetActiveSprint } from "@/queries/sprint/hooks";
 
 export const TaskGrid = ({
   tasks,
@@ -24,6 +26,7 @@ export const TaskGrid = ({
   const router = useRouter()
   const togglePriority = useToggleSubtaskPriority()
   const { id } = useParams() as { id: string }
+  const { data: sprintData } = useGetActiveSprint(id)
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
@@ -33,21 +36,33 @@ export const TaskGrid = ({
             (b?.taskSortIndex?.[0]?.sortIndex || 0) -
             (a?.taskSortIndex?.[0]?.sortIndex || 0),
         )
-        .map((task, i) => (
+        .map((task, i) => {
+          const inSprint = sprintData?.sprint?.taskIds.includes(task.id) ?? false;
+          const hasPendingWork = taskHasPendingWork(task.subtasks);
+
+          return (
           <div
             key={i}
             className={cn(
-              "mb-4 p-3 rounded-lg border border-border bg-white shadow-sm hover:shadow-md hover:border-blue-200/50 transition-all duration-150 relative",
+              "mb-4 p-3 rounded-lg border bg-white shadow-sm hover:shadow-md transition-all duration-150 relative",
+              inSprint ? "border-green-300 hover:border-green-400" : "border-border hover:border-blue-200/50",
             )}
           >
-            <div className="flex justify-between items-start gap-2">
+            <div className="flex justify-between items-start gap-2 flex-wrap">
               <h3 className="text-lg font-bold cursor-pointer flex-1">{task.name}</h3>
-              {task.subtasks.length > 0 && (
-                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                  <ListChecks className="size-3.5 shrink-0" aria-hidden />
-                  {task.subtasks.length}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <SprintTaskToggle
+                  projectId={id}
+                  taskId={task.id}
+                  hasPendingWork={hasPendingWork}
+                />
+                {task.subtasks.length > 0 && (
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                    <ListChecks className="size-3.5 shrink-0" aria-hidden />
+                    {task.subtasks.length}
+                  </span>
+                )}
+              </div>
             </div>
 
             <ul className="list-none space-y-1.5 mt-3">
@@ -103,7 +118,8 @@ export const TaskGrid = ({
               ))}
             </ul>
           </div>
-        ))}
+          );
+        })}
     </div>
   );
 };

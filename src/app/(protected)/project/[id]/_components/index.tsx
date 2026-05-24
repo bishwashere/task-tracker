@@ -5,8 +5,6 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { ProjectHeader } from "./project-header";
 import { ProjectContextProvider, useProjectContext } from "../_context";
-import ProgressBar from "@/components/common/ProgressBar";
-import { calculateProgressWithStats } from "@/lib/progress";
 import ProjectFilters from "./project-filters";
 import { ViewToggle } from "./view-toggle";
 import AddTaskDialog from "./dialogs/add-task-dialog";
@@ -17,12 +15,13 @@ import { TaskGrid } from "./task-view/task-grid";
 import { ProjectInsights } from "./project-insights";
 import Loading from "@/components/ui/loading";
 import Link from "next/link";
+import SprintControl from "./sprint-control";
+import SprintProgress from "./sprint-progress";
 
 const Project = ({ id }: { id: string }) => {
 
   const { data, isPending } = useGetProjectById(id);
   const { setEditMode, editMode, viewMode, setRole, filteredTasks } = useProjectContext();
-  const stats = calculateProgressWithStats(data?.tasks || []);
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const ai = useGetAISuggestedTasks(id)
   const [mockLoading, setMockLoading] = useState(true);
@@ -50,25 +49,17 @@ const Project = ({ id }: { id: string }) => {
             showPoints={true}
             onEditButtonClick={() => setEditMode((prev) => !prev)}
           />
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-gray-800">Project Progress</h3>
-              <span className="text-2xl font-bold text-green-600">
-                {Math.round(stats.progress)}%
-              </span>
-            </div>
-            <ProgressBar progress={stats.progress} className="h-6" showPercentage={false} />
-            <p className="text-sm text-gray-600 mt-2">
-              {stats.totalSubtasks} subtasks • {stats.completedSubtasks} done • {stats.pendingSubtasks} pending
-            </p>
-          </div>
+          <SprintProgress projectId={id} tasks={data?.tasks || []} />
           <ProjectFilters
             hideUserFilter={data?.role !== "admin"}
             members={data?.members || []}
+            toolbarExtra={
+              <>
+                <SprintControl projectId={id} />
+                <ViewToggle />
+              </>
+            }
           />
-          <div className="flex flex-row items-center justify-end gap-4 -mt-3">
-            <ViewToggle />
-          </div>
 
           <div className="flex justify-end">
             {data?.role?.toLowerCase() === "admin" && editMode && (

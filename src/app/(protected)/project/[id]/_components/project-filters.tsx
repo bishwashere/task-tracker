@@ -5,13 +5,15 @@ import { Separator } from "@/components/ui/separator";
 type Props = {
   hideUserFilter: boolean;
   members: { name: string | null; id: string }[];
+  toolbarExtra?: React.ReactNode;
 };
 
-const ProjectFilters = ({ hideUserFilter, members }: Props) => {
+const ProjectFilters = ({ hideUserFilter, members, toolbarExtra }: Props) => {
   const { tabs, setTab, tab, userFilter, setUserFilter, dateFilters, setFilterByDate, filterByDate, showSubtasks, setShowSubtasks } = useProjectContext();
   return (
     <>
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
         <div className="flex justify-start items-center max-sm:space-x-2 space-x-4 ">
           {tabs.map((filter) => (
             <button
@@ -50,6 +52,13 @@ const ProjectFilters = ({ hideUserFilter, members }: Props) => {
             </>
           )
         }
+        </div>
+
+        {toolbarExtra && (
+          <div className="flex items-center gap-3 ml-auto shrink-0">
+            {toolbarExtra}
+          </div>
+        )}
       </div>
       <div className="mb-4 flex flex-row gap-4">
         <p

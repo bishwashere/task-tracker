@@ -14,7 +14,9 @@
     "postinstall": "prisma generate",
     "db:update": "prisma db push && prisma generate",
     "format": "prettier --write .",
-    "grant-paid": "tsx --env-file=.env scripts/grant-paid-subscription.ts"
+    "grant-paid": "tsx --env-file=.env scripts/grant-paid-subscription.ts",
+    "backfill-launch-sprints": "tsx --env-file=.env scripts/backfill-launch-sprints.ts",
+    "backfill-completed-launch-sprints": "tsx --env-file=.env scripts/backfill-completed-launch-sprints.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",

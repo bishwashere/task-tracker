@@ -134,6 +134,7 @@ model Project {
   projectSortIndex  ProjectSortIndex[]
   insight           Insight[]
   projectSummary    ProjectSummary[]
+  sprints           Sprint[]
 }
 
 model ProjectSortIndex {
@@ -248,4 +249,40 @@ model ProjectSummary {
   response  String?
   done      String[]
   pending   String[]
+}
+
+enum SprintStatus {
+  ACTIVE
+  COMPLETED
+}
+
+enum SprintType {
+  GROWTH
+  RELIABILITY
+  LAUNCH
+  ONBOARDING
+  SEO
+  ANALYTICS
+  INFRASTRUCTURE
+  EXPERIMENT
+  RETENTION
+  AI_QUALITY
+}
+
+model Sprint {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  projectId     String       @db.ObjectId
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name          String
+  sprintType    SprintType   @default(LAUNCH)
+  weekNumber    Int
+  durationDays  Int          @default(7)
+  primaryGoal   String?
+  targetMetric  String?
+  taskIds       String[]     @db.ObjectId
+  startDate     DateTime     @default(now())
+  endDate       DateTime
+  status        SprintStatus @default(ACTIVE)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }

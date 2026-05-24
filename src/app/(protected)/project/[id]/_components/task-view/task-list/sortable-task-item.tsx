@@ -12,6 +12,8 @@ import AddSubtaskDialog from "../../dialogs/add-subtask-dialog";
 import SubTaskView from "./subtask-view";
 import { useTaskListContext } from "./context";
 import { ListChecks } from "lucide-react";
+import SprintTaskToggle, { taskHasPendingWork } from "../../sprint-task-toggle";
+import { useGetActiveSprint } from "@/queries/sprint/hooks";
 
 const SortableTaskItem = ({
   task,
@@ -34,6 +36,9 @@ const SortableTaskItem = ({
   }
   const { activeDragging } = useTaskListContext()
   const { editMode, role, showSubtasks } = useProjectContext()
+  const { data: sprintData } = useGetActiveSprint(id)
+  const inSprint = sprintData?.sprint?.taskIds.includes(task.id) ?? false
+  const hasPendingWork = taskHasPendingWork(task.subtasks)
   const {
     attributes,
     listeners,
@@ -82,7 +87,10 @@ const SortableTaskItem = ({
       )}
     >
       <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
-      <div className="mb-4 p-3 rounded-lg border border-border bg-white shadow-sm hover:shadow-md hover:border-blue-200/50 transition-all duration-150 relative flex-1">
+      <div className={cn(
+        "mb-4 p-3 rounded-lg border bg-white shadow-sm hover:shadow-md transition-all duration-150 relative flex-1",
+        inSprint ? "border-green-300 hover:border-green-400" : "border-border hover:border-blue-200/50",
+      )}>
         {role === "admin" && editMode && (
           <AddSubtaskDialog
             taskId={task?.id}
@@ -92,6 +100,11 @@ const SortableTaskItem = ({
         )}
         <div className="flex flex-row items-center gap-2 flex-wrap mb-1.5">
           <h3 className="text-xl font-bold">{task?.name}</h3>
+          <SprintTaskToggle
+            projectId={id}
+            taskId={task.id}
+            hasPendingWork={hasPendingWork}
+          />
           {task.subtasks.length > 0 && (
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-normal">
               <ListChecks className="size-3.5 shrink-0" aria-hidden />
