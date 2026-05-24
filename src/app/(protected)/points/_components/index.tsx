@@ -5,6 +5,8 @@ import ProfileMenu from "@/components/common/profile-menu";
 import Loading from "@/components/ui/loading";
 import { useGetPoints } from "@/queries/points/hooks";
 import { useRouter } from "next/navigation";
+import ProjectPointsTile, { ProjectPointsTileData } from "./project-points-tile";
+import { HiCurrencyDollar } from "react-icons/hi2";
 
 type DataItem = {
   organizationId: string;
@@ -44,72 +46,47 @@ type Organization = {
   projects: Project[];
 };
 
-const Points = (
-  { user }: { user: string }
-) => {
-  const { data, isLoading } = useGetPoints(user)
-  const router = useRouter()
+const Points = ({ user }: { user: string }) => {
+  const { data, isLoading } = useGetPoints(user);
+  const router = useRouter();
+
   if (isLoading) {
-    return <Loading />
+    return <Loading />;
   }
 
   if (!data) return null;
 
+  const projects = structureProjects(data.points || [], data.projectSlugs || {});
+  const totalPoints = projects.reduce((sum, project) => sum + project.totalPoints, 0);
 
   return (
     <>
-      <SuperHeader
-        onBackClick={() => router.back()}
-      />
+      <SuperHeader onBackClick={() => router.back()} />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Points Earned ({data?.user?.name})</h1>
+        <div className="flex justify-between items-center mb-2">
+          <div>
+            <h1 className="text-3xl font-bold">Points Earned</h1>
+            <p className="text-muted-foreground mt-1">{data.user?.name}</p>
+          </div>
           <ProfileMenu showSettings={false} />
         </div>
 
-        {data?.points?.length ? (
-          structureData(data?.points).map((org) => (
-            <div key={org.id} className="mb-6">
-              {/* Organization */}
-              <h2 className="text-lg font-bold">
-                {org.name}{" "}
-                <span className="text-gray-500">
-                  ({org.totalPoints} Points)
-                </span>
-              </h2>
-              <div className="ml-6">
-                {org.projects.map((proj) => (
-                  <div key={proj.id} className="mb-4">
-                    {/* Project */}
-                    <h3 className="text-md font-semibold">
-                      {proj.name}{" "}
-                      <span className="text-gray-500">
-                        ({proj.totalPoints} Points)
-                      </span>
-                    </h3>
-                    <div className="ml-6">
-                      {proj.tasks.map((task) => (
-                        <div key={task.id} className="mb-2">
-                          {/* Task */}
-                          <h4 className="text-sm font-medium">{task.name}</h4>
-                          <div className="ml-6 text-sm">
-                            {task.subtasks.map((subtask) => (
-                              <p key={subtask.id}>
-                                {subtask.name}{" "}
-                                <span className="text-gray-500">
-                                  ({subtask.points} Points)
-                                </span>
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+        {projects.length > 0 ? (
+          <>
+            <div className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-3 shadow-sm">
+              <HiCurrencyDollar className="text-3xl text-[#fbbc05]" />
+              <div>
+                <p className="text-sm text-muted-foreground">Total points</p>
+                <p className="text-2xl font-bold">{totalPoints}</p>
               </div>
             </div>
-          ))
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {projects.map((project) => (
+                <ProjectPointsTile key={project.id} project={project} />
+              ))}
+            </div>
+          </>
         ) : (
           <div className="flex items-center justify-center mt-6 text-md">
             No points earned.
@@ -121,6 +98,23 @@ const Points = (
 };
 
 export default Points;
+
+function structureProjects(
+  data: DataItem[],
+  projectSlugs: Record<string, string>,
+): ProjectPointsTileData[] {
+  const orgs = structureData(data);
+
+  return orgs
+    .flatMap((org) =>
+      org.projects.map((project) => ({
+        ...project,
+        slug: projectSlugs[project.id] ?? project.id,
+        organizationName: org.name,
+      })),
+    )
+    .sort((a, b) => b.totalPoints - a.totalPoints);
+}
 
 const structureData = (data: DataItem[]): Organization[] => {
   const orgMap = new Map<
@@ -140,7 +134,6 @@ const structureData = (data: DataItem[]): Organization[] => {
   >();
 
   data.forEach((item) => {
-    // Organization Level
     if (!orgMap.has(item.organizationId)) {
       orgMap.set(item.organizationId, {
         name: item.organizationName,
@@ -150,7 +143,6 @@ const structureData = (data: DataItem[]): Organization[] => {
     }
     const org = orgMap.get(item.organizationId)!;
 
-    // Project Level
     if (!org.projects.has(item.projectId)) {
       org.projects.set(item.projectId, {
         name: item.projectName,
@@ -160,7 +152,6 @@ const structureData = (data: DataItem[]): Organization[] => {
     }
     const proj = org.projects.get(item.projectId)!;
 
-    // Task Level
     if (!proj.tasks.has(item.taskId)) {
       proj.tasks.set(item.taskId, {
         name: item.taskName,
@@ -169,19 +160,16 @@ const structureData = (data: DataItem[]): Organization[] => {
     }
     const task = proj.tasks.get(item.taskId)!;
 
-    // Subtask Level
     task.subtasks.push({
       id: item.subtaskId,
       name: item.subtaskName,
       points: item.points,
     });
 
-    // Update total points
     proj.totalPoints += item.points;
     org.totalPoints += item.points;
   });
 
-  // Convert Maps to Arrays before returning
   return Array.from(orgMap.entries()).map(([orgId, org]) => ({
     id: orgId,
     name: org.name,

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { useState } from "react";
 import { useSaveTask } from "@/queries/tasks/hooks";
-import { useParams } from "next/navigation";
+import { useProjectContext } from "../../_context";
 
 const AddTaskDialog = ({
   modalIsOpen,
@@ -25,16 +25,14 @@ const AddTaskDialog = ({
     taskDescription: "",
   });
 
-  const save = useSaveTask()
-  const { id } = useParams() as {
-    id: string;
-  }
+  const save = useSaveTask();
+  const { projectId } = useProjectContext();
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.taskTitle.trim()) return;
     try {
       await save.mutateAsync({
-        projectId: id,
+        projectId,
         taskTitle: formData.taskTitle,
         taskDescription: formData.taskDescription,
       })

@@ -27,7 +27,20 @@ export const getPoints = async (u?: string) => {
         userId: userId,
       },
     });
-    return { success: true, points, user: userFromDb };
+
+    const projectIds = [...new Set(points.map((entry) => entry.projectId))];
+    const projects = projectIds.length
+      ? await prisma.project.findMany({
+          where: { id: { in: projectIds } },
+          select: { id: true, slug: true },
+        })
+      : [];
+
+    const projectSlugs = Object.fromEntries(
+      projects.map((project) => [project.id, project.slug]),
+    );
+
+    return { success: true, points, user: userFromDb, projectSlugs };
   } catch (error) {
     console.error("Error fetching user organizations:", error);
     return { success: false, message: "Failed to fetch organizations" };

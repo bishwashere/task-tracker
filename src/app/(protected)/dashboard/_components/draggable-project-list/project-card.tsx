@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { getProjectTasksPath } from "@/lib/project-slug";
 import { Project } from ".";
 import { useRouter } from "next/navigation";
 import { ProjectSummary } from "@prisma/client";
@@ -19,7 +20,7 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
         "bg-white p-4 rounded-lg border border-border shadow-sm border-l-[3px] border-l-blue-500 cursor-pointer select-none transition-shadow duration-150 hover:shadow-md hover:border-l-blue-600",
         isDragging && "border-l-red-500 ring-2 ring-red-200/60 shadow-md",
       )}
-      onClick={() => router.push(`/project/${project.id}`)}
+      onClick={() => router.push(getProjectTasksPath(project.slug))}
     >
       <div className="mb-2">
         <h3 className="text-lg font-semibold">{project.name}</h3>

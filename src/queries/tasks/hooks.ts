@@ -52,22 +52,7 @@ export const useSaveTask = () => {
     mutationFn: async (props: SaveTaskProps) => {
       const res = await saveTask(props);
       if (res.success) {
-        await queryClient.setQueryData(
-          ["project", props.projectId],
-          (
-            oldData:
-              | (Project & {
-                  tasks: Task[];
-                })
-              | undefined
-          ) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              tasks: [res.task, ...oldData.tasks],
-            };
-          }
-        );
+        await queryClient.invalidateQueries({ queryKey: ["project"] });
         await queryClient.invalidateQueries({ queryKey: ["sprint", props.projectId] });
         await queryClient.invalidateQueries({ queryKey: ["sprints", props.projectId] });
         return res.message;

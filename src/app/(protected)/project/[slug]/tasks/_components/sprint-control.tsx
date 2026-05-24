@@ -6,6 +6,7 @@ import { differenceInCalendarDays, format, startOfDay } from "date-fns";
 import { Loader2, Play } from "lucide-react";
 import { cn } from "@/lib/cn";
 import StartSprintDialog from "./dialogs/start-sprint-dialog";
+import EditSprintDialog from "./dialogs/edit-sprint-dialog";
 import { useProjectContext } from "../_context";
 import { formatSprintName } from "@/lib/sprint";
 
@@ -32,7 +33,7 @@ function getEndsInLabel(endDate: Date) {
 }
 
 const SprintControl = ({ projectId }: Props) => {
-  const { role } = useProjectContext();
+  const { role, editMode } = useProjectContext();
   const isAdmin = role.toLowerCase() === "admin";
   const { data, isLoading } = useGetActiveSprint(projectId);
   const [modalOpen, setModalOpen] = useState(false);
@@ -51,12 +52,17 @@ const SprintControl = ({ projectId }: Props) => {
 
   if (sprint) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-right text-sm leading-snug max-w-[320px]">
-        <p className="font-semibold text-green-700">
-          Active Sprint : {formatSprintName(sprint.name)} (
-          {formatSprintDateRange(new Date(sprint.startDate), new Date(sprint.endDate))})
-        </p>
-        <p className="text-muted-foreground text-xs">{getEndsInLabel(new Date(sprint.endDate))}</p>
+      <div className="flex items-start gap-1 max-w-[340px]">
+        {isAdmin && editMode && (
+          <EditSprintDialog projectId={projectId} sprint={sprint} />
+        )}
+        <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-right text-sm leading-snug flex-1 min-w-0">
+          <p className="font-semibold text-green-700">
+            Active Sprint : {formatSprintName(sprint.name)} (
+            {formatSprintDateRange(new Date(sprint.startDate), new Date(sprint.endDate))})
+          </p>
+          <p className="text-muted-foreground text-xs">{getEndsInLabel(new Date(sprint.endDate))}</p>
+        </div>
       </div>
     );
   }

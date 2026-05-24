@@ -24,6 +24,18 @@ const startSprintSchema = z.object({
 
 export type StartSprintInput = z.infer<typeof startSprintSchema>;
 
+const updateSprintSchema = z.object({
+  projectId: z.string(),
+  sprintId: z.string(),
+  name: z.string().trim().min(1, "Sprint name is required"),
+  sprintType: z.enum(SPRINT_TYPE_VALUES),
+  durationDays: z.union([z.literal(7), z.literal(14), z.literal(30)]),
+  primaryGoal: z.string().trim().optional(),
+  targetMetric: z.string().trim().optional(),
+});
+
+export type UpdateSprintInput = z.infer<typeof updateSprintSchema>;
+
 async function getProjectAccess(projectId: string) {
   const user = await auth();
   if (!user?.user?.id) {
@@ -217,6 +229,63 @@ export const startSprint = async (input: StartSprintInput) => {
       return { success: false, message: error.errors[0]?.message || "Invalid input." };
     }
     console.error("Error starting sprint:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export const updateSprint = async (input: UpdateSprintInput) => {
+  try {
+    const parsed = updateSprintSchema.parse(input);
+    const access = await getProjectAccess(parsed.projectId);
+    if ("error" in access) {
+      return { success: false, message: access.error };
+    }
+
+    if (!access.isAdmin) {
+      return { success: false, message: "Only admins can edit a sprint." };
+    }
+
+    const sprint = await prisma.sprint.findFirst({
+      where: {
+        id: parsed.sprintId,
+        projectId: parsed.projectId,
+        status: "ACTIVE",
+      },
+    });
+
+    if (!sprint) {
+      return { success: false, message: "No active sprint found." };
+    }
+
+    const active = await expireSprintIfNeeded(sprint);
+    if (!active) {
+      return { success: false, message: "No active sprint found." };
+    }
+
+    const endDate = new Date(active.startDate);
+    endDate.setDate(endDate.getDate() + parsed.durationDays);
+
+    const updated = await prisma.sprint.update({
+      where: { id: active.id },
+      data: {
+        name: parsed.name,
+        sprintType: parsed.sprintType as SprintType,
+        durationDays: parsed.durationDays,
+        primaryGoal: parsed.primaryGoal || null,
+        targetMetric: parsed.targetMetric || null,
+        endDate,
+      },
+    });
+
+    return { success: true, sprint: updated, message: "Sprint updated!" };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, message: error.errors[0]?.message || "Invalid input." };
+    }
+    console.error("Error updating sprint:", error);
     return {
       success: false,
       message: "Something went wrong. Please try again.",

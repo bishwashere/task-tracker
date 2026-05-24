@@ -12,6 +12,7 @@ export const useGetPoints = (userId?: string) => {
         return {
           points,
           user,
+          projectSlugs: res.projectSlugs ?? {},
         };
       } else {
         return {};

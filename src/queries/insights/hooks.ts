@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createInsights, CreateInsightsProps, getInsights, getInsightsFromSubredditsKeywords, GetInsightsFromSubredditsKeywordsProps, updateDesiredOutCome, UpdateDesiredOutComeProps } from "./action";
-import { InsightsType } from "@/app/(protected)/project/[id]/_components/project-insights";
+import { InsightsType } from "@/app/(protected)/project/[slug]/tasks/_components/project-insights";
 import toast from "react-hot-toast";
 
 export const useGetInsights = (projectId: string) => {

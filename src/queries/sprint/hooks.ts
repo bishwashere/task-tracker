@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getActiveSprint, getProjectSprints, startSprint, StartSprintInput, toggleSprintTask } from "./action";
+import { getActiveSprint, getProjectSprints, startSprint, StartSprintInput, toggleSprintTask, updateSprint, UpdateSprintInput } from "./action";
 import toast from "react-hot-toast";
 
 export const useGetActiveSprint = (projectId: string) => {
@@ -46,6 +46,28 @@ export const useStartSprint = (projectId: string) => {
     },
     onSuccess: (msg) => {
       toast.success(msg ?? "Sprint started!");
+      queryClient.invalidateQueries({ queryKey: ["sprint", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+};
+
+export const useUpdateSprint = (projectId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: Omit<UpdateSprintInput, "projectId">) => {
+      const res = await updateSprint({ ...input, projectId });
+      if (res.success) {
+        return res.message;
+      }
+      throw new Error(res.message);
+    },
+    onSuccess: (msg) => {
+      toast.success(msg ?? "Sprint updated!");
       queryClient.invalidateQueries({ queryKey: ["sprint", projectId] });
       queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
     },

@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "grant-paid": "tsx --env-file=.env scripts/grant-paid-subscription.ts",
     "backfill-launch-sprints": "tsx --env-file=.env scripts/backfill-launch-sprints.ts",
-    "backfill-completed-launch-sprints": "tsx --env-file=.env scripts/backfill-completed-launch-sprints.ts"
+    "backfill-completed-launch-sprints": "tsx --env-file=.env scripts/backfill-completed-launch-sprints.ts",
+    "backfill-project-slugs": "tsx --env-file=.env scripts/backfill-project-slugs.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",

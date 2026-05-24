@@ -43,6 +43,8 @@ export type ProjectContextType = {
   setViewMode: React.Dispatch<React.SetStateAction<"list" | "grid">>;
   role: string;
   setRole: React.Dispatch<React.SetStateAction<string>>;
+  projectId: string;
+  slug: string;
 
   filteredTasks: any;
 };
@@ -54,11 +56,12 @@ export const ProjectContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { id } = useParams() as {
-    id: string;
+  const { slug } = useParams() as {
+    slug: string;
   };
-  const { data, isPending } = useGetProjectById(id);
-  const { data: sprintData } = useGetActiveSprint(id);
+  const { data, isPending } = useGetProjectById(slug);
+  const projectId = data?.project?.id ?? "";
+  const { data: sprintData } = useGetActiveSprint(projectId);
   const [editMode, setEditMode] =
     useState<ProjectContextType["editMode"]>(false);
   const [tab, setTab] = useState<ProjectContextType["tab"]>("pending");
@@ -231,6 +234,8 @@ export const ProjectContextProvider = ({
         setViewMode,
         role,
         setRole,
+        projectId,
+        slug,
         filteredTasks,
       }}
     >

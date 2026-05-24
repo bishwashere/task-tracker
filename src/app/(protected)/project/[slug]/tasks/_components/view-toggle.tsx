@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ListIcon, ColumnsIcon } from "@/components/common/Icons";
-import { useProjectContext } from "@/app/(protected)/project/[id]/_context";
+import { useProjectContext } from "@/app/(protected)/project/[slug]/tasks/_context";
 
 export const ViewToggle = () => {
   const { viewMode, setViewMode } = useProjectContext()

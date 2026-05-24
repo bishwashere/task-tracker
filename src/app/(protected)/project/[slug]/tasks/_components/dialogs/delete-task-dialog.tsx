@@ -3,16 +3,14 @@ import { MdDelete } from "react-icons/md";
 import { confirm } from "@/components/ui/alert-dialog";
 import { useDeleteTask } from "@/queries/tasks/hooks";
 import toast from "react-hot-toast";
-import { useParams } from "next/navigation";
+import { useProjectContext } from "../../_context";
 
 type Props = {
   taskId?: string;
 };
 
 const DeleteTask = (props: Props) => {
-  const { id } = useParams() as {
-    id: string
-  }
+  const { projectId } = useProjectContext();
   const del = useDeleteTask()
   const onClick = async () => {
     const confirmed = await confirm(
@@ -26,7 +24,7 @@ const DeleteTask = (props: Props) => {
     try {
       await del.mutateAsync({
         taskId: props.taskId as string,
-        projectId: id,
+        projectId,
       })
       toast.success("Task deleted successfully")
     } catch { }

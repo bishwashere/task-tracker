@@ -9,7 +9,7 @@ import EditOrganizationModal from "./edit-organization-modal";
 import SubscriptionStatus from "../subscription-status";
 import { Avatar } from "@/components/ui/avatar";
 import { IoSettingsOutline } from "react-icons/io5";
-import DesiredOutcomeDialog from "@/app/(protected)/project/[id]/_components/dialogs/desired-outcome-dialog";
+import DesiredOutcomeDialog from "@/app/(protected)/project/[slug]/tasks/_components/dialogs/desired-outcome-dialog";
 import { Switch } from "@/components/ui/switch";
 import { useSetGuidedMode } from "@/queries/toggle-guided/hooks";
 

@@ -1,7 +1,10 @@
 import React from "react";
+import { redirect } from "next/navigation";
 import ProjectPage from "./_components";
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import { ProjectContextProvider } from "./_context";
+import { getProjectTasksPath, isMongoObjectId } from "@/lib/project-slug";
+import { getProjectById } from "@/queries/project/action";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -14,8 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
         {
           url: "https://taskmentor.io/logo.png",
           alt: "taskmentor.io",
-        }
-      ]
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -25,20 +28,29 @@ export async function generateMetadata(): Promise<Metadata> {
         {
           url: "https://taskmentor.io/logo.png",
           alt: "taskmentor.io",
-        }
-      ]
+        },
+      ],
     },
-  }
-};
+  };
+}
 
-const Project = async ({ params, }: { params: Promise<{ id: string }> }) => {
-  const { id } = await params;
+const ProjectTasksPage = async ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) => {
+  const { slug } = await params;
+  const res = await getProjectById(slug);
+
+  if (res.success && res.project?.slug && isMongoObjectId(slug) && slug !== res.project.slug) {
+    redirect(getProjectTasksPath(res.project.slug));
+  }
 
   return (
     <ProjectContextProvider>
-      <ProjectPage id={id} />
+      <ProjectPage />
     </ProjectContextProvider>
-  )
+  );
 };
 
-export default Project;
+export default ProjectTasksPage;

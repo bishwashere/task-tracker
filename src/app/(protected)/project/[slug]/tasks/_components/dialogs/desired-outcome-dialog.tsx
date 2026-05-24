@@ -9,10 +9,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { useState } from "react";
-import { useSaveTask } from "@/queries/tasks/hooks";
-import { useParams } from "next/navigation";
 import { useCreateInsights, useGetInsights, useUpdateInsights } from "@/queries/insights/hooks";
 import desiredOutcomes from "@/constants/desiredOutcomes";
+import { useProjectContext } from "../../_context";
 
 const DesiredOutcomeDialog = ({
     modalIsOpen,
@@ -22,14 +21,11 @@ const DesiredOutcomeDialog = ({
     setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
 
-    const { id } = useParams() as {
-        id: string;
-    }
+    const { projectId } = useProjectContext();
 
-
-    const { data: insightsData, isPending: isInsightsPending } = useGetInsights(id);
-    const createInsights = useCreateInsights(id);
-    const updateInsights = useUpdateInsights(id);
+    const { data: insightsData, isPending: isInsightsPending } = useGetInsights(projectId);
+    const createInsights = useCreateInsights(projectId);
+    const updateInsights = useUpdateInsights(projectId);
 
     const [selectedOutcomes, setSelectedOutcomes] = useState<string[]>(insightsData?.insights?.desiredOutcome || []);
 
@@ -48,7 +44,7 @@ const DesiredOutcomeDialog = ({
         if(insightsData?.insights) {
             try {
                 await updateInsights.mutateAsync({
-                    projectId: id,
+                    projectId,
                     newDesiredOutcome: selectedOutcomes,
                 })
                 setSelectedOutcomes(insightsData?.insights?.desiredOutcome || [])
@@ -57,7 +53,7 @@ const DesiredOutcomeDialog = ({
         } else {
             try {
                 await createInsights.mutateAsync({
-                    projectId: id,
+                    projectId,
                     desiredOutcome: selectedOutcomes,
                 })
                 setSelectedOutcomes(insightsData?.insights?.desiredOutcome || [])

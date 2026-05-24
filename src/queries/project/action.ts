@@ -4,7 +4,29 @@ import { ai } from "@/lib/ai";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateProgressWithStats } from "@/lib/progress";
+import { isMongoObjectId, slugifyProjectName } from "@/lib/project-slug";
 import { z } from "zod";
+
+async function generateUniqueProjectSlug(name: string) {
+  const base = slugifyProjectName(name);
+  let slug = base;
+  let suffix = 2;
+
+  while (await prisma.project.findUnique({ where: { slug } })) {
+    slug = `${base}-${suffix}`;
+    suffix += 1;
+  }
+
+  return slug;
+}
+
+async function findProjectBySlugOrId(slugOrId: string) {
+  if (isMongoObjectId(slugOrId)) {
+    return prisma.project.findUnique({ where: { id: slugOrId } });
+  }
+
+  return prisma.project.findUnique({ where: { slug: slugOrId } });
+}
 
 export type AddProjectProps = {
   organizationId: string;
@@ -57,6 +79,7 @@ export const addProject = async ({
     const project = await prisma.project.create({
       data: {
         name: projectName,
+        slug: await generateUniqueProjectSlug(projectName),
         description: projectDescription,
         organizationId,
         goal,
@@ -203,7 +226,7 @@ export const sortProjects = async (
   }
 };
 
-export const getProjectById = async (projectId: string) => {
+export const getProjectById = async (slugOrId: string) => {
   const user = await auth();
   if (!user || !user.user || !user.user.id) {
     return { success: false, error: "Unauthorized !" };
@@ -211,15 +234,13 @@ export const getProjectById = async (projectId: string) => {
 
   const userId = user.user.id;
   try {
-    //Get the organization ID from the project ID
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-    });
+    const project = await findProjectBySlugOrId(slugOrId);
 
     if (!project) {
       return { success: false, message: "Project not found." };
     }
 
+    const projectId = project.id;
     const organizationId = project.organizationId;
 
     //Check if the user is an admin or member in the organization
