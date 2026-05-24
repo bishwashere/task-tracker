@@ -1,4 +1,3 @@
-import ProgressBar from "@/components/common/ProgressBar";
 import { cn } from "@/lib/cn";
 import { Project } from ".";
 import { useRouter } from "next/navigation";
@@ -22,9 +21,8 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
       )}
       onClick={() => router.push(`/project/${project.id}`)}
     >
-      <div className="flex justify-between items-center mb-2 gap-6">
+      <div className="mb-2">
         <h3 className="text-lg font-semibold">{project.name}</h3>
-        <ProgressBar progress={project.progress} className="w-24" />
       </div>
       <p className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
         <ListTodo className="size-3.5 shrink-0" aria-hidden />
