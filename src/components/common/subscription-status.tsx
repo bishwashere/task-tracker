@@ -3,7 +3,11 @@ import { getUserSubscription } from "@/actions/subscription";
 import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/cn";
-import { isSubscriptionExpired } from "@/lib/sub";
+import {
+  getPeriodEnd,
+  hasPaidAccess,
+  isSubscriptionExpired,
+} from "@/lib/sub";
 import { Dialog, DialogContent } from "../ui/dialog";
 import PLANS from "@/constants/plans";
 import PricingCards from "./pricing-cards";
@@ -27,26 +31,36 @@ const SubscriptionStatus = () => {
   const { data, isLoading } = useQuery({
     queryFn: getUserSubscription,
     queryKey: ["subscription"],
+    staleTime: 0,
+    refetchOnMount: "always",
   });
   const [isSubModalOpen, setIsSubModalOpen] = React.useState(false);
   const router = useRouter();
+  const periodEnd = getPeriodEnd(data);
+  const { isExpired } = isSubscriptionExpired(periodEnd);
+  const isPaid = hasPaidAccess(data);
+  const isBlocking = isExpired && !isPaid;
+
   useEffect(() => {
     if (isLoading) return;
-    const sub = data;
 
-    if (
-      isSubscriptionExpired(sub?.currentPeriodEnd?.toString() || "").isExpired
-    ) {
+    if (isPaid) {
+      setIsSubModalOpen(false);
+      return;
+    }
+
+    if (isExpired) {
       setIsSubModalOpen(true);
-    } else if (sub?.status === "trial") {
+      return;
+    }
+
+    if (data?.status === "trial") {
       const lastModalShow = localStorage.getItem("lastModalShow");
 
       if (!lastModalShow) {
         localStorage.setItem("lastModalShow", new Date().toString());
         setIsSubModalOpen(true);
-      }
-      //  only show modal once a day
-      else if (
+      } else if (
         new Date(lastModalShow).getTime() <
         new Date().getTime() - 24 * 60 * 60 * 1000
       ) {
@@ -56,7 +70,7 @@ const SubscriptionStatus = () => {
         setIsSubModalOpen(false);
       }
     }
-  }, [data, isLoading]);
+  }, [data, isLoading, isExpired, isPaid]);
 
   return (
     <>
@@ -74,42 +88,30 @@ const SubscriptionStatus = () => {
       </Button>
       <Dialog
         open={isSubModalOpen}
-        onOpenChange={
-          isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "")
-            .isExpired
-            ? undefined
-            : setIsSubModalOpen
-        }
+        onOpenChange={(open) => {
+          if (isBlocking && !open) return;
+          setIsSubModalOpen(open);
+        }}
       >
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto max-sm:h-full">
           {data?.status === "trial" ? (
             <>
               <PricingCards
                 desc={
-                  isSubscriptionExpired(
-                    data?.currentPeriodEnd?.toString() || "",
-                  ).isExpired
+                  isExpired
                     ? "Your free trial has expired. Upgrade to access more features !"
                     : data?.status === "trial"
                       ? "You are currently on the free trial plan. Upgrade to access more features !"
                       : undefined
                 }
-                header={
-                  isSubscriptionExpired(
-                    data?.currentPeriodEnd?.toString() || "",
-                  ).isExpired
-                    ? "Upgrade Now"
-                    : "Upgrade to access more..."
-                }
+                header={isExpired ? "Upgrade Now" : "Upgrade to access more..."}
                 onSelectPlan={async (pkg) => {
                   const res = await createStripeSession(pkg);
                   if (res) router.push(res);
                 }}
                 plans={PLANS}
               />
-              {data?.status === "trial" &&
-                !isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "")
-                  .isExpired && (
+              {data?.status === "trial" && !isExpired && (
                   <button
                     className="text-black px-4 py-2 rounded underline"
                     onClick={() => setIsSubModalOpen(false)}
@@ -142,21 +144,15 @@ const SubscriptionStatus = () => {
                       </Badge>
                       <Badge
                         variant={
-                          isSubscriptionExpired(
-                            data?.currentPeriodEnd?.toString() || "",
-                          ).expiringSoon
+                          isSubscriptionExpired(periodEnd).expiringSoon
                             ? "destructive"
                             : "default"
                         }
                       >
-                        {isSubscriptionExpired(
-                          data?.currentPeriodEnd?.toString() || "",
-                        ).isExpired
+                        {isExpired
                           ? "Expired"
-                          : isSubscriptionExpired(
-                            data?.currentPeriodEnd?.toString() || "",
-                          ).expiringSoon
-                            ? `Expiring in ${isSubscriptionExpired(data?.currentPeriodEnd?.toString() || "").remainingDays} days`
+                          : isSubscriptionExpired(periodEnd).expiringSoon
+                            ? `Expiring in ${isSubscriptionExpired(periodEnd).remainingDays} days`
                             : "Running"}
                       </Badge>
                     </div>
@@ -224,9 +220,7 @@ const SubscriptionStatus = () => {
                     <Calendar1Icon className="mr-2 h-4 w-4" />
                     Manage Subscription
                   </Button>
-                  {isSubscriptionExpired(
-                    data?.currentPeriodEnd?.toString() || "",
-                  ).isExpired && (
+                  {isExpired && (
                       <Button
                         onClick={async (e) => {
                           e.currentTarget.disabled = true;
