@@ -41,7 +41,7 @@ const Project = ({ id }: { id: string }) => {
   if (project.isSuccess && project.data) {
     return (
       <>
-        <SuperHeader path="/dashboard" label={data?.project?.name} />
+        <SuperHeader path="/dashboard" label={`${data?.project?.name}: Task List`} />
         <div className="max-w-7xl mx-auto p-4 space-y-6">
           <ProjectHeader
             projectName={data?.project?.name || ""}
@@ -66,11 +66,11 @@ const Project = ({ id }: { id: string }) => {
             hideUserFilter={data?.role !== "admin"}
             members={data?.members || []}
           />
-          <div className="flex flex-row items-center justify-end gap-4 -mt-5">
+          <div className="flex flex-row items-center justify-end gap-4 -mt-3">
             <ViewToggle />
           </div>
 
-          <div className="flex justify-end -mt-3">
+          <div className="flex justify-end">
             {data?.role?.toLowerCase() === "admin" && editMode && (
               <button
                 className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2"

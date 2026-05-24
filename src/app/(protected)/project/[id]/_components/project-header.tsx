@@ -21,7 +21,9 @@ export const ProjectHeader = ({
   const { selectedOrg } = useDashboardContext()
   return (
     <div className="flex justify-between items-center mb-5 flex-col sm:flex-row">
-      <h1 className="text-2xl font-bold max-sm:hidden">{projectName}</h1>
+      <div>
+        <h1 className="text-2xl font-bold">{projectName}: Task List</h1>
+      </div>
       <div className="flex flex-row justify-center items-center gap-5">
         {showPoints && projectId && (
           <Link
