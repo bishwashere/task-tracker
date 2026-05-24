@@ -2,7 +2,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { GC_TIME_MS } from "@/lib/query-cache";
+import { GC_TIME_MS, STALE_TIME_MS } from "@/lib/query-cache";
 
 type Props = {
   children: React.ReactNode;
@@ -11,11 +11,11 @@ type Props = {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity,
+      staleTime: STALE_TIME_MS,
       gcTime: GC_TIME_MS,
       retry: false,
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
       refetchOnReconnect: false,
     },
   },

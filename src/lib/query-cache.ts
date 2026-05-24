@@ -1,10 +1,11 @@
+export const STALE_TIME_MS = 1000 * 60 * 60 * 12;
 export const GC_TIME_MS = 1000 * 60 * 60 * 24;
 
-/** Long-lived cache for pages that rarely change (project list, member subtask view). */
+/** Cached pages refetch in the background once data is older than 12 hours. */
 export const staticPageQueryOptions = {
-  staleTime: Infinity,
+  staleTime: STALE_TIME_MS,
   gcTime: GC_TIME_MS,
-  refetchOnMount: false,
+  refetchOnMount: true,
   refetchOnReconnect: false,
   refetchOnWindowFocus: false,
 } as const;
