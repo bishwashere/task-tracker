@@ -33,7 +33,8 @@ export function ViewAsContextProvider({
   children: React.ReactNode;
 }) {
   const { selectedOrg } = useDashboardContext();
-  const organizationId = selectedOrg?.organizationId ?? "";
+  const organizationId =
+    selectedOrg?.organization?.id ?? selectedOrg?.organizationId ?? "";
   const { data, isLoading } = useViewAsState(organizationId);
   const setViewAs = useSetViewAsUser(organizationId);
 

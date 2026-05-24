@@ -51,7 +51,10 @@ const Header = () => {
             ))}
           </select>
         )}
-        <ProfileMenu showSettings={true} organizationId={selectedOrg?.organizationId} />
+        <ProfileMenu
+          showSettings={true}
+          organizationId={selectedOrg?.organization?.id ?? selectedOrg?.organizationId}
+        />
       </div>
     </div>
   );

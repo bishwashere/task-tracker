@@ -34,6 +34,7 @@ export function useViewAsMembers(organizationId: string, enabled = true) {
       throw new Error(res.message);
     },
     enabled: enabled && !!organizationId,
+    staleTime: 0,
   });
 }
 

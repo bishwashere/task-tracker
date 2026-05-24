@@ -24,6 +24,10 @@ type Props = {
   organizationId?: string;
 };
 
+function isMemberRole(role: string) {
+  return String(role).toUpperCase() === "MEMBER";
+}
+
 function toViewAsMember(member: {
   user: { id: string; name: string | null; email: string | null };
   role: string;
@@ -54,24 +58,42 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
   );
   const setViewAs = useSetViewAsUser(orgId);
 
-  const settingsMembers = useMemo(() => {
-    if (!selectedOrg || !session?.user?.id) return [];
+  const clientMembers = useMemo(() => {
+    if (!selectedOrg?.organization?.members?.length) return [];
 
     const selectedOrgId =
-      selectedOrg.organization?.id ?? selectedOrg.organizationId;
+      selectedOrg.organization.id ?? selectedOrg.organizationId;
 
-    if (selectedOrgId !== orgId) return [];
+    if (orgId && selectedOrgId !== orgId) return [];
+
+    const excludeUserId = session?.user?.id;
+    const excludeEmail = session?.user?.email?.toLowerCase();
 
     return selectedOrg.organization.members
-      .filter(
-        (member) =>
-          member.user.id !== session.user.id &&
-          String(member.role).toUpperCase() === "MEMBER",
-      )
-      .map(toViewAsMember);
-  }, [orgId, selectedOrg, session?.user?.id]);
+      .filter((member) => {
+        if (!isMemberRole(member.role)) return false;
+        if (excludeUserId && member.user.id === excludeUserId) return false;
+        if (
+          excludeEmail &&
+          member.user.email?.toLowerCase() === excludeEmail
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .map(toViewAsMember)
+      .sort((a, b) =>
+        (a.name || a.email || "").localeCompare(b.name || b.email || ""),
+      );
+  }, [
+    orgId,
+    selectedOrg,
+    session?.user?.email,
+    session?.user?.id,
+  ]);
 
-  const members = serverMembers.length > 0 ? serverMembers : settingsMembers;
+  const members =
+    clientMembers.length > 0 ? clientMembers : serverMembers;
 
   if (!orgId) {
     return null;
@@ -133,7 +155,7 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
               </span>
             </button>
 
-            {isLoading && members.length === 0 ? (
+            {isLoading && clientMembers.length === 0 && serverMembers.length === 0 ? (
               <div className="flex items-center justify-center gap-2 py-8 text-sm text-gray-500">
                 <Loader2 className="size-4 animate-spin" />
                 Loading members...
