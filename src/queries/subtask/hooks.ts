@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDashboardContext } from "@/context/dashboard-context";
 import {
+  adminLiveQueryOptions,
   isOrgAdmin,
-  queryOptionsForRole,
   staticPageQueryOptions,
 } from "@/lib/query-cache";
 import {
@@ -459,7 +459,7 @@ export const useFetchSubtaskData = (subtaskId: string) => {
       }
     },
     enabled: !!subtaskId,
-    ...(isAdmin ? queryOptionsForRole("admin") : staticPageQueryOptions),
+    ...(isAdmin ? adminLiveQueryOptions : staticPageQueryOptions),
   });
 };
 
