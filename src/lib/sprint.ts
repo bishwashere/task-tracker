@@ -93,3 +93,36 @@ export function getSprintDefaultName(type: SprintTypeValue, weekNumber: number) 
 export function formatSprintName(name: string) {
   return name.replace(/\s Sprint$/i, "").trim();
 }
+
+type SprintTaskRef = {
+  name: string;
+  taskIds: string[];
+  createdAt: Date | string;
+};
+
+export function getTaskSprintInfo(
+  taskId: string,
+  subtasks: { status: string }[],
+  sprints: SprintTaskRef[],
+) {
+  const sprint = [...sprints]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    .find((entry) => entry.taskIds.includes(taskId));
+
+  if (!sprint) return null;
+
+  const isDone =
+    subtasks.length > 0 && subtasks.every((subtask) => subtask.status === "done");
+
+  return {
+    name: formatSprintName(sprint.name),
+    status: isDone ? ("Done" as const) : ("Pending" as const),
+  };
+}
+
+export function isTaskInSprint(taskId: string, sprints: SprintTaskRef[]) {
+  return sprints.some((sprint) => sprint.taskIds.includes(taskId));
+}

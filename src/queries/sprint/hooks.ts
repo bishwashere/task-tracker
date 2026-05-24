@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getActiveSprint, startSprint, StartSprintInput, toggleSprintTask } from "./action";
+import { getActiveSprint, getProjectSprints, startSprint, StartSprintInput, toggleSprintTask } from "./action";
 import toast from "react-hot-toast";
 
 export const useGetActiveSprint = (projectId: string) => {
@@ -19,6 +19,20 @@ export const useGetActiveSprint = (projectId: string) => {
   });
 };
 
+export const useProjectSprints = (projectId: string) => {
+  return useQuery({
+    queryKey: ["sprints", projectId],
+    queryFn: async () => {
+      const res = await getProjectSprints(projectId);
+      if (res.success) {
+        return res.sprints;
+      }
+      throw new Error(res.message || "Failed to load sprints");
+    },
+    enabled: !!projectId,
+  });
+};
+
 export const useStartSprint = (projectId: string) => {
   const queryClient = useQueryClient();
 
@@ -33,6 +47,7 @@ export const useStartSprint = (projectId: string) => {
     onSuccess: (msg) => {
       toast.success(msg);
       queryClient.invalidateQueries({ queryKey: ["sprint", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
     },
     onError: (error) => {
       toast.error(error.message);
@@ -53,6 +68,7 @@ export const useToggleSprintTask = (projectId: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sprint", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
     },
     onError: (error) => {
       toast.error(error.message);

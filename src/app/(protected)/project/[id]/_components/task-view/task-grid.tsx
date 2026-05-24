@@ -5,7 +5,9 @@ import { useProjectContext } from "../../_context";
 import { useToggleSubtaskPriority } from "@/queries/subtask/hooks";
 import { Circle, CircleCheck, ListChecks, MessageSquare, Star } from "lucide-react";
 import SprintTaskToggle, { taskHasPendingWork } from "../sprint-task-toggle";
-import { useGetActiveSprint } from "@/queries/sprint/hooks";
+import { useProjectSprints } from "@/queries/sprint/hooks";
+import { getTaskSprintInfo, isTaskInSprint } from "@/lib/sprint";
+import TaskSprintLabel from "../task-sprint-label";
 
 export const TaskGrid = ({
   tasks,
@@ -26,7 +28,7 @@ export const TaskGrid = ({
   const router = useRouter()
   const togglePriority = useToggleSubtaskPriority()
   const { id } = useParams() as { id: string }
-  const { data: sprintData } = useGetActiveSprint(id)
+  const { data: projectSprints = [] } = useProjectSprints(id)
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
@@ -37,7 +39,8 @@ export const TaskGrid = ({
             (a?.taskSortIndex?.[0]?.sortIndex || 0),
         )
         .map((task, i) => {
-          const inSprint = sprintData?.sprint?.taskIds.includes(task.id) ?? false;
+          const sprintInfo = getTaskSprintInfo(task.id, task.subtasks, projectSprints);
+          const inSprint = isTaskInSprint(task.id, projectSprints);
           const hasPendingWork = taskHasPendingWork(task.subtasks);
 
           return (
@@ -50,18 +53,19 @@ export const TaskGrid = ({
           >
             <div className="flex justify-between items-start gap-2 flex-wrap">
               <h3 className="text-lg font-bold cursor-pointer flex-1">{task.name}</h3>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <SprintTaskToggle
-                  projectId={id}
-                  taskId={task.id}
-                  hasPendingWork={hasPendingWork}
-                />
+              <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                 {task.subtasks.length > 0 && (
                   <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                     <ListChecks className="size-3.5 shrink-0" aria-hidden />
                     {task.subtasks.length}
                   </span>
                 )}
+                <TaskSprintLabel sprintInfo={sprintInfo} />
+                <SprintTaskToggle
+                  projectId={id}
+                  taskId={task.id}
+                  hasPendingWork={hasPendingWork}
+                />
               </div>
             </div>
 

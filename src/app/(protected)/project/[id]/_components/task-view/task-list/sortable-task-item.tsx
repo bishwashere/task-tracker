@@ -13,7 +13,9 @@ import SubTaskView from "./subtask-view";
 import { useTaskListContext } from "./context";
 import { ListChecks } from "lucide-react";
 import SprintTaskToggle, { taskHasPendingWork } from "../../sprint-task-toggle";
-import { useGetActiveSprint } from "@/queries/sprint/hooks";
+import { useProjectSprints } from "@/queries/sprint/hooks";
+import { getTaskSprintInfo, isTaskInSprint } from "@/lib/sprint";
+import TaskSprintLabel from "../../task-sprint-label";
 
 const SortableTaskItem = ({
   task,
@@ -36,8 +38,9 @@ const SortableTaskItem = ({
   }
   const { activeDragging } = useTaskListContext()
   const { editMode, role, showSubtasks } = useProjectContext()
-  const { data: sprintData } = useGetActiveSprint(id)
-  const inSprint = sprintData?.sprint?.taskIds.includes(task.id) ?? false
+  const { data: projectSprints = [] } = useProjectSprints(id)
+  const sprintInfo = getTaskSprintInfo(task.id, task.subtasks, projectSprints)
+  const inSprint = isTaskInSprint(task.id, projectSprints)
   const hasPendingWork = taskHasPendingWork(task.subtasks)
   const {
     attributes,
@@ -100,17 +103,18 @@ const SortableTaskItem = ({
         )}
         <div className="flex flex-row items-center gap-2 flex-wrap mb-1.5">
           <h3 className="text-xl font-bold">{task?.name}</h3>
-          <SprintTaskToggle
-            projectId={id}
-            taskId={task.id}
-            hasPendingWork={hasPendingWork}
-          />
           {task.subtasks.length > 0 && (
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-normal">
               <ListChecks className="size-3.5 shrink-0" aria-hidden />
               {task.subtasks.length}
             </span>
           )}
+          <TaskSprintLabel sprintInfo={sprintInfo} />
+          <SprintTaskToggle
+            projectId={id}
+            taskId={task.id}
+            hasPendingWork={hasPendingWork}
+          />
           {task?.createdAt && (
             <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
               {isNewTask(task?.createdAt) ? (

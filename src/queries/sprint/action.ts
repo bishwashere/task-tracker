@@ -108,6 +108,35 @@ export const getActiveSprint = async (projectId: string) => {
   }
 };
 
+export const getProjectSprints = async (projectId: string) => {
+  try {
+    const access = await getProjectAccess(projectId);
+    if ("error" in access) {
+      return { success: false, message: access.error };
+    }
+
+    const sprints = await prisma.sprint.findMany({
+      where: { projectId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        taskIds: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    return { success: true, sprints };
+  } catch (error) {
+    console.error("Error fetching project sprints:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
 export const startSprint = async (input: StartSprintInput) => {
   try {
     const parsed = startSprintSchema.parse(input);
