@@ -68,7 +68,10 @@ const Subtask = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="flex justify-between items-center mb-6 flex-col sm:flex-row">
           <h1 className="text-3xl font-bold">Subtask Details</h1>
-          <ProfileMenu showSettings={false} />
+          <ProfileMenu
+          showSettings={false}
+          organizationId={subtask?.task?.project?.organizationId}
+        />
         </div>
 
         <div className="bg-gray-100 p-6 rounded shadow-md">

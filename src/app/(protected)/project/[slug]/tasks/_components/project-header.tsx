@@ -18,7 +18,7 @@ export const ProjectHeader = ({
   showPoints?: boolean;
   onEditButtonClick?: () => void;
 }) => {
-  const { role } = useProjectContext()
+  const { role, projectData } = useProjectContext()
   return (
     <div className="relative z-50 flex justify-between items-center mb-5 flex-col sm:flex-row">
       <div>
@@ -38,6 +38,7 @@ export const ProjectHeader = ({
           showSettings={false}
           onEditButtonClick={onEditButtonClick}
           showInsightsOption={role === "admin"}
+          organizationId={projectData?.project?.organizationId}
         />
       </div>
     </div>

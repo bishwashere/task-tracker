@@ -87,3 +87,46 @@ export async function setViewAsUser(
   revalidatePath("/", "layout");
   return { success: true, message: "View As updated." };
 }
+
+export type ViewAsMember = {
+  id: string;
+  name: string | null;
+  email: string | null;
+};
+
+export async function getViewAsMembers(organizationId: string) {
+  const ctx = await getEffectiveUser(organizationId);
+
+  if ("error" in ctx) {
+    return { success: false, message: ctx.error };
+  }
+
+  if (!ctx.isRealAdmin) {
+    return { success: false, message: "Only admins can use View As." };
+  }
+
+  const members = await prisma.userOrganization.findMany({
+    where: {
+      organizationId,
+      role: "MEMBER",
+      userId: { not: ctx.realUserId },
+    },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+  });
+
+  const sorted = members
+    .map((entry) => ({
+      id: entry.user.id,
+      name: entry.user.name,
+      email: entry.user.email,
+    }))
+    .sort((a, b) =>
+      (a.name || a.email || "").localeCompare(b.name || b.email || ""),
+    );
+
+  return { success: true, members: sorted };
+}

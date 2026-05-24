@@ -19,10 +19,12 @@ const ProfileMenu = ({
   showSettings,
   onEditButtonClick,
   showInsightsOption,
+  organizationId,
 }: {
   showSettings: boolean;
   onEditButtonClick?: () => void;
   showInsightsOption?: boolean;
+  organizationId?: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
@@ -134,7 +136,13 @@ const ProfileMenu = ({
             </div>
           )}
           {selectedOrg && isRealAdmin && (
-            <ViewAsMenu onClose={() => setIsOpen(false)} />
+            <>
+              <hr className="border border-gray-300 my-1" />
+              <ViewAsMenu
+                onClose={() => setIsOpen(false)}
+                organizationId={organizationId}
+              />
+            </>
           )}
 
           <button

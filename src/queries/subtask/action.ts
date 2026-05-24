@@ -448,6 +448,7 @@ export const fetchSubtaskData = async (subtaskId: string) => {
                 },
                 id: true,
                 slug: true,
+                organizationId: true,
               },
             },
             name: true,
