@@ -161,11 +161,27 @@ export const listAllUserProjectByOrganizationId = async (
       saveProjectSummary(project.id);
     });
 
+    const projectIds = projects.map((project) => project.id);
+    const activeSprints = projectIds.length
+      ? await prisma.sprint.findMany({
+          where: {
+            projectId: { in: projectIds },
+            status: "ACTIVE",
+            endDate: { gte: new Date() },
+          },
+          select: { projectId: true },
+        })
+      : [];
+    const activeSprintProjectIds = new Set(
+      activeSprints.map((sprint) => sprint.projectId),
+    );
+
     const projectWithProgress = projects.map(({ tasks, ...project }) => {
       return {
         ...project,
         progress: calculateProgressWithStats(tasks).progress,
         tasksCount: tasks.reduce((sum, task) => sum + task.subtasks.length, 0),
+        hasActiveSprint: activeSprintProjectIds.has(project.id),
       };
     });
 

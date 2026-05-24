@@ -11,7 +11,8 @@ import GuidedProjectModal from "./guided-project/guided-project-modal";
 import GuidedOrganizationModal from "./guided-organization/guided-organization-modal";
 import OnboardingModal from "./onboarding-modal";
 import { useListUserProjectByOrganizationId } from "@/queries/project/hooks";
-import { Plus } from "lucide-react";
+import { Plus, Play } from "lucide-react";
+import { cn } from "@/lib/cn";
 
 const Dashboard = () => {
   const { selectedOrg, guidedMode } = useDashboardContext();
@@ -26,6 +27,7 @@ const Dashboard = () => {
 
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
   const [isGuidedAddProjectModalOpen, setIsGuidedAddProjectModalOpen] = useState(false);
+  const [activeSprintOnly, setActiveSprintOnly] = useState(false);
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -92,24 +94,46 @@ const Dashboard = () => {
           </div>
         )}
 
-        {selectedOrg && selectedOrg.role == "ADMIN" && !isOnboardingOpen && (
-          <>
+        {selectedOrg && !isOnboardingOpen && (
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={openAddProjectModal}
-              className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer inline-flex items-center gap-1.5"
+              type="button"
+              onClick={() => setActiveSprintOnly((prev) => !prev)}
+              className={cn(
+                "rounded-md border py-1 px-2 text-sm font-medium inline-flex items-center gap-1.5 transition-colors",
+                activeSprintOnly
+                  ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                  : "bg-white border-border text-muted-foreground hover:bg-muted/40",
+              )}
+              aria-pressed={activeSprintOnly}
             >
-              <Plus className="size-4" aria-hidden />
-              Add a project
+              <Play className={cn("size-4", activeSprintOnly && "fill-current")} aria-hidden />
+              Active Sprint
             </button>
-            <AddProject
-              isOpen={addProjectModalIsOpen}
-              onOpenChange={setAddProjectModalIsOpen}
-            />
-            <GuidedProjectModal isOpen={isGuidedAddProjectModalOpen} onOpenChange={setIsGuidedAddProjectModalOpen} />
-          </>
+
+            {selectedOrg.role === "ADMIN" && (
+              <>
+                <button
+                  onClick={openAddProjectModal}
+                  className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <Plus className="size-4" aria-hidden />
+                  Add a project
+                </button>
+                <AddProject
+                  isOpen={addProjectModalIsOpen}
+                  onOpenChange={setAddProjectModalIsOpen}
+                />
+                <GuidedProjectModal
+                  isOpen={isGuidedAddProjectModalOpen}
+                  onOpenChange={setIsGuidedAddProjectModalOpen}
+                />
+              </>
+            )}
+          </div>
         )}
 
-        {!isOnboardingOpen && <ProjectsList />}
+        {!isOnboardingOpen && <ProjectsList activeSprintOnly={activeSprintOnly} />}
       </div>
     </>
   );

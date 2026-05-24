@@ -5,25 +5,40 @@ import React from "react";
 import DashboardDraggableProjectList from "./draggable-project-list";
 import { FolderOpen } from "lucide-react";
 
-const ProjectsList = () => {
+type Props = {
+  activeSprintOnly?: boolean;
+};
+
+const ProjectsList = ({ activeSprintOnly = false }: Props) => {
   const { selectedOrg } = useDashboardContext();
   const projects = useListUserProjectByOrganizationId(
     selectedOrg?.organization?.id || "",
   );
 
   if (projects.isLoading) return <Loading className="h-48" />;
+
+  const visibleProjects =
+    projects.data?.filter((project) =>
+      activeSprintOnly ? project.hasActiveSprint : true,
+    ) ?? [];
+
   return (
     <>
-      {selectedOrg && projects.data?.length ? (
-
-        <DashboardDraggableProjectList projects={projects.data?.map((p) => ({
-          ...p,
-          projectSummary: p.projectSummary[0],
-        })) || []} />
+      {selectedOrg && visibleProjects.length ? (
+        <DashboardDraggableProjectList
+          projects={visibleProjects.map((p) => ({
+            ...p,
+            projectSummary: p.projectSummary[0],
+          }))}
+        />
       ) : (
         <div className="h-48 flex flex-col items-center justify-center gap-2 text-muted-foreground">
           <FolderOpen className="size-8 opacity-50" aria-hidden />
-          <p className="text-center text-lg">No projects found, add one!</p>
+          <p className="text-center text-lg">
+            {activeSprintOnly
+              ? "No projects with an active sprint."
+              : "No projects found, add one!"}
+          </p>
         </div>
       )}
     </>
