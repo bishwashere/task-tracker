@@ -68,6 +68,8 @@ export const useSaveTask = () => {
             };
           }
         );
+        await queryClient.invalidateQueries({ queryKey: ["sprint", props.projectId] });
+        await queryClient.invalidateQueries({ queryKey: ["sprints", props.projectId] });
         return res.message;
       } else {
         throw new Error(res.message);

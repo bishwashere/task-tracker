@@ -70,6 +70,24 @@ async function expireSprintIfNeeded(sprint: Sprint): Promise<Sprint | null> {
   return null;
 }
 
+export async function autoAssignTaskToActiveSprint(projectId: string, taskId: string) {
+  const sprint = await prisma.sprint.findFirst({
+    where: { projectId, status: "ACTIVE" },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (!sprint) return;
+
+  const active = await expireSprintIfNeeded(sprint);
+  if (!active || active.taskIds.includes(taskId)) return;
+  if (active.taskIds.length >= MAX_ACTIVE_SPRINT_TASKS) return;
+
+  await prisma.sprint.update({
+    where: { id: active.id },
+    data: { taskIds: [...active.taskIds, taskId] },
+  });
+}
+
 export const getActiveSprint = async (projectId: string) => {
   try {
     const access = await getProjectAccess(projectId);

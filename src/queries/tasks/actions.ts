@@ -3,6 +3,7 @@
 import { ai } from "@/lib/ai";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { autoAssignTaskToActiveSprint } from "@/queries/sprint/action";
 
 /**
  * First find the project
@@ -185,6 +186,8 @@ export const saveTask = async ({
         taskSortIndex: true,
       },
     });
+
+    await autoAssignTaskToActiveSprint(projectId, task.id);
 
     return { success: true, message: "Task Added!", task };
   } catch (error) {
