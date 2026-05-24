@@ -45,7 +45,7 @@ export const useStartSprint = (projectId: string) => {
       throw new Error(res.message);
     },
     onSuccess: (msg) => {
-      toast.success(msg);
+      toast.success(msg ?? "Sprint started!");
       queryClient.invalidateQueries({ queryKey: ["sprint", projectId] });
       queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
     },

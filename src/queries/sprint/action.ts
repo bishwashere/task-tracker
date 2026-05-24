@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MAX_ACTIVE_SPRINT_TASKS, SPRINT_TYPE_VALUES } from "@/lib/sprint";
-import { SprintType } from "@prisma/client";
+import { Sprint, SprintType } from "@prisma/client";
 import { z } from "zod";
 
 const startSprintSchema = z.object({
@@ -57,11 +57,7 @@ async function getProjectAccess(projectId: string) {
   };
 }
 
-async function expireSprintIfNeeded(sprint: {
-  id: string;
-  endDate: Date;
-  status: string;
-}) {
+async function expireSprintIfNeeded(sprint: Sprint): Promise<Sprint | null> {
   if (sprint.status !== "ACTIVE" || sprint.endDate >= new Date()) {
     return sprint;
   }
