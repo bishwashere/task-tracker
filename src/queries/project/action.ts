@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateProgressWithStats } from "@/lib/progress";
 import { isMongoObjectId, slugifyProjectName } from "@/lib/project-slug";
+import { cleanupStaleEmptyTasks } from "@/queries/tasks/actions";
 import { z } from "zod";
 
 async function generateUniqueProjectSlug(name: string) {
@@ -260,6 +261,8 @@ export const getProjectById = async (slugOrId: string) => {
     }
 
     const isAdmin = userOrganization.role === "ADMIN";
+
+    await cleanupStaleEmptyTasks(projectId);
 
     let tasksWithSubtasks;
 

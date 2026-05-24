@@ -108,7 +108,7 @@ export const ProjectContextProvider = ({
     const shouldShowEmptyTask = () => {
       if (filterByDate !== "all") return false;
       if (userFilter !== "all" && userFilter !== "unassigned") return false;
-      return tab === "all" || tab === "pending";
+      return tab === "all";
     };
 
     // Apply all filters to tasks
@@ -187,6 +187,7 @@ export const ProjectContextProvider = ({
       if (isEmptyTask && shouldShowEmptyTask()) return true;
 
       if (tab === "done" && task.subtasks.length === 0) return false;
+      if (tab === "pending" && task.subtasks.length === 0) return false;
       return task.subtasks.length > 0;
     }) || [];
 

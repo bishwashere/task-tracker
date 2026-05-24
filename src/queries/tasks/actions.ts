@@ -260,6 +260,60 @@ export const editTask = async ({
   }
 };
 
+export const cleanupStaleEmptyTasks = async (projectId: string) => {
+  try {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 14);
+
+    const staleTasks = await prisma.task.findMany({
+      where: {
+        projectId,
+        createdAt: { lt: cutoff },
+        subtasks: { none: {} },
+      },
+      select: { id: true },
+    });
+
+    if (staleTasks.length === 0) {
+      return { success: true, deletedCount: 0 };
+    }
+
+    const staleTaskIds = staleTasks.map((task) => task.id);
+
+    const sprints = await prisma.sprint.findMany({
+      where: {
+        projectId,
+        taskIds: { hasSome: staleTaskIds },
+      },
+      select: { id: true, taskIds: true },
+    });
+
+    await Promise.all(
+      sprints.map((sprint) =>
+        prisma.sprint.update({
+          where: { id: sprint.id },
+          data: {
+            taskIds: sprint.taskIds.filter((id) => !staleTaskIds.includes(id)),
+          },
+        }),
+      ),
+    );
+
+    await prisma.taskSortIndex.deleteMany({
+      where: { taskId: { in: staleTaskIds } },
+    });
+
+    await prisma.task.deleteMany({
+      where: { id: { in: staleTaskIds } },
+    });
+
+    return { success: true, deletedCount: staleTaskIds.length };
+  } catch (error) {
+    console.error("Error cleaning up stale empty tasks:", error);
+    return { success: false, deletedCount: 0 };
+  }
+};
+
 export const deleteTask = async (taskId: string) => {
   try {
     const user = await auth();
