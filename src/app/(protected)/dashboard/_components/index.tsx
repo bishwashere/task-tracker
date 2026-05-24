@@ -11,6 +11,7 @@ import GuidedProjectModal from "./guided-project/guided-project-modal";
 import GuidedOrganizationModal from "./guided-organization/guided-organization-modal";
 import OnboardingModal from "./onboarding-modal";
 import { useListUserProjectByOrganizationId } from "@/queries/project/hooks";
+import { Plus } from "lucide-react";
 
 const Dashboard = () => {
   const { selectedOrg, guidedMode } = useDashboardContext();
@@ -95,8 +96,9 @@ const Dashboard = () => {
           <>
             <button
               onClick={openAddProjectModal}
-              className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer"
+              className="bg-blue-500 rounded-md text-white py-1 px-2 cursor-pointer inline-flex items-center gap-1.5"
             >
+              <Plus className="size-4" aria-hidden />
               Add a project
             </button>
             <AddProject

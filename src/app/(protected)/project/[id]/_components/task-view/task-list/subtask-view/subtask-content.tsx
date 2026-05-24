@@ -1,6 +1,5 @@
 import { useParams, useRouter } from "next/navigation";
 import { SubTaskViewProps } from ".";
-import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { useProjectContext } from "../../../../_context";
 import { Avatar } from "@/components/ui/avatar";
@@ -9,6 +8,7 @@ import { confirm } from "@/components/ui/alert-dialog";
 import { MdDelete } from "react-icons/md";
 import EditSubtaskDialog from "./edit-subtask-dialog";
 import AddTagPopup from "./add-tag-dialog";
+import { Calendar, Check, Circle, CircleCheck, Coins, MessageSquare, Star, UserRound } from "lucide-react";
 
 interface SubTaskContentProps extends SubTaskViewProps {
   isDragging?: boolean;
@@ -101,7 +101,8 @@ export const SubTaskContent = ({
           )}
           {/* //todo */}
           {(subtask.issueCount || 0) > 0 && (
-            <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
+            <span className="text-xs text-white bg-red-500 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
+              <MessageSquare className="size-3" aria-hidden />
               {subtask.issueCount}
             </span>
           )}
@@ -124,23 +125,41 @@ export const SubTaskContent = ({
             </button>
           )}
         </div>
-        <div className="text-sm">
-          {subtask.status} •{" "}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mt-0.5">
+          <span className="inline-flex items-center gap-1 capitalize">
+            {subtask.status === "done" ? (
+              <CircleCheck className="size-3.5 text-green-600 shrink-0" aria-hidden />
+            ) : (
+              <Circle className="size-3.5 shrink-0" aria-hidden />
+            )}
+            {subtask.status}
+          </span>
           {subtask.assignedUserId && subtask.assignedUser ? (
-            <div className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-background">
+            <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-background">
               <Avatar
                 className="border-foreground"
                 src={subtask.assignedUser?.image || ""}
                 alt={subtask.assignedUser?.name || ""}
                 size="xs"
-              />{" "}
+              />
               {subtask.assignedUser?.name}
-            </div>
+            </span>
           ) : (
-            "Unassigned"
-          )}{" "}
-          • {subtask.points} points{" "}
-          {subtask.dueDate && `• Due: ${dueRemaining(subtask.dueDate)}`}
+            <span className="inline-flex items-center gap-1">
+              <UserRound className="size-3.5 shrink-0" aria-hidden />
+              Unassigned
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1">
+            <Coins className="size-3.5 shrink-0" aria-hidden />
+            {subtask.points} pts
+          </span>
+          {subtask.dueDate && (
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="size-3.5 shrink-0" aria-hidden />
+              {dueRemaining(subtask.dueDate)}
+            </span>
+          )}
         </div>
       </div>
       {editMode && (
@@ -169,19 +188,23 @@ export const SubTaskContent = ({
               priority: subtask.priority === 0 ? 1 : 0,
               taskId: taskId
             })}
-            className={`text-sm rounded ${subtask.priority
-              ? "text-yellow-500 hover:text-yellow-600"
-              : "text-gray-500 hover:text-gray-600"
-              }`}
+            className={cn(
+              "rounded p-0.5",
+              subtask.priority
+                ? "text-yellow-500 hover:text-yellow-600"
+                : "text-gray-400 hover:text-gray-600",
+            )}
+            aria-label={subtask.priority ? "Remove priority" : "Mark as priority"}
           >
-            {subtask.priority ? "⭐" : "☆"}
+            <Star className={cn("size-4", subtask.priority && "fill-current")} />
           </button>
           {subtask.status !== "done" && (
             <button
               onClick={() => update.mutate({ subtaskId: subtask.id, status: "done", projectId: id, taskId })}
-              className="bg-green-100 text-white px-4 py-2 rounded hover:bg-green-200 disabled:opacity-75"
+              className="p-1.5 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-75"
+              aria-label="Mark as done"
             >
-              &#10003;
+              <Check className="size-4" />
             </button>
           )}
         </div>

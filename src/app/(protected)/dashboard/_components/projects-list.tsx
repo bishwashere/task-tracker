@@ -3,6 +3,7 @@ import { useDashboardContext } from "@/context/dashboard-context";
 import { useListUserProjectByOrganizationId } from "@/queries/project/hooks";
 import React from "react";
 import DashboardDraggableProjectList from "./draggable-project-list";
+import { FolderOpen } from "lucide-react";
 
 const ProjectsList = () => {
   const { selectedOrg } = useDashboardContext();
@@ -20,8 +21,9 @@ const ProjectsList = () => {
           projectSummary: p.projectSummary[0],
         })) || []} />
       ) : (
-        <div className="h-48 flex flex-col items-center justify-center">
-          <p className="text-center text-xl">No projects found, add one !</p>
+        <div className="h-48 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+          <FolderOpen className="size-8 opacity-50" aria-hidden />
+          <p className="text-center text-lg">No projects found, add one!</p>
         </div>
       )}
     </>

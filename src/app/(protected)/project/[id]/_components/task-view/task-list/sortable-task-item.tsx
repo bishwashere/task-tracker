@@ -11,6 +11,7 @@ import DeleteTask from "../../dialogs/delete-task-dialog";
 import AddSubtaskDialog from "../../dialogs/add-subtask-dialog";
 import SubTaskView from "./subtask-view";
 import { useTaskListContext } from "./context";
+import { ListChecks } from "lucide-react";
 
 const SortableTaskItem = ({
   task,
@@ -89,8 +90,14 @@ const SortableTaskItem = ({
             showAi={!task?.hasAISuggestions}
           />
         )}
-        <div className="flex flex-row items-center gap-1">
-          <h3 className="text-xl font-bold mb-1.5">{task?.name}</h3>
+        <div className="flex flex-row items-center gap-2 flex-wrap mb-1.5">
+          <h3 className="text-xl font-bold">{task?.name}</h3>
+          {task.subtasks.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-normal">
+              <ListChecks className="size-3.5 shrink-0" aria-hidden />
+              {task.subtasks.length}
+            </span>
+          )}
           {task?.createdAt && (
             <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
               {isNewTask(task?.createdAt) ? (

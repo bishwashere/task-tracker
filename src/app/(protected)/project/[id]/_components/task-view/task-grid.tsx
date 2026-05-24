@@ -3,6 +3,7 @@ import { Subtask, Task, User } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useProjectContext } from "../../_context";
 import { useToggleSubtaskPriority } from "@/queries/subtask/hooks";
+import { Circle, CircleCheck, ListChecks, MessageSquare, Star } from "lucide-react";
 
 export const TaskGrid = ({
   tasks,
@@ -39,8 +40,14 @@ export const TaskGrid = ({
               "mb-4 p-3 rounded-lg border border-border bg-white shadow-sm hover:shadow-md hover:border-blue-200/50 transition-all duration-150 relative",
             )}
           >
-            <div className="flex justify-between items-start gap-4">
+            <div className="flex justify-between items-start gap-2">
               <h3 className="text-lg font-bold cursor-pointer flex-1">{task.name}</h3>
+              {task.subtasks.length > 0 && (
+                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                  <ListChecks className="size-3.5 shrink-0" aria-hidden />
+                  {task.subtasks.length}
+                </span>
+              )}
             </div>
 
             <ul className="list-none space-y-1.5 mt-3">
@@ -55,14 +62,20 @@ export const TaskGrid = ({
                   )}
                 >
                   <span
-                    className="cursor-pointer"
+                    className="cursor-pointer inline-flex items-center gap-1.5 min-w-0"
                     onClick={() => router.push(`/project/subtask/${subtask.id}`)}
                   >
-                    {subtask.name}
+                    {subtask.status === "done" ? (
+                      <CircleCheck className="size-3.5 text-green-600 shrink-0" aria-hidden />
+                    ) : (
+                      <Circle className="size-3.5 text-muted-foreground shrink-0" aria-hidden />
+                    )}
+                    <span className="truncate">{subtask.name}</span>
                   </span>
-                  <div className="space-x-2">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {(subtask.issueCount || 0) > 0 && (
-                      <span className="text-xs text-white bg-red-500 px-1 py-0.5 inline-flex items-center rounded-full aspect-square">
+                      <span className="text-xs text-white bg-red-500 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
+                        <MessageSquare className="size-3" aria-hidden />
                         {subtask.issueCount}
                       </span>
                     )}
@@ -74,12 +87,15 @@ export const TaskGrid = ({
                           priority: subtask.priority === 0 ? 1 : 0,
                           taskId: task.id
                         })}
-                        className={`text-sm rounded ${subtask.priority
-                          ? "text-yellow-500 hover:text-yellow-600"
-                          : "text-gray-500 hover:text-gray-600"
-                          }`}
+                        className={cn(
+                          "rounded p-0.5",
+                          subtask.priority
+                            ? "text-yellow-500 hover:text-yellow-600"
+                            : "text-gray-400 hover:text-gray-600",
+                        )}
+                        aria-label={subtask.priority ? "Remove priority" : "Mark as priority"}
                       >
-                        {subtask.priority ? "⭐" : "☆"}
+                        <Star className={cn("size-3.5", subtask.priority && "fill-current")} />
                       </button>
                     )}
                   </div>

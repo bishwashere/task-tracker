@@ -3,6 +3,7 @@ import { cn } from "@/lib/cn";
 import { Project } from ".";
 import { useRouter } from "next/navigation";
 import { ProjectSummary } from "@prisma/client";
+import { CircleCheck, Clock, ListTodo } from "lucide-react";
 
 interface ProjectCardProps {
   project: Project & {
@@ -25,15 +26,21 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
         <h3 className="text-lg font-semibold">{project.name}</h3>
         <ProgressBar progress={project.progress} className="w-24" />
       </div>
-      <p className="text-sm text-muted-foreground">{project?.tasksCount} Tasks</p>
+      <p className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
+        <ListTodo className="size-3.5 shrink-0" aria-hidden />
+        {project?.tasksCount} Tasks
+      </p>
       {/* project summary done and pending */}
       <div className="border-t border-border/60 my-2" />
 
       <div className="grid sm:grid-cols-2 gap-3 text-muted-foreground">
         {(project?.projectSummary?.done?.length || 0) > 0 ? (
           <div>
-            <h4 className="text-sm font-medium">Done</h4>
-            <ul className="list-disc list-inside">
+            <h4 className="text-sm font-medium inline-flex items-center gap-1.5 mb-1">
+              <CircleCheck className="size-3.5 text-green-600 shrink-0" aria-hidden />
+              Done
+            </h4>
+            <ul className="list-none space-y-0.5 pl-5">
               {project?.projectSummary?.done?.map((item) => (
                 <li key={item} className="text-sm">
                   {item}
@@ -43,8 +50,11 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
           </div>) : null}
         {(project?.projectSummary?.pending?.length || 0) > 0 ? (
           <div>
-            <h4 className="text-sm font-medium">Pending</h4>
-            <ul className="list-disc list-inside">
+            <h4 className="text-sm font-medium inline-flex items-center gap-1.5 mb-1">
+              <Clock className="size-3.5 text-amber-600 shrink-0" aria-hidden />
+              Pending
+            </h4>
+            <ul className="list-none space-y-0.5 pl-5">
               {project?.projectSummary?.pending?.map((item) => (
                 <li key={item} className="text-sm">
                   {item}
