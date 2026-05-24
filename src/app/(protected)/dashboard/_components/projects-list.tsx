@@ -19,7 +19,7 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
 
   const visibleProjects =
     projects.data?.filter((project) =>
-      activeSprintOnly ? project.hasActiveSprint : true,
+      activeSprintOnly ? project.isInActiveSprint : true,
     ) ?? [];
 
   return (
@@ -29,7 +29,7 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
           projects={visibleProjects.map((p) => ({
             ...p,
             projectSummary:
-              activeSprintOnly && p.hasActiveSprint
+              activeSprintOnly && p.isInActiveSprint
                 ? { done: p.sprintDone, pending: p.sprintPending }
                 : p.projectSummary[0] ?? null,
           }))}
@@ -39,7 +39,7 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
           <FolderOpen className="size-8 opacity-50" aria-hidden />
           <p className="text-center text-lg">
             {activeSprintOnly
-              ? "No projects with an active sprint."
+              ? "No projects in your active sprint."
               : "No projects found, add one!"}
           </p>
         </div>

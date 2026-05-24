@@ -119,13 +119,30 @@ export function isTaskInSprint(taskId: string, sprints: SprintTaskRef[]) {
 
 type SprintSummaryTask = {
   id: string;
-  subtasks: Array<{ name: string; status: string }>;
+  subtasks: Array<{ name: string; status: string; assignedUserId?: string | null }>;
 };
+
+export function userIsInActiveSprint(
+  tasks: SprintSummaryTask[],
+  sprintTaskIds: string[],
+  userId: string,
+) {
+  if (sprintTaskIds.length === 0) return false;
+
+  const sprintTaskIdSet = new Set(sprintTaskIds);
+
+  return tasks.some(
+    (task) =>
+      sprintTaskIdSet.has(task.id) &&
+      task.subtasks.some((subtask) => subtask.assignedUserId === userId),
+  );
+}
 
 export function buildSprintDonePending(
   tasks: SprintSummaryTask[],
   sprintTaskIds: string[],
   maxItems = 3,
+  assignedUserId?: string,
 ) {
   const done: string[] = [];
   const pending: string[] = [];
@@ -134,6 +151,10 @@ export function buildSprintDonePending(
     if (!sprintTaskIds.includes(task.id)) continue;
 
     for (const subtask of task.subtasks) {
+      if (assignedUserId && subtask.assignedUserId !== assignedUserId) {
+        continue;
+      }
+
       const bucket = subtask.status === "done" ? done : pending;
       if (bucket.length < maxItems) {
         bucket.push(subtask.name);

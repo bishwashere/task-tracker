@@ -15,12 +15,13 @@ import {
 } from "@/queries/view-as/hooks";
 import { cn } from "@/lib/cn";
 import { Eye, Loader2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
-type Props = {
-  onClose: () => void;
+type ViewAsDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   organizationId?: string;
 };
 
@@ -31,7 +32,6 @@ function isMemberRole(role: string) {
 function toViewAsMember(member: {
   user: { id: string; name: string | null; email: string | null };
   role: string;
-  userId?: string;
 }) {
   return {
     id: member.user.id,
@@ -40,11 +40,14 @@ function toViewAsMember(member: {
   };
 }
 
-export default function ViewAsMenu({ onClose, organizationId }: Props) {
+export function ViewAsDialog({
+  open,
+  onOpenChange,
+  organizationId,
+}: ViewAsDialogProps) {
   const { selectedOrg } = useDashboardContext();
   const { isViewingAs, viewingAsUser } = useViewAsContext();
   const { data: session } = useSession();
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   const orgId =
     organizationId ??
@@ -54,7 +57,7 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
 
   const { data: serverMembers = [], isLoading, isError, refetch } = useViewAsMembers(
     orgId,
-    dialogOpen && !!orgId,
+    open && !!orgId,
   );
   const setViewAs = useSetViewAsUser(orgId);
 
@@ -95,48 +98,42 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
   const members =
     clientMembers.length > 0 ? clientMembers : serverMembers;
 
-  if (!orgId) {
-    return null;
-  }
-
   const handleSelect = async (userId: string | null) => {
+    if (!orgId) {
+      toast.error("Select an organization first.");
+      return;
+    }
+
     try {
       await setViewAs.mutateAsync(userId);
-      setDialogOpen(false);
-      onClose();
+      onOpenChange(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update View As");
     }
   };
 
-  const openDialog = () => {
-    onClose();
-    setDialogOpen(true);
-    if (orgId) {
+  const handleOpenChange = (nextOpen: boolean) => {
+    onOpenChange(nextOpen);
+    if (nextOpen && orgId) {
       void refetch();
     }
   };
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={openDialog}
-        className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
-      >
-        <Eye className="size-4" />
-        View as
-      </button>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>View as</DialogTitle>
+          <DialogDescription>
+            Choose a team member to preview the app as they see it.
+          </DialogDescription>
+        </DialogHeader>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>View as</DialogTitle>
-            <DialogDescription>
-              Choose a team member to preview the app as they see it.
-            </DialogDescription>
-          </DialogHeader>
-
+        {!orgId ? (
+          <p className="py-4 text-sm text-gray-500 text-center">
+            Select an organization to use View As.
+          </p>
+        ) : (
           <div className="max-h-72 overflow-y-auto space-y-1 pt-2">
             <button
               type="button"
@@ -195,8 +192,21 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
               ))
             )}
           </div>
-        </DialogContent>
-      </Dialog>
-    </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function ViewAsMenuButton({ onOpen }: { onOpen: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
+    >
+      <Eye className="size-4" />
+      View as
+    </button>
   );
 }

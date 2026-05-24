@@ -6,7 +6,7 @@ import { getEffectiveUser } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 import { calculateProgressWithStats } from "@/lib/progress";
 import { isMongoObjectId, slugifyProjectName } from "@/lib/project-slug";
-import { buildSprintDonePending } from "@/lib/sprint";
+import { buildSprintDonePending, userIsInActiveSprint } from "@/lib/sprint";
 import { cleanupStaleEmptyTasks } from "@/queries/tasks/actions";
 import { z } from "zod";
 
@@ -188,6 +188,8 @@ export const listAllUserProjectByOrganizationId = async (
       const { done: sprintDone, pending: sprintPending } = buildSprintDonePending(
         tasks,
         sprintTaskIds,
+        3,
+        effectiveUserId,
       );
 
       return {
@@ -195,6 +197,11 @@ export const listAllUserProjectByOrganizationId = async (
         progress: calculateProgressWithStats(tasks).progress,
         tasksCount: tasks.reduce((sum, task) => sum + task.subtasks.length, 0),
         hasActiveSprint: activeSprintTaskIdsByProjectId.has(project.id),
+        isInActiveSprint: userIsInActiveSprint(
+          tasks,
+          sprintTaskIds,
+          effectiveUserId,
+        ),
         sprintDone,
         sprintPending,
       };

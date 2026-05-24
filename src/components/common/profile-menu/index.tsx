@@ -13,7 +13,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import DesiredOutcomeDialog from "@/app/(protected)/project/[slug]/tasks/_components/dialogs/desired-outcome-dialog";
 import { Switch } from "@/components/ui/switch";
 import { useSetGuidedMode } from "@/queries/toggle-guided/hooks";
-import ViewAsMenu from "./view-as-menu";
+import { ViewAsDialog, ViewAsMenuButton } from "./view-as-menu";
 
 const ProfileMenu = ({
   showSettings,
@@ -32,6 +32,7 @@ const ProfileMenu = ({
   const isRealAdmin = useIsRealAdmin();
   const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] = useState(false);
   const [isDesiredOutcomeDialogOpen, setIsDesiredOutcomeDialogOpen] = useState(false);
+  const [viewAsDialogOpen, setViewAsDialogOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
   // Close menu when clicking outside
@@ -138,9 +139,11 @@ const ProfileMenu = ({
           {selectedOrg && isRealAdmin && (
             <>
               <hr className="border border-gray-300 my-1" />
-              <ViewAsMenu
-                onClose={() => setIsOpen(false)}
-                organizationId={organizationId}
+              <ViewAsMenuButton
+                onOpen={() => {
+                  setViewAsDialogOpen(true);
+                  setIsOpen(false);
+                }}
               />
             </>
           )}
@@ -157,6 +160,11 @@ const ProfileMenu = ({
       <EditOrganizationModal
         isOpen={editOrganizationModalIsOpen}
         onOpenChange={setEditOrganizationModalIsOpen}
+      />
+      <ViewAsDialog
+        open={viewAsDialogOpen}
+        onOpenChange={setViewAsDialogOpen}
+        organizationId={organizationId}
       />
       {isDesiredOutcomeDialogOpen && <DesiredOutcomeDialog
         modalIsOpen={isDesiredOutcomeDialogOpen}
