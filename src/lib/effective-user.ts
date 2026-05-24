@@ -36,7 +36,7 @@ async function getRealAdminStatus(userId: string, organizationId?: string) {
     select: { role: true },
   });
 
-  return membership?.role === "ADMIN";
+  return membership?.role.toUpperCase() === "ADMIN";
 }
 
 function toRole(isAdmin: boolean): "admin" | "member" {
@@ -67,7 +67,7 @@ async function resolveViewAsContext(
       where: { userId: realUserId, organizationId, role: "ADMIN" },
     }),
     prisma.userOrganization.findFirst({
-      where: { userId: viewAsUserId, organizationId, role: "MEMBER" },
+      where: { userId: viewAsUserId, organizationId },
     }),
     prisma.user.findUnique({
       where: { id: viewAsUserId },
@@ -76,6 +76,11 @@ async function resolveViewAsContext(
   ]);
 
   if (!adminMembership || !targetMembership || !targetUser) {
+    const isRealAdmin = !!adminMembership;
+    return buildSelfContext(realUserId, isRealAdmin);
+  }
+
+  if (targetMembership.role.toUpperCase() !== "MEMBER") {
     const isRealAdmin = !!adminMembership;
     return buildSelfContext(realUserId, isRealAdmin);
   }

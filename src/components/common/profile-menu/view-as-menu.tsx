@@ -15,7 +15,8 @@ import {
 } from "@/queries/view-as/hooks";
 import { cn } from "@/lib/cn";
 import { Eye, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -23,17 +24,54 @@ type Props = {
   organizationId?: string;
 };
 
+function toViewAsMember(member: {
+  user: { id: string; name: string | null; email: string | null };
+  role: string;
+  userId?: string;
+}) {
+  return {
+    id: member.user.id,
+    name: member.user.name,
+    email: member.user.email,
+  };
+}
+
 export default function ViewAsMenu({ onClose, organizationId }: Props) {
   const { selectedOrg } = useDashboardContext();
   const { isViewingAs, viewingAsUser } = useViewAsContext();
+  const { data: session } = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const orgId = organizationId ?? selectedOrg?.organizationId ?? "";
-  const { data: members = [], isLoading, isError } = useViewAsMembers(
+  const orgId =
+    organizationId ??
+    selectedOrg?.organization?.id ??
+    selectedOrg?.organizationId ??
+    "";
+
+  const { data: serverMembers = [], isLoading, isError, refetch } = useViewAsMembers(
     orgId,
     dialogOpen && !!orgId,
   );
   const setViewAs = useSetViewAsUser(orgId);
+
+  const settingsMembers = useMemo(() => {
+    if (!selectedOrg || !session?.user?.id) return [];
+
+    const selectedOrgId =
+      selectedOrg.organization?.id ?? selectedOrg.organizationId;
+
+    if (selectedOrgId !== orgId) return [];
+
+    return selectedOrg.organization.members
+      .filter(
+        (member) =>
+          member.user.id !== session.user.id &&
+          String(member.role).toUpperCase() === "MEMBER",
+      )
+      .map(toViewAsMember);
+  }, [orgId, selectedOrg, session?.user?.id]);
+
+  const members = serverMembers.length > 0 ? serverMembers : settingsMembers;
 
   if (!orgId) {
     return null;
@@ -49,14 +87,19 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
     }
   };
 
+  const openDialog = () => {
+    onClose();
+    setDialogOpen(true);
+    if (orgId) {
+      void refetch();
+    }
+  };
+
   return (
     <>
       <button
         type="button"
-        onClick={() => {
-          onClose();
-          setDialogOpen(true);
-        }}
+        onClick={openDialog}
         className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
       >
         <Eye className="size-4" />
@@ -68,7 +111,7 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
           <DialogHeader>
             <DialogTitle>View as</DialogTitle>
             <DialogDescription>
-              Preview the app as a team member. You stay signed in as admin.
+              Choose a team member to preview the app as they see it.
             </DialogDescription>
           </DialogHeader>
 
@@ -90,18 +133,19 @@ export default function ViewAsMenu({ onClose, organizationId }: Props) {
               </span>
             </button>
 
-            {isLoading ? (
+            {isLoading && members.length === 0 ? (
               <div className="flex items-center justify-center gap-2 py-8 text-sm text-gray-500">
                 <Loader2 className="size-4 animate-spin" />
                 Loading members...
               </div>
-            ) : isError ? (
+            ) : isError && members.length === 0 ? (
               <p className="py-4 text-sm text-red-500 text-center">
                 You can only use View As for organizations you admin.
               </p>
             ) : members.length === 0 ? (
               <p className="py-4 text-sm text-gray-500 text-center">
-                No members yet. Add people via Settings → Add Members.
+                No members with the Member role yet. In Settings, add users with
+                the Member role (not Admin).
               </p>
             ) : (
               members.map((member) => (

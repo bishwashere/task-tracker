@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import {
   getEffectiveUser,
   VIEW_AS_ORG_COOKIE,
@@ -9,6 +10,23 @@ import {
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+
+function isMemberRole(role: string) {
+  return role.toUpperCase() === "MEMBER";
+}
+
+function isAdminRole(role: string) {
+  return role.toUpperCase() === "ADMIN";
+}
+
+async function assertOrgAdmin(userId: string, organizationId: string) {
+  const membership = await prisma.userOrganization.findFirst({
+    where: { userId, organizationId },
+    select: { role: true },
+  });
+
+  return membership && isAdminRole(membership.role);
+}
 
 export type ViewAsState = {
   isViewingAs: boolean;
@@ -62,11 +80,10 @@ export async function setViewAsUser(
     where: {
       userId,
       organizationId,
-      role: "MEMBER",
     },
   });
 
-  if (!targetMembership) {
+  if (!targetMembership || !isMemberRole(targetMembership.role)) {
     return {
       success: false,
       message: "You can only view as non-admin members in this organization.",
@@ -95,30 +112,39 @@ export type ViewAsMember = {
 };
 
 export async function getViewAsMembers(organizationId: string) {
-  const ctx = await getEffectiveUser(organizationId);
-
-  if ("error" in ctx) {
-    return { success: false, message: ctx.error };
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, message: "Unauthorized !" };
   }
 
-  if (!ctx.isRealAdmin) {
+  const realUserId = session.user.id;
+
+  if (!(await assertOrgAdmin(realUserId, organizationId))) {
     return { success: false, message: "Only admins can use View As." };
   }
 
-  const members = await prisma.userOrganization.findMany({
-    where: {
-      organizationId,
-      role: "MEMBER",
-      userId: { not: ctx.realUserId },
-    },
+  const organization = await prisma.organization.findUnique({
+    where: { id: organizationId },
     include: {
-      user: {
-        select: { id: true, name: true, email: true },
+      members: {
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+        },
       },
     },
   });
 
-  const sorted = members
+  if (!organization) {
+    return { success: false, message: "Organization not found." };
+  }
+
+  const members = organization.members
+    .filter(
+      (entry) =>
+        entry.userId !== realUserId && isMemberRole(String(entry.role)),
+    )
     .map((entry) => ({
       id: entry.user.id,
       name: entry.user.name,
@@ -128,5 +154,5 @@ export async function getViewAsMembers(organizationId: string) {
       (a.name || a.email || "").localeCompare(b.name || b.email || ""),
     );
 
-  return { success: true, members: sorted };
+  return { success: true, members };
 }
