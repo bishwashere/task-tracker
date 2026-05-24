@@ -125,6 +125,7 @@ export const listAllUserProjectByOrganizationId = async (
       return { success: false, message: effective.error };
     }
     const effectiveUserId = effective.effectiveUserId;
+    const isAdmin = effective.isAdmin;
 
     const projects = await prisma.project.findMany({
       where: {
@@ -189,7 +190,7 @@ export const listAllUserProjectByOrganizationId = async (
         tasks,
         sprintTaskIds,
         3,
-        effectiveUserId,
+        isAdmin ? undefined : effectiveUserId,
       );
 
       return {

@@ -2,7 +2,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { MdLogout } from "react-icons/md";
 import logOut from "@/queries/auth/action";
-import { Edit2Icon, SettingsIcon, ToggleRight } from "lucide-react";
+import { Edit2Icon, SettingsIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useDashboardContext } from "@/context/dashboard-context";
 import { useIsRealAdmin } from "@/context/view-as-context";
@@ -11,8 +11,6 @@ import SubscriptionStatus from "../subscription-status";
 import { Avatar } from "@/components/ui/avatar";
 import { IoSettingsOutline } from "react-icons/io5";
 import DesiredOutcomeDialog from "@/app/(protected)/project/[slug]/tasks/_components/dialogs/desired-outcome-dialog";
-import { Switch } from "@/components/ui/switch";
-import { useSetGuidedMode } from "@/queries/toggle-guided/hooks";
 import { ViewAsDialog, ViewAsMenuButton } from "./view-as-menu";
 
 const ProfileMenu = ({
@@ -28,7 +26,7 @@ const ProfileMenu = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
-  const { selectedOrg, setSelectedOrg, guidedMode, setGuidedMode } = useDashboardContext();
+  const { selectedOrg } = useDashboardContext();
   const isRealAdmin = useIsRealAdmin();
   const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] = useState(false);
   const [isDesiredOutcomeDialogOpen, setIsDesiredOutcomeDialogOpen] = useState(false);
@@ -51,15 +49,6 @@ const ProfileMenu = ({
   const handleProfileClick = () => {
     setIsOpen((prev) => !prev);
   };
-
-  const setGuidedModePromise = useSetGuidedMode();
-  const onChangeGuidedToggle = async (checked: boolean) => {
-    // console.log(checked)
-    try {
-      await setGuidedModePromise.mutateAsync(checked);
-      setGuidedMode(checked);
-    } catch { }
-  }
 
   return (
     <div className="relative z-50 mt-2 w-fit" ref={menuRef}>
@@ -129,12 +118,6 @@ const ProfileMenu = ({
               <IoSettingsOutline />
               Settings
             </button>
-          )}
-          {showSettings && selectedOrg && isRealAdmin && (
-            <div className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md">
-              <Switch checked={guidedMode} onCheckedChange={(checked) => onChangeGuidedToggle(checked)} disabled={setGuidedModePromise.isPending} />
-              Guided Mode
-            </div>
           )}
           {selectedOrg && isRealAdmin && (
             <>

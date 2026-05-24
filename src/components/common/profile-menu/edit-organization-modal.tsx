@@ -6,10 +6,12 @@ import {
 } from "@/queries/organizations/action";
 import { useDashboardContext } from "@/context/dashboard-context";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   useAddUserToOrganization,
   useUpdateOrganizationName,
 } from "@/queries/organizations/hooks";
+import { useSetGuidedMode } from "@/queries/toggle-guided/hooks";
 
 type Props = {
   isOpen: boolean;
@@ -17,8 +19,9 @@ type Props = {
 };
 
 const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
-  const { selectedOrg } = useDashboardContext();
+  const { selectedOrg, guidedMode, setGuidedMode } = useDashboardContext();
   const oldName = useRef(selectedOrg?.organization?.name);
+  const setGuidedModePromise = useSetGuidedMode();
 
   const [addUserToOrg, setAddUserToOrg] = useState<AddUserToOrganizationProps>({
     organizationId: selectedOrg?.organizationId as string,
@@ -73,12 +76,36 @@ const EditOrganizationModal = ({ isOpen, onOpenChange }: Props) => {
     } catch {}
   };
 
+  const onChangeGuidedMode = async (checked: boolean) => {
+    try {
+      await setGuidedModePromise.mutateAsync(checked);
+      setGuidedMode(checked);
+    } catch {}
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10">
         <div className="w-full ">
-          <h3 className="text-2xl font-semibold">Edit</h3>
+          <h3 className="text-2xl font-semibold">Settings</h3>
         </div>
+
+        <div className="mt-6 flex items-center justify-between gap-4 rounded-md border px-4 py-3">
+          <div>
+            <p className="font-semibold">Guided Mode</p>
+            <p className="text-sm text-muted-foreground">
+              Show step-by-step prompts when creating organizations and projects.
+            </p>
+          </div>
+          <Switch
+            checked={guidedMode}
+            onCheckedChange={onChangeGuidedMode}
+            disabled={setGuidedModePromise.isPending}
+          />
+        </div>
+
+        <hr className="border border-gray-300 my-6" />
+
         <form className="mt-4" onSubmit={onNameChange}>
           <p className="font-semibold">Change Organization Name</p>
           <input
