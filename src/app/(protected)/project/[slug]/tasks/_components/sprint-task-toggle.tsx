@@ -22,6 +22,8 @@ const SprintTaskToggle = ({ projectId, taskId, hasPendingWork }: Props) => {
 
   const inSprint = sprint.taskIds.includes(taskId);
 
+  if (inSprint) return null;
+
   return (
     <button
       type="button"
@@ -32,15 +34,11 @@ const SprintTaskToggle = ({ projectId, taskId, hasPendingWork }: Props) => {
       }}
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors shrink-0",
-        inSprint
-          ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
-          : "bg-muted text-muted-foreground border border-border hover:bg-muted/80",
+        "bg-muted text-muted-foreground border border-border hover:bg-muted/80",
       )}
     >
       {toggle.isPending ? (
         <Loader2 className="size-3 animate-spin" />
-      ) : inSprint ? (
-        "In sprint"
       ) : (
         "Add to sprint"
       )}

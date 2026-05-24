@@ -12,7 +12,7 @@ const TaskSprintLabel = ({ sprintInfo }: Props) => {
 
   return (
     <span
-      title={`${sprintInfo.status} in sprint`}
+      title={sprintInfo.status}
       className={cn(
         "text-xs font-normal shrink-0",
         sprintInfo.status === "Done" ? "text-green-700" : "text-amber-700",
