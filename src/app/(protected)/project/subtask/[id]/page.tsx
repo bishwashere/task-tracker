@@ -111,8 +111,9 @@ const Subtask = () => {
           <div
           >
             <textarea
-              className="border p-2 w-full rounded mb-4"
+              className="border p-2 w-full rounded mb-4 min-h-24 resize-y"
               placeholder="Add a comment..."
+              rows={4}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
@@ -163,7 +164,9 @@ const Subtask = () => {
                             </span>
                           )}
                         </p>
-                        <p className="text-sm text-gray-600">{c.comment}</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">
+                          {c.comment}
+                        </p>
                         <p className="text-xs text-gray-400">
                           {new Date(c.createdAt).toLocaleString()}
                         </p>
