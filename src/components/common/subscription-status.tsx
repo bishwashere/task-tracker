@@ -7,6 +7,7 @@ import {
   getPeriodEnd,
   hasPaidAccess,
   isSubscriptionExpired,
+  shouldShowUpgradeFlow,
 } from "@/lib/sub";
 import { Dialog, DialogContent } from "../ui/dialog";
 import PLANS from "@/constants/plans";
@@ -29,21 +30,25 @@ import { MdSubscriptions } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 
 const SubscriptionStatus = () => {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryFn: getUserSubscription,
     queryKey: ["subscription"],
     staleTime: 0,
+    gcTime: 0,
     refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
   const [isSubModalOpen, setIsSubModalOpen] = React.useState(false);
   const router = useRouter();
   const periodEnd = getPeriodEnd(data);
   const { isExpired } = isSubscriptionExpired(periodEnd);
   const isPaid = hasPaidAccess(data);
+  const showUpgradeFlow = shouldShowUpgradeFlow(data);
   const isBlocking = isExpired && !isPaid;
+  const subscriptionReady = !isLoading && !isFetching;
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!subscriptionReady) return;
 
     if (isPaid) {
       setIsSubModalOpen(false);
@@ -55,7 +60,7 @@ const SubscriptionStatus = () => {
       return;
     }
 
-    if (data?.status === "trial") {
+    if (showUpgradeFlow) {
       const lastModalShow = localStorage.getItem("lastModalShow");
 
       if (!lastModalShow) {
@@ -71,37 +76,38 @@ const SubscriptionStatus = () => {
         setIsSubModalOpen(false);
       }
     }
-  }, [data, isLoading, isExpired, isPaid]);
+  }, [data, subscriptionReady, isExpired, isPaid, showUpgradeFlow]);
 
   return (
     <>
       <Button
         onClick={() => setIsSubModalOpen(true)}
         size={"sm"}
-        loading={isLoading}
+        loading={!subscriptionReady}
         variant={"outline"}
         className={cn(
-          data?.status === "trial" ? "border-destructive text-destructive" : "",
+          showUpgradeFlow ? "border-destructive text-destructive" : "",
           "capitalize",
         )}
       >
-        {data?.status === "trial" ? data.status : "Manage Subscription"}
+        {showUpgradeFlow ? "trial" : "Manage Subscription"}
       </Button>
       <Dialog
-        open={isSubModalOpen}
+        open={isSubModalOpen && subscriptionReady && !isPaid}
         onOpenChange={(open) => {
+          if (isPaid) return;
           if (isBlocking && !open) return;
           setIsSubModalOpen(open);
         }}
       >
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto max-sm:h-full">
-          {data?.status === "trial" ? (
+          {showUpgradeFlow ? (
             <>
               <PricingCards
                 desc={
                   isExpired
                     ? "Your free trial has expired. Upgrade to access more features !"
-                    : data?.status === "trial"
+                    : showUpgradeFlow
                       ? "You are currently on the free trial plan. Upgrade to access more features !"
                       : undefined
                 }
@@ -112,7 +118,7 @@ const SubscriptionStatus = () => {
                 }}
                 plans={PLANS}
               />
-              {data?.status === "trial" && !isExpired && (
+              {showUpgradeFlow && !isExpired && (
                   <button
                     className="text-black px-4 py-2 rounded underline"
                     onClick={() => setIsSubModalOpen(false)}

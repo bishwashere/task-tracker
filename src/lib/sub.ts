@@ -1,10 +1,16 @@
 type SubscriptionLike = {
   status?: string | null;
+  planId?: string | null;
   currentPeriodEnd?: string | Date | null;
 };
 
-export const getPeriodEnd = (sub?: SubscriptionLike | null) =>
-  sub?.currentPeriodEnd?.toString() ?? "";
+export const getPeriodEnd = (sub?: SubscriptionLike | null) => {
+  const end = sub?.currentPeriodEnd;
+  if (!end) return "";
+  if (typeof end === "string") return end;
+  if (end instanceof Date) return end.toISOString();
+  return String(end);
+};
 
 export const isSubscriptionExpired = (endsAt: string) => {
   const now = new Date();
@@ -26,6 +32,13 @@ export const isSubscriptionExpired = (endsAt: string) => {
 
 export const hasPaidAccess = (sub?: SubscriptionLike | null) => {
   if (!sub) return false;
-  const { isExpired } = isSubscriptionExpired(getPeriodEnd(sub));
-  return sub.status === "active" && !isExpired;
+  if (sub.status !== "active") return false;
+  const periodEnd = getPeriodEnd(sub);
+  if (!periodEnd) return true;
+  return !isSubscriptionExpired(periodEnd).isExpired;
+};
+
+export const shouldShowUpgradeFlow = (sub?: SubscriptionLike | null) => {
+  if (!sub || hasPaidAccess(sub)) return false;
+  return sub.status === "trial";
 };

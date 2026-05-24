@@ -4,29 +4,35 @@ import createProtectedServerAction from "@/lib/create-protected-server-action";
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 
+const serializeSubscription = (
+  subscription: NonNullable<
+    Awaited<ReturnType<typeof prisma.subscription.findUnique>>
+  >,
+) => ({
+  ...subscription,
+  currentPeriodStart: subscription.currentPeriodStart?.toISOString() ?? null,
+  currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
+  createdAt: subscription.createdAt.toISOString(),
+  updatedAt: subscription.updatedAt.toISOString(),
+});
+
 export const getUserSubscription = createProtectedServerAction(
   async (user: User) => {
-    const subscription = await prisma.subscription.findFirst({
-      where: {
-        userId: user.id,
-      },
+    let subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
     });
 
     if (!subscription) {
-      // if there is no subscription, assume user has not claimed the free trial
-      const subscription = await prisma.subscription.create({
+      subscription = await prisma.subscription.create({
         data: {
           currentPeriodStart: new Date(),
-          // 7 day trial
           currentPeriodEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           userId: user.id,
           status: "trial",
         },
       });
-
-      return subscription;
     }
 
-    return subscription;
+    return serializeSubscription(subscription);
   },
 );
