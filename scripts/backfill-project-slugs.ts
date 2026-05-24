@@ -33,10 +33,17 @@ async function main() {
     if (project.slug) continue;
 
     const slug = await generateUniqueSlug(project.name, usedSlugs);
-    await prisma.project.update({
-      where: { id: project.id },
-      data: { slug },
+
+    await prisma.$runCommandRaw({
+      update: "Project",
+      updates: [
+        {
+          q: { _id: { $oid: project.id } },
+          u: { $set: { slug } },
+        },
+      ],
     });
+
     updated += 1;
     console.log(`${project.name} -> ${slug}`);
   }
