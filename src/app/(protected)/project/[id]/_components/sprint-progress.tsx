@@ -27,7 +27,7 @@ const SprintProgress = ({ projectId, tasks }: Props) => {
         <div>
           <h3 className="text-lg font-semibold text-gray-800">Sprint Progress</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {typeMeta.label} • Usually owned by {typeMeta.owner}
+            {typeMeta.name} • Usually owned by {typeMeta.owner}
           </p>
         </div>
         <span className="text-2xl font-bold text-green-600">
