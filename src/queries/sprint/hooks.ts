@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { staticPageQueryOptions } from "@/lib/query-cache";
 import { getActiveSprint, getProjectSprints, startSprint, StartSprintInput, toggleSprintTask, updateSprint, UpdateSprintInput } from "./action";
 import toast from "react-hot-toast";
 
@@ -16,6 +17,7 @@ export const useGetActiveSprint = (projectId: string) => {
       throw new Error(res.message || "Failed to load sprint");
     },
     enabled: !!projectId,
+    ...staticPageQueryOptions,
   });
 };
 

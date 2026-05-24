@@ -11,21 +11,17 @@ import {
 import { Project, Task } from "@prisma/client";
 
 export const useGetAISuggestedTasks = (projectId: string) => {
-  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["ai-suggested-tasks", projectId],
     queryFn: async () => {
       const res = await getAISuggestedTasksByProjectId(projectId);
       if (res.success) {
-        await queryClient.invalidateQueries({
-          queryKey: ["project", projectId],
-        });
-
         return res.tasks || [];
       } else {
         return [];
       }
     },
+    enabled: !!projectId,
   });
 };
 

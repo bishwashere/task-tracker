@@ -1,8 +1,11 @@
 "use client";
 import { useGetProjectById } from "@/queries/project/hooks";
 import { useGetActiveSprint } from "@/queries/sprint/hooks";
+import { cleanupStaleEmptyTasks } from "@/queries/tasks/actions";
+import { projectQueryKey } from "@/lib/query-cache";
 import { useParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const tabs = ["all", "pending", "done"] as const;
 const dateFilters = [{
@@ -45,6 +48,8 @@ export type ProjectContextType = {
   setRole: React.Dispatch<React.SetStateAction<string>>;
   projectId: string;
   slug: string;
+  projectData: ReturnType<typeof useGetProjectById>["data"];
+  isProjectLoading: boolean;
 
   filteredTasks: any;
 };
@@ -56,11 +61,13 @@ export const ProjectContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const queryClient = useQueryClient();
   const { slug } = useParams() as {
     slug: string;
   };
-  const { data, isPending } = useGetProjectById(slug);
+  const { data, isPending, isLoading } = useGetProjectById(slug);
   const projectId = data?.project?.id ?? "";
+  const isProjectLoading = isLoading && !data;
   const { data: sprintData } = useGetActiveSprint(projectId);
   const [editMode, setEditMode] =
     useState<ProjectContextType["editMode"]>(false);
@@ -72,6 +79,18 @@ export const ProjectContextProvider = ({
   const [viewMode, setViewMode] = useState<ProjectContextType["viewMode"]>("list");
   const [role, setRole] = useState("");
   const [filteredTasks, setFilteredTasks] = useState(data?.tasks || [])
+
+  useEffect(() => {
+    if (!projectId || typeof window === "undefined") return;
+
+    const cleanupKey = `stale-task-cleanup:${projectId}`;
+    if (sessionStorage.getItem(cleanupKey)) return;
+
+    cleanupStaleEmptyTasks(projectId).then(() => {
+      sessionStorage.setItem(cleanupKey, "1");
+      queryClient.invalidateQueries({ queryKey: projectQueryKey(slug) });
+    });
+  }, [projectId, slug, queryClient]);
 
   useEffect(() => {
     if (isPending) return;
@@ -237,6 +256,8 @@ export const ProjectContextProvider = ({
         setRole,
         projectId,
         slug,
+        projectData: data,
+        isProjectLoading,
         filteredTasks,
       }}
     >

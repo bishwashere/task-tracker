@@ -1,4 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDashboardContext } from "@/context/dashboard-context";
+import {
+  isOrgAdmin,
+  queryOptionsForRole,
+  staticPageQueryOptions,
+} from "@/lib/query-cache";
 import {
   deleteSubtask,
   editSubTask,
@@ -439,6 +445,9 @@ export const useSaveSubtaskTag = () => {
 };
 
 export const useFetchSubtaskData = (subtaskId: string) => {
+  const { selectedOrg } = useDashboardContext();
+  const isAdmin = isOrgAdmin(selectedOrg?.role);
+
   return useQuery({
     queryKey: ["subtask", subtaskId],
     queryFn: async () => {
@@ -446,9 +455,11 @@ export const useFetchSubtaskData = (subtaskId: string) => {
       if (res.success) {
         return res.subtask as any;
       } else {
-        return [];
+        return null;
       }
     },
+    enabled: !!subtaskId,
+    ...(isAdmin ? queryOptionsForRole("admin") : staticPageQueryOptions),
   });
 };
 

@@ -243,7 +243,10 @@ export const sortProjects = async (
   }
 };
 
-export const getProjectById = async (slugOrId: string) => {
+export const getProjectById = async (
+  slugOrId: string,
+  options?: { skipCleanup?: boolean },
+) => {
   const user = await auth();
   if (!user || !user.user || !user.user.id) {
     return { success: false, error: "Unauthorized !" };
@@ -278,7 +281,9 @@ export const getProjectById = async (slugOrId: string) => {
 
     const isAdmin = userOrganization.role === "ADMIN";
 
-    await cleanupStaleEmptyTasks(projectId);
+    if (!options?.skipCleanup) {
+      await cleanupStaleEmptyTasks(projectId);
+    }
 
     let tasksWithSubtasks;
 

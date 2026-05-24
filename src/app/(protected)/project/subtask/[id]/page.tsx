@@ -42,7 +42,7 @@ const Subtask = () => {
     } catch { }
   };
 
-  if (isLoading)
+  if (isLoading && !subtask)
     return <Loading />
   if (!subtask)
     return (

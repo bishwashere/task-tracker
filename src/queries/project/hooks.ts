@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   addProject,
   AddProjectProps,
@@ -6,6 +7,7 @@ import {
   listAllUserProjectByOrganizationId,
   sortProjects,
 } from "./action";
+import { projectQueryKey, staticPageQueryOptions } from "@/lib/query-cache";
 import toast from "react-hot-toast";
 
 export const useAddProject = () => {
@@ -58,16 +60,29 @@ export const useSortProjects = () => {
   });
 };
 
-export const useGetProjectById = (projectId: string) => {
-  return useQuery({
-    queryKey: ["project", projectId],
+export const useGetProjectById = (slugOrId: string) => {
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: projectQueryKey(slugOrId),
     queryFn: async () => {
-      const res = await getProjectById(projectId);
+      const res = await getProjectById(slugOrId, { skipCleanup: true });
       if (res.success) {
         return res;
       } else {
         return null;
       }
     },
+    enabled: !!slugOrId,
+    ...staticPageQueryOptions,
   });
+
+  useEffect(() => {
+    const projectId = query.data?.project?.id;
+    if (projectId && projectId !== slugOrId) {
+      queryClient.setQueryData(projectQueryKey(projectId), query.data);
+    }
+  }, [query.data, slugOrId, queryClient]);
+
+  return query;
 };

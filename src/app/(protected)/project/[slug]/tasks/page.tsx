@@ -40,7 +40,7 @@ const ProjectTasksPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const res = await getProjectById(slug);
+  const res = await getProjectById(slug, { skipCleanup: true });
 
   if (res.success && res.project?.slug && isMongoObjectId(slug) && slug !== res.project.slug) {
     redirect(getProjectTasksPath(res.project.slug));
