@@ -7,7 +7,7 @@ import { ProjectSummary } from "@prisma/client";
 
 const SortableProjectCard = ({ project, isDragDisabled = false }: {
   project: Project & {
-    projectSummary: ProjectSummary | null;
+    projectSummary: Pick<ProjectSummary, "done" | "pending"> | null;
   };
   isDragDisabled?: boolean;
 }) => {

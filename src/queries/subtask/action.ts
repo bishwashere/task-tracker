@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { getEffectiveUser } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 
 export type SaveSubtaskProps = {
@@ -253,8 +254,6 @@ export const updateSubtaskStatus = async ({
     return { success: false, message: "Unauthorized !" };
   }
 
-  const userId = user.user.id;
-
   try {
     // Fetch the subtask along with its related task and organization
     const subtask = await prisma.subtask.findUnique({
@@ -307,16 +306,20 @@ export const updateSubtaskStatus = async ({
     if (!organization) {
       return { success: false, message: "Organization not found" };
     }
-    // Fetch organization members
-    const isAdmin = organization.members.some(
-      (member) => member.userId === userId && member.role === "ADMIN"
-    );
+
+    const effective = await getEffectiveUser(organization.id);
+    if ("error" in effective) {
+      return { success: false, message: effective.error };
+    }
+
+    const userId = effective.effectiveUserId;
+    const isAdmin = effective.isAdmin;
     const isAssignedUser = subtask.assignedUserId === userId;
     // Check if the user is authorized
     if (!(isAdmin || isAssignedUser)) {
       return {
         success: false,
-        message: "Forbidden: You do not have permission to view this subtask",
+        message: "Forbidden: You do not have permission to update this subtask",
       };
     }
     await prisma.pointsEarned.create({
@@ -423,8 +426,6 @@ export const fetchSubtaskData = async (subtaskId: string) => {
     return { success: false, error: "Unauthorized !" };
   }
 
-  const userId = user.user.id;
-
   try {
     // Fetch the subtask along with its related task and organization
     const subtask = await prisma.subtask.findUnique({
@@ -484,10 +485,14 @@ export const fetchSubtaskData = async (subtaskId: string) => {
     if (!organization) {
       return { success: false, message: "Organization not found" };
     }
-    // Fetch organization members
-    const isAdmin = organization.members.some(
-      (member) => member.userId === userId && member.role === "ADMIN"
-    );
+
+    const effective = await getEffectiveUser(organization.id);
+    if ("error" in effective) {
+      return { success: false, error: effective.error };
+    }
+
+    const userId = effective.effectiveUserId;
+    const isAdmin = effective.isAdmin;
     const isAssignedUser = subtask.assignedUserId === userId;
     // Check if the user is authorized
     if (!(isAdmin || isAssignedUser)) {
@@ -528,8 +533,6 @@ export const saveComment = async ({
     return { success: false, message: "Unauthorized !" };
   }
 
-  const userId = user.user.id;
-
   try {
     // Fetch project and organization
     const project = await prisma.project.findUnique({
@@ -540,11 +543,30 @@ export const saveComment = async ({
       return { success: false, message: "Project not found" };
     }
 
-    // Check if the user is an admin in the organization
+    const effective = await getEffectiveUser(project.organizationId);
+    if ("error" in effective) {
+      return { success: false, message: effective.error };
+    }
+
+    const userId = effective.effectiveUserId;
+
     const userOrg = project.organization.members.find(
       (member) => member.userId === userId
     );
     if (!userOrg) {
+      return { success: false, message: "Permission denied" };
+    }
+
+    const subtask = await prisma.subtask.findUnique({
+      where: { id: subtaskId },
+      select: { assignedUserId: true },
+    });
+
+    if (!subtask) {
+      return { success: false, message: "Subtask not found" };
+    }
+
+    if (!effective.isAdmin && subtask.assignedUserId !== userId) {
       return { success: false, message: "Permission denied" };
     }
 

@@ -38,7 +38,7 @@ export type Project = P & {
 
 type Props = {
   projects: (Project & {
-    projectSummary: ProjectSummary | null;
+    projectSummary: Pick<ProjectSummary, "done" | "pending"> | null;
   })[];
 };
 

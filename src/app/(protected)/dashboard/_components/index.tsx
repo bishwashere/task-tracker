@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./header";
 import { useDashboardContext } from "@/context/dashboard-context";
+import { useAppRole } from "@/context/view-as-context";
 import AddOrganizationModal from "./header/add-organization-modal";
 import AddProject from "./add-project";
 import { useListUserOrganizations } from "@/queries/organizations/hooks";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/cn";
 
 const Dashboard = () => {
   const { selectedOrg, guidedMode } = useDashboardContext();
+  const appRole = useAppRole();
   const org = useListUserOrganizations();
   const projects = useListUserProjectByOrganizationId(
     selectedOrg?.organization?.id || "",
@@ -27,7 +29,7 @@ const Dashboard = () => {
 
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
   const [isGuidedAddProjectModalOpen, setIsGuidedAddProjectModalOpen] = useState(false);
-  const [activeSprintOnly, setActiveSprintOnly] = useState(false);
+  const [activeSprintOnly, setActiveSprintOnly] = useState(true);
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -111,7 +113,7 @@ const Dashboard = () => {
               Active Sprint
             </button>
 
-            {selectedOrg.role === "ADMIN" && (
+            {appRole === "admin" && (
               <>
                 <button
                   onClick={openAddProjectModal}

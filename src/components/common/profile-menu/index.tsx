@@ -5,6 +5,7 @@ import logOut from "@/queries/auth/action";
 import { Edit2Icon, SettingsIcon, ToggleRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useDashboardContext } from "@/context/dashboard-context";
+import { useIsRealAdmin } from "@/context/view-as-context";
 import EditOrganizationModal from "./edit-organization-modal";
 import SubscriptionStatus from "../subscription-status";
 import { Avatar } from "@/components/ui/avatar";
@@ -12,6 +13,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import DesiredOutcomeDialog from "@/app/(protected)/project/[slug]/tasks/_components/dialogs/desired-outcome-dialog";
 import { Switch } from "@/components/ui/switch";
 import { useSetGuidedMode } from "@/queries/toggle-guided/hooks";
+import ViewAsMenu from "./view-as-menu";
 
 const ProfileMenu = ({
   showSettings,
@@ -25,6 +27,7 @@ const ProfileMenu = ({
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const { selectedOrg, setSelectedOrg, guidedMode, setGuidedMode } = useDashboardContext();
+  const isRealAdmin = useIsRealAdmin();
   const [editOrganizationModalIsOpen, setEditOrganizationModalIsOpen] = useState(false);
   const [isDesiredOutcomeDialogOpen, setIsDesiredOutcomeDialogOpen] = useState(false);
 
@@ -98,7 +101,7 @@ const ProfileMenu = ({
               </button>
             </Fragment>
           )}
-          {showInsightsOption && selectedOrg && selectedOrg?.role === "ADMIN" && <Fragment>
+          {showInsightsOption && selectedOrg && isRealAdmin && <Fragment>
             <hr className="border border-gray-300 my-1" />
             <button
               onClick={() => {
@@ -112,7 +115,7 @@ const ProfileMenu = ({
             </button>
           </Fragment>}
           <hr className="border border-gray-300 my-1" />
-          {showSettings && selectedOrg && selectedOrg?.role === "ADMIN" && (
+          {showSettings && selectedOrg && isRealAdmin && (
             <button
               className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md"
               onClick={() => {
@@ -124,11 +127,14 @@ const ProfileMenu = ({
               Settings
             </button>
           )}
-          {showSettings && selectedOrg && selectedOrg?.role === "ADMIN" && (
+          {showSettings && selectedOrg && isRealAdmin && (
             <div className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md">
               <Switch checked={guidedMode} onCheckedChange={(checked) => onChangeGuidedToggle(checked)} disabled={setGuidedModePromise.isPending} />
               Guided Mode
             </div>
+          )}
+          {selectedOrg && isRealAdmin && (
+            <ViewAsMenu onClose={() => setIsOpen(false)} />
           )}
 
           <button

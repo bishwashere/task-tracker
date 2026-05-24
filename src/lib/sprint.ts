@@ -116,3 +116,30 @@ export function getTaskSprintInfo(
 export function isTaskInSprint(taskId: string, sprints: SprintTaskRef[]) {
   return sprints.some((sprint) => sprint.taskIds.includes(taskId));
 }
+
+type SprintSummaryTask = {
+  id: string;
+  subtasks: Array<{ name: string; status: string }>;
+};
+
+export function buildSprintDonePending(
+  tasks: SprintSummaryTask[],
+  sprintTaskIds: string[],
+  maxItems = 3,
+) {
+  const done: string[] = [];
+  const pending: string[] = [];
+
+  for (const task of tasks) {
+    if (!sprintTaskIds.includes(task.id)) continue;
+
+    for (const subtask of task.subtasks) {
+      const bucket = subtask.status === "done" ? done : pending;
+      if (bucket.length < maxItems) {
+        bucket.push(subtask.name);
+      }
+    }
+  }
+
+  return { done, pending };
+}

@@ -1,16 +1,16 @@
 "use server";
-import { auth } from "@/lib/auth";
+import { getEffectiveUser } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 
-export const getPoints = async (u?: string) => {
-  const user = await auth();
-  if (!user || !user.user || !user.user.id) {
-    return { success: false, message: "Unauthorized !" };
+export const getPoints = async (u?: string, organizationId?: string) => {
+  const effective = await getEffectiveUser(organizationId);
+  if ("error" in effective) {
+    return { success: false, message: effective.error };
   }
 
-  const userId = u || user.user.id;
-
-  console.log(userId);
+  const userId = effective.isViewingAs
+    ? effective.effectiveUserId
+    : (u || effective.effectiveUserId);
 
   const userFromDb = await prisma.user.findUnique({
     where: { id: userId },

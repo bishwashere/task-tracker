@@ -1,4 +1,4 @@
-import { useDashboardContext } from "@/context/dashboard-context";
+import { useProjectContext } from "../_context";
 import { projectInsightsPrompt } from "@/lib/prompt";
 import { useCreateInsights, useGetInsights, useGetInsightsFromSubredditsKeywords } from "@/queries/insights/hooks";
 import { useGetProjectById } from "@/queries/project/hooks";
@@ -16,13 +16,13 @@ export const ProjectInsights = ({ id }: { id: string }) => {
 
     const { data: projectData, isPending: isProjectPending } = useGetProjectById(id);
     const { data: insightsData, isPending: isInsightsPending } = useGetInsights(id);
-    const { selectedOrg } = useDashboardContext();
+    const { role } = useProjectContext();
 
     const createInsights = useCreateInsights(id);
     const getInsights = useGetInsightsFromSubredditsKeywords(id);
 
     useEffect(() => {
-        if (selectedOrg?.role.toLowerCase() !== "admin") return;
+        if (role !== "admin") return;
         if (isProjectPending || isInsightsPending) return;
         const insights: InsightsType | null = insightsData?.insights as InsightsType
 
@@ -57,7 +57,7 @@ export const ProjectInsights = ({ id }: { id: string }) => {
                 catch { }
             }
         }
-    }, [projectData, isProjectPending, insightsData, isInsightsPending, selectedOrg])
+    }, [projectData, isProjectPending, insightsData, isInsightsPending, role])
 
     return (
         <div>

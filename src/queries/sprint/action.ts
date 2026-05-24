@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { getProjectAccessContext } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 import { MAX_ACTIVE_SPRINT_TASKS, SPRINT_TYPE_VALUES } from "@/lib/sprint";
 import { Sprint, SprintType } from "@prisma/client";
@@ -37,35 +37,14 @@ const updateSprintSchema = z.object({
 export type UpdateSprintInput = z.infer<typeof updateSprintSchema>;
 
 async function getProjectAccess(projectId: string) {
-  const user = await auth();
-  if (!user?.user?.id) {
-    return { error: "Unauthorized !" as const };
-  }
-
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: { organizationId: true },
-  });
-
-  if (!project) {
-    return { error: "Project not found." as const };
-  }
-
-  const membership = await prisma.userOrganization.findFirst({
-    where: {
-      userId: user.user.id,
-      organizationId: project.organizationId,
-    },
-    select: { role: true },
-  });
-
-  if (!membership) {
-    return { error: "You are not part of this organization." as const };
+  const access = await getProjectAccessContext(projectId);
+  if ("error" in access) {
+    return access;
   }
 
   return {
-    userId: user.user.id,
-    isAdmin: membership.role === "ADMIN",
+    userId: access.effectiveUserId,
+    isAdmin: access.isAdmin,
   };
 }
 

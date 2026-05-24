@@ -2,9 +2,11 @@
 
 import { ai } from "@/lib/ai";
 import { auth } from "@/lib/auth";
+import { getEffectiveUser } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 import { calculateProgressWithStats } from "@/lib/progress";
 import { isMongoObjectId, slugifyProjectName } from "@/lib/project-slug";
+import { buildSprintDonePending } from "@/lib/sprint";
 import { cleanupStaleEmptyTasks } from "@/queries/tasks/actions";
 import { z } from "zod";
 
@@ -118,6 +120,11 @@ export const listAllUserProjectByOrganizationId = async (
     }
 
     const userId = user.user.id;
+    const effective = await getEffectiveUser(organizationId);
+    if ("error" in effective) {
+      return { success: false, message: effective.error };
+    }
+    const effectiveUserId = effective.effectiveUserId;
 
     const projects = await prisma.project.findMany({
       where: {
@@ -125,7 +132,7 @@ export const listAllUserProjectByOrganizationId = async (
           // Include all projects if user is ADMIN
           {
             organization: {
-              members: { some: { userId, role: "ADMIN" } },
+              members: { some: { userId: effectiveUserId, role: "ADMIN" } },
             },
             organizationId,
           },
@@ -134,7 +141,7 @@ export const listAllUserProjectByOrganizationId = async (
             tasks: {
               some: {
                 subtasks: {
-                  some: { assignedUserId: userId },
+                  some: { assignedUserId: effectiveUserId },
                 },
               },
             },
@@ -149,7 +156,7 @@ export const listAllUserProjectByOrganizationId = async (
           },
         },
         projectSortIndex: {
-          where: { userId },
+          where: { userId: effectiveUserId },
           select: { sortIndex: true },
         },
         projectSummary: true, 
@@ -169,19 +176,27 @@ export const listAllUserProjectByOrganizationId = async (
             status: "ACTIVE",
             endDate: { gte: new Date() },
           },
-          select: { projectId: true },
+          select: { projectId: true, taskIds: true },
         })
       : [];
-    const activeSprintProjectIds = new Set(
-      activeSprints.map((sprint) => sprint.projectId),
+    const activeSprintTaskIdsByProjectId = new Map(
+      activeSprints.map((sprint) => [sprint.projectId, sprint.taskIds]),
     );
 
     const projectWithProgress = projects.map(({ tasks, ...project }) => {
+      const sprintTaskIds = activeSprintTaskIdsByProjectId.get(project.id) ?? [];
+      const { done: sprintDone, pending: sprintPending } = buildSprintDonePending(
+        tasks,
+        sprintTaskIds,
+      );
+
       return {
         ...project,
         progress: calculateProgressWithStats(tasks).progress,
         tasksCount: tasks.reduce((sum, task) => sum + task.subtasks.length, 0),
-        hasActiveSprint: activeSprintProjectIds.has(project.id),
+        hasActiveSprint: activeSprintTaskIdsByProjectId.has(project.id),
+        sprintDone,
+        sprintPending,
       };
     });
 
@@ -252,7 +267,6 @@ export const getProjectById = async (
     return { success: false, error: "Unauthorized !" };
   }
 
-  const userId = user.user.id;
   try {
     const project = await findProjectBySlugOrId(slugOrId);
 
@@ -263,10 +277,17 @@ export const getProjectById = async (
     const projectId = project.id;
     const organizationId = project.organizationId;
 
+    const effective = await getEffectiveUser(organizationId);
+    if ("error" in effective) {
+      return { success: false, error: effective.error };
+    }
+
+    const userId = effective.effectiveUserId;
+
     //Check if the user is an admin or member in the organization
     const userOrganization = await prisma.userOrganization.findFirst({
       where: {
-        userId: userId,
+        userId,
         organizationId: organizationId,
       },
       select: { role: true },
@@ -279,7 +300,7 @@ export const getProjectById = async (
       };
     }
 
-    const isAdmin = userOrganization.role === "ADMIN";
+    const isAdmin = effective.isAdmin;
 
     if (!options?.skipCleanup) {
       await cleanupStaleEmptyTasks(projectId);
@@ -358,7 +379,7 @@ export const getProjectById = async (
         success: true,
         tasks: tasksWithSubtasks,
         members: organizationMembers,
-        role: "admin",
+        role: effective.role,
         pointsEarned: pointsEarned,
         project: project,
       };
@@ -413,7 +434,7 @@ export const getProjectById = async (
       return {
         success: true,
         tasks: tasksWithSubtasks,
-        role: "member",
+        role: effective.role,
         pointsEarned: pointsEarned,
         project: project,
       };

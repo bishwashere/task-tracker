@@ -9,7 +9,7 @@ type Props = {
   activeSprintOnly?: boolean;
 };
 
-const ProjectsList = ({ activeSprintOnly = false }: Props) => {
+const ProjectsList = ({ activeSprintOnly = true }: Props) => {
   const { selectedOrg } = useDashboardContext();
   const projects = useListUserProjectByOrganizationId(
     selectedOrg?.organization?.id || "",
@@ -28,7 +28,10 @@ const ProjectsList = ({ activeSprintOnly = false }: Props) => {
         <DashboardDraggableProjectList
           projects={visibleProjects.map((p) => ({
             ...p,
-            projectSummary: p.projectSummary[0],
+            projectSummary:
+              activeSprintOnly && p.hasActiveSprint
+                ? { done: p.sprintDone, pending: p.sprintPending }
+                : p.projectSummary[0] ?? null,
           }))}
         />
       ) : (

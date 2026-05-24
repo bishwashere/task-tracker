@@ -4,6 +4,7 @@ import ProfileMenu from '@/components/common/profile-menu'
 import { buttonVariants } from '@/components/ui/button'
 import Loading from '@/components/ui/loading'
 import { useDashboardContext } from '@/context/dashboard-context'
+import { useAppRole } from '@/context/view-as-context'
 import { useGetPoints } from '@/queries/points/hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -11,6 +12,7 @@ import React, { useState } from 'react'
 
 const Page = () => {
   const { selectedOrg } = useDashboardContext()
+  const appRole = useAppRole()
   const router = useRouter()
   const [points, setPoints] = useState(0)
   if (!selectedOrg) {
@@ -18,7 +20,7 @@ const Page = () => {
   }
 
 
-  if (selectedOrg?.role.toLowerCase() !== "admin") return (
+  if (appRole !== "admin") return (
     <div
       className='flex flex-col items-center justify-center h-screen text-xl'
     >Not Allowed</div>

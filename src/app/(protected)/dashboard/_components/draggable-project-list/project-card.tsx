@@ -7,7 +7,7 @@ import { CircleCheck, Clock, ListTodo } from "lucide-react";
 
 interface ProjectCardProps {
   project: Project & {
-    projectSummary: ProjectSummary | null;
+    projectSummary: Pick<ProjectSummary, "done" | "pending"> | null;
   };
   isDragging: boolean;
 }

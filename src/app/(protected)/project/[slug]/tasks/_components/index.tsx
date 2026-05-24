@@ -1,6 +1,6 @@
 "use client";
 import SuperHeader from "@/components/common/block/super-header";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ProjectHeader } from "./project-header";
 import { useProjectContext } from "../_context";
 import ProjectFilters from "./project-filters";
@@ -23,7 +23,6 @@ const Project = () => {
     setEditMode,
     editMode,
     viewMode,
-    setRole,
     filteredTasks,
     projectData: data,
     isProjectLoading,
@@ -31,11 +30,6 @@ const Project = () => {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const ai = useGetAISuggestedTasks(projectId);
   const [mockLoading, setMockLoading] = useState(true);
-
-  useEffect(() => {
-    if (isProjectLoading) return;
-    setRole(data?.role || "member");
-  }, [data?.role, isProjectLoading, setRole]);
 
   if (isProjectLoading) {
     return <Loading />;

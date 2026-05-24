@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useDashboardContext } from "@/context/dashboard-context";
+import { useAppRole } from "@/context/view-as-context";
 import {
   adminLiveQueryOptions,
   isOrgAdmin,
@@ -445,8 +445,8 @@ export const useSaveSubtaskTag = () => {
 };
 
 export const useFetchSubtaskData = (subtaskId: string) => {
-  const { selectedOrg } = useDashboardContext();
-  const isAdmin = isOrgAdmin(selectedOrg?.role);
+  const appRole = useAppRole();
+  const isAdmin = isOrgAdmin(appRole);
 
   return useQuery({
     queryKey: ["subtask", subtaskId],

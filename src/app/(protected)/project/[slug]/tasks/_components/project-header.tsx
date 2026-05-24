@@ -3,7 +3,7 @@ import React from "react";
 import { HiCurrencyDollar } from "react-icons/hi2";
 import Link from "next/link";
 import ProfileMenu from "@/components/common/profile-menu";
-import { useDashboardContext } from "@/context/dashboard-context";
+import { useProjectContext } from "../_context";
 
 export const ProjectHeader = ({
   projectName,
@@ -18,7 +18,7 @@ export const ProjectHeader = ({
   showPoints?: boolean;
   onEditButtonClick?: () => void;
 }) => {
-  const { selectedOrg } = useDashboardContext()
+  const { role } = useProjectContext()
   return (
     <div className="relative z-50 flex justify-between items-center mb-5 flex-col sm:flex-row">
       <div>
@@ -27,7 +27,7 @@ export const ProjectHeader = ({
       <div className="flex flex-row justify-center items-center gap-5">
         {showPoints && projectId && (
           <Link
-            href={selectedOrg?.role.toLowerCase() === "admin" ? "/allpoints" : `/points`}
+            href={role === "admin" ? "/allpoints" : `/points`}
             className="flex flex-row justify-center items-center gap-1"
           >
             <HiCurrencyDollar className="text-3xl text-[#fbbc05]" />
@@ -37,7 +37,7 @@ export const ProjectHeader = ({
         <ProfileMenu
           showSettings={false}
           onEditButtonClick={onEditButtonClick}
-          showInsightsOption={true}
+          showInsightsOption={role === "admin"}
         />
       </div>
     </div>

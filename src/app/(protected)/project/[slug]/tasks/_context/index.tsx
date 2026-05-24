@@ -94,6 +94,15 @@ export const ProjectContextProvider = ({
 
   useEffect(() => {
     if (isPending) return;
+    const nextRole = data?.role || "member";
+    setRole(nextRole);
+    if (nextRole !== "admin") {
+      setEditMode(false);
+    }
+  }, [data?.role, isPending, setRole, setEditMode]);
+
+  useEffect(() => {
+    if (isPending) return;
 
     const isAdmin = data?.role?.toLowerCase() === "admin";
     const activeSprint = sprintData?.sprint;
