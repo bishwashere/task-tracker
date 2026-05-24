@@ -36,21 +36,23 @@ export const TaskGrid = ({
           <div
             key={i}
             className={cn(
-              "mb-6 p-4 rounded hover:bg-gray-50 border border-gray-200 relative",
+              "mb-4 p-3 rounded-lg border border-border bg-white shadow-sm hover:shadow-md hover:border-blue-200/50 transition-all duration-150 relative",
             )}
           >
             <div className="flex justify-between items-start gap-4">
               <h3 className="text-lg font-bold cursor-pointer flex-1">{task.name}</h3>
             </div>
 
-            <ul className="list-none space-y-2 mt-4">
+            <ul className="list-none space-y-1.5 mt-3">
               {task.subtasks.map((subtask) => (
                 <li
                   key={subtask.id}
-                  className={`p-2 rounded shadow-md flex justify-between items-center ${subtask.status === "done"
-                    ? "bg-green-200 text-green-700 hover:bg-green-300"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                  className={cn(
+                    "px-2.5 py-1.5 rounded-md border shadow-sm flex justify-between items-center transition-colors duration-150",
+                    subtask.status === "done"
+                      ? "bg-green-50 border-green-200/80 text-green-800 hover:bg-green-100"
+                      : "bg-white border-border text-foreground hover:bg-muted/40",
+                  )}
                 >
                   <span
                     className="cursor-pointer"

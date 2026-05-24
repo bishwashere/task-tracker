@@ -16,20 +16,20 @@ const ProjectCard = ({ project, isDragging }: ProjectCardProps) => {
   return (
     <div
       className={cn(
-        "bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer select-none",
-        isDragging && "border-red-500",
+        "bg-white p-4 rounded-lg border border-border shadow-sm border-l-[3px] border-l-blue-500 cursor-pointer select-none transition-shadow duration-150 hover:shadow-md hover:border-l-blue-600",
+        isDragging && "border-l-red-500 ring-2 ring-red-200/60 shadow-md",
       )}
       onClick={() => router.push(`/project/${project.id}`)}
     >
-      <div className="flex justify-between items-center mb-4 gap-6">
+      <div className="flex justify-between items-center mb-2 gap-6">
         <h3 className="text-lg font-semibold">{project.name}</h3>
         <ProgressBar progress={project.progress} className="w-24" />
       </div>
-      <p className="text-sm text-gray-500">{project?.tasksCount} Tasks</p>
+      <p className="text-sm text-muted-foreground">{project?.tasksCount} Tasks</p>
       {/* project summary done and pending */}
-      <hr className="my-2" />
+      <div className="border-t border-border/60 my-2" />
 
-      <div className="grid sm:grid-cols-2 gap-4 text-muted-foreground">
+      <div className="grid sm:grid-cols-2 gap-3 text-muted-foreground">
         {(project?.projectSummary?.done?.length || 0) > 0 ? (
           <div>
             <h4 className="text-sm font-medium">Done</h4>

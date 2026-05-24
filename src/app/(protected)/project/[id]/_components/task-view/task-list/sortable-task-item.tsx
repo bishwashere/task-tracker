@@ -81,7 +81,7 @@ const SortableTaskItem = ({
       )}
     >
       <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
-      <div className="mb-6 p-2 rounded hover:bg-gray-50 border border-gray-200 relative flex-1">
+      <div className="mb-4 p-3 rounded-lg border border-border bg-white shadow-sm hover:shadow-md hover:border-blue-200/50 transition-all duration-150 relative flex-1">
         {role === "admin" && editMode && (
           <AddSubtaskDialog
             taskId={task?.id}
@@ -90,7 +90,7 @@ const SortableTaskItem = ({
           />
         )}
         <div className="flex flex-row items-center gap-1">
-          <h3 className="text-xl font-bold mb-2">{task?.name}</h3>
+          <h3 className="text-xl font-bold mb-1.5">{task?.name}</h3>
           {task?.createdAt && (
             <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
               {isNewTask(task?.createdAt) ? (
@@ -114,7 +114,7 @@ const SortableTaskItem = ({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-2" style={{ display: showSubtasks ? "grid" : "none" }}>
+        <div className="grid grid-cols-1 gap-1.5" style={{ display: showSubtasks ? "grid" : "none" }}>
           {task?.subtasks
             // sort by sortIndex
             .sort(

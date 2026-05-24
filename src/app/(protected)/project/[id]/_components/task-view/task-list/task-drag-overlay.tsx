@@ -46,7 +46,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, index, isDragging }) => {
     <div className="flex items-start gap-1">
       <span className="text-lg font-bold text-gray-500">{index + 1}.</span>
       <div
-        className={`mb-6 p-2 rounded hover:bg-gray-50 border border-gray-200 relative flex-1 ${isDragging ? "border-blue-500 shadow-lg" : ""}`}
+        className={`mb-4 p-3 rounded-lg border border-border bg-white shadow-md relative flex-1 ${isDragging ? "ring-2 ring-blue-400/40 border-blue-300" : ""}`}
       >
         <div className="flex flex-row items-center gap-1">
           <h3 className="text-xl font-bold mb-2">{task?.name}</h3>

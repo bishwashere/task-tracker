@@ -75,11 +75,11 @@ export const SubTaskContent = ({
     <div
       key={subtask.id}
       className={cn(
-        `p-2 rounded shadow-md flex justify-between items-center`,
+        "px-2.5 py-1.5 rounded-md border shadow-sm flex justify-between items-center transition-colors duration-150",
         subtask.status === "done"
-          ? "bg-green-200 text-green-700 hover:bg-green-300"
-          : "bg-white hover:bg-gray-100",
-        isDragging && "border-blue-500 shadow-lg",
+          ? "bg-green-50 border-green-200/80 text-green-800 hover:bg-green-100"
+          : "bg-white border-border hover:bg-muted/40",
+        isDragging && "ring-2 ring-blue-400/40 border-blue-300 shadow-md",
       )}
     >
       <div>

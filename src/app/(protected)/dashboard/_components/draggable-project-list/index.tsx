@@ -113,7 +113,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Projects List */}
       <DndContext
         sensors={sensors}
@@ -125,7 +125,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
           items={projects.map((p) => p.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="space-y-4">
+          <div className="space-y-3">
             {projects
               .sort(
                 (a, b) =>

@@ -80,7 +80,7 @@ const Dashboard = () => {
         {/* Sample Organization */}
         {!selectedOrg && !isOnboardingOpen && (
           <div
-            className="bg-white p-6 rounded shadow-md border-l-4 border-blue-500 cursor-pointer"
+            className="bg-white p-4 rounded-lg border border-border shadow-sm border-l-[3px] border-l-blue-500 cursor-pointer hover:shadow-md transition-shadow duration-150"
             onClick={openAddOrganizationModal}
           >
             <div className="flex justify-between items-center mb-4">
