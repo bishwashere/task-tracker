@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useGetActiveSprint } from "@/queries/sprint/hooks";
-import { differenceInCalendarDays, startOfDay } from "date-fns";
+import { differenceInCalendarDays, format, startOfDay } from "date-fns";
 import { Loader2, Play } from "lucide-react";
 import { cn } from "@/lib/cn";
 import StartSprintDialog from "./dialogs/start-sprint-dialog";
@@ -12,6 +12,16 @@ import { formatSprintName } from "@/lib/sprint";
 type Props = {
   projectId: string;
 };
+
+function formatSprintDateRange(startDate: Date, endDate: Date) {
+  const start = format(startDate, "MMM d");
+  const end =
+    startDate.getFullYear() === endDate.getFullYear()
+      ? format(endDate, "MMM d")
+      : format(endDate, "MMM d, yyyy");
+
+  return `${start} - ${end}`;
+}
 
 function getEndsInLabel(endDate: Date) {
   const daysLeft = differenceInCalendarDays(startOfDay(endDate), startOfDay(new Date()));
@@ -41,9 +51,10 @@ const SprintControl = ({ projectId }: Props) => {
 
   if (sprint) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-right text-sm leading-snug max-w-[220px]">
-        <p className="font-semibold text-green-700 truncate">
-          Active Sprint : {formatSprintName(sprint.name)}
+      <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-right text-sm leading-snug max-w-[320px]">
+        <p className="font-semibold text-green-700">
+          Active Sprint : {formatSprintName(sprint.name)} (
+          {formatSprintDateRange(new Date(sprint.startDate), new Date(sprint.endDate))})
         </p>
         <p className="text-muted-foreground text-xs">{getEndsInLabel(new Date(sprint.endDate))}</p>
       </div>
