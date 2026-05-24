@@ -20,7 +20,7 @@ export const ProjectHeader = ({
 }) => {
   const { selectedOrg } = useDashboardContext()
   return (
-    <div className="flex justify-between items-center mb-5 flex-col sm:flex-row">
+    <div className="relative z-50 flex justify-between items-center mb-5 flex-col sm:flex-row">
       <div>
         <h1 className="text-2xl font-bold">{projectName}: Task List</h1>
       </div>

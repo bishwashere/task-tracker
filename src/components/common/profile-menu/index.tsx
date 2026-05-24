@@ -56,7 +56,7 @@ const ProfileMenu = ({
   }
 
   return (
-    <div className="relative mt-2 w-fit" ref={menuRef}>
+    <div className="relative z-50 mt-2 w-fit" ref={menuRef}>
       <div className="flex items-center justify-center gap-2 mb-2">
         <SubscriptionStatus />
         {/* Edit Organizations */}
@@ -67,7 +67,7 @@ const ProfileMenu = ({
       </div>
       {isOpen && (
         <div
-          className="absolute right-0 min-w-48 bg-white rounded-lg py-2 w-fit"
+          className="absolute right-0 z-50 min-w-48 bg-white rounded-lg py-2 w-fit shadow-lg"
           style={{ boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px" }}
         >
           <div className="px-3 p-2  flex gap-2.5">
