@@ -12,6 +12,7 @@ import { Dialog, DialogContent } from "../ui/dialog";
 import PLANS from "@/constants/plans";
 import PricingCards from "./pricing-cards";
 import { createCustomerPortal, createStripeSession } from "@/actions/payment";
+import logOut from "@/queries/auth/action";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -119,6 +120,15 @@ const SubscriptionStatus = () => {
                     Continue with Free Trial!
                   </button>
                 )}
+              {isBlocking && (
+                <Button
+                  variant="outline"
+                  onClick={() => logOut()}
+                  className="w-full"
+                >
+                  Log out
+                </Button>
+              )}
             </>
           ) : (
             <div className="py-6 space-y-4 sm:space-y-8 max-w-5xl mx-auto pb-4 sm:pb-16">
@@ -239,6 +249,15 @@ const SubscriptionStatus = () => {
                         Renew
                       </Button>
                     )}
+                  {isBlocking && (
+                    <Button
+                      variant="outline"
+                      onClick={() => logOut()}
+                      className="w-full sm:w-auto"
+                    >
+                      Log out
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             </div>
