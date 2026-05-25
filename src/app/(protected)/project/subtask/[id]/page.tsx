@@ -4,8 +4,8 @@ import ProfileMenu from "@/components/common/profile-menu";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/cn";
-import { resolveComment } from "@/queries/subtask/action";
-import { useFetchSubtaskData, useResolveComment, useSaveComment } from "@/queries/subtask/hooks";
+import { confirm } from "@/components/ui/alert-dialog";
+import { useFetchSubtaskData, useResolveComment, useSaveComment, useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
 import { getProjectTasksPath } from "@/lib/project-slug";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -21,6 +21,7 @@ const Subtask = () => {
   const save = useSaveComment()
   const [commentType, setCommentType] = useState("comment");
   const r = useResolveComment()
+  const closeSubtask = useUpdateSubtaskStatus()
 
   const onSubmit = async (issue: boolean) => {
 
@@ -40,6 +41,33 @@ const Subtask = () => {
       })
       setComment("");
     } catch { }
+  };
+
+  const onCloseSubtask = async () => {
+    if (!subtask.comments?.length) {
+      toast.error("Add a comment before closing this subtask.");
+      return;
+    }
+
+    const shouldClose = await confirm({
+      title: "Close subtask?",
+      description: "This will mark the subtask as done.",
+      confirm: "Close",
+    });
+
+    if (!shouldClose) return;
+
+    try {
+      await closeSubtask.mutateAsync({
+        subtaskId: id,
+        status: "done",
+        projectId: subtask.task.project.id,
+        taskId: subtask.task.id,
+      });
+      toast.success("Subtask closed.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not close subtask.");
+    }
   };
 
   if (isLoading && !subtask)
@@ -75,7 +103,19 @@ const Subtask = () => {
         </div>
 
         <div className="bg-gray-100 p-6 rounded shadow-md">
-          <h2 className="text-2xl font-bold mb-4">{subtask.name}</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-4">
+            <h2 className="text-2xl font-bold">{subtask.name}</h2>
+            {subtask.role !== "admin" && subtask.status !== "done" && (
+              <Button
+                variant="blue"
+                loading={closeSubtask.isPending}
+                disabled={closeSubtask.isPending}
+                onClick={onCloseSubtask}
+              >
+                Close
+              </Button>
+            )}
+          </div>
           <p className="text-sm text-gray-600 mb-2">
             Task: <span className="font-semibold">{subtask.task?.name}</span>
           </p>

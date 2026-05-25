@@ -22,6 +22,8 @@ export const SubTaskContent = ({
 }: SubTaskContentProps) => {
   const router = useRouter();
   const { role, editMode, projectId } = useProjectContext()
+  const isAdmin = role.toLowerCase() === "admin";
+  const showSubtaskActions = editMode || (role.length > 0 && !isAdmin);
   const del = useDeleteSubtask()
   const dueRemaining = (dueDate: Date) => {
     const currentDate = new Date();
@@ -103,7 +105,7 @@ export const SubTaskContent = ({
               {subtask.issueCount}
             </span>
           )}
-          {role.toLowerCase() === "admin" && editMode && (
+          {isAdmin && editMode && (
             <EditSubtaskDialog
               projectId={projectId}
               taskId={taskId}
@@ -116,7 +118,7 @@ export const SubTaskContent = ({
               }}
             />
           )}
-          {role.toLowerCase() === "admin" && editMode && (
+          {isAdmin && editMode && (
             <button className="px-1 w-4" onClick={onDelete}>
               <MdDelete className="text-red-600 " />
             </button>
@@ -159,7 +161,7 @@ export const SubTaskContent = ({
           )}
         </div>
       </div>
-      {editMode && (
+      {showSubtaskActions && (
         <div className="flex items-center gap-2">
           {subtask.tagName ? (
             <span
@@ -195,7 +197,7 @@ export const SubTaskContent = ({
           >
             <Star className={cn("size-4", subtask.priority && "fill-current")} />
           </button>
-          {subtask.status !== "done" && (
+          {isAdmin && subtask.status !== "done" && (
             <button
               onClick={() => update.mutate({ subtaskId: subtask.id, status: "done", projectId, taskId })}
               className="p-1.5 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-75"

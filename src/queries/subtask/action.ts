@@ -261,6 +261,7 @@ export const updateSubtaskStatus = async ({
       include: {
         task: {
           select: {
+            id: true,
             project: {
               select: {
                 organization: {
@@ -320,6 +321,12 @@ export const updateSubtaskStatus = async ({
       return {
         success: false,
         message: "Forbidden: You do not have permission to update this subtask",
+      };
+    }
+    if (!isAdmin && status === "done" && subtask.comments.length === 0) {
+      return {
+        success: false,
+        message: "Add a comment before closing this subtask.",
       };
     }
     await prisma.pointsEarned.create({
@@ -433,6 +440,7 @@ export const fetchSubtaskData = async (subtaskId: string) => {
       include: {
         task: {
           select: {
+            id: true,
             project: {
               select: {
                 organization: {
@@ -505,7 +513,10 @@ export const fetchSubtaskData = async (subtaskId: string) => {
 
     return {
       success: true,
-      subtask,
+      subtask: {
+        ...subtask,
+        role: effective.role,
+      },
       comments: subtask.comments,
     };
   } catch (error) {

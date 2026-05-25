@@ -319,9 +319,10 @@ export const useUpdateSubtaskStatus = () => {
             | undefined
         ) => {
           old = oldData;
+          if (!oldData) return oldData;
           return {
             ...oldData,
-            tasks: oldData?.tasks.map((task) => {
+            tasks: oldData.tasks.map((task) => {
               if (task.id === props.taskId) {
                 return {
                   ...task,
@@ -345,12 +346,16 @@ export const useUpdateSubtaskStatus = () => {
       const res = await updateSubtaskStatus(props);
 
       if (res.success) {
+        await queryClient.invalidateQueries({
+          queryKey: ["subtask", props.subtaskId],
+        });
         return res.message;
       } else {
         throw new Error(res.message);
       }
     },
     onError: () => {
+      if (!old) return;
       queryClient.setQueryData(
         ["project", old.id],
         (

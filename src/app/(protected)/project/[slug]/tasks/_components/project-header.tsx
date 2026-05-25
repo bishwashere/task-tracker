@@ -19,6 +19,7 @@ export const ProjectHeader = ({
   onEditButtonClick?: () => void;
 }) => {
   const { role, projectData } = useProjectContext()
+  const isAdmin = role.toLowerCase() === "admin";
   return (
     <div className="relative z-50 flex justify-between items-center mb-5 flex-col sm:flex-row">
       <div>
@@ -36,8 +37,8 @@ export const ProjectHeader = ({
         )}
         <ProfileMenu
           showSettings={false}
-          onEditButtonClick={onEditButtonClick}
-          showInsightsOption={role === "admin"}
+          onEditButtonClick={isAdmin ? onEditButtonClick : undefined}
+          showInsightsOption={isAdmin}
           organizationId={projectData?.project?.organizationId}
         />
       </div>
