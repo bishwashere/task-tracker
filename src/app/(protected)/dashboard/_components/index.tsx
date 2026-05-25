@@ -12,7 +12,7 @@ import GuidedProjectModal from "./guided-project/guided-project-modal";
 import GuidedOrganizationModal from "./guided-organization/guided-organization-modal";
 import OnboardingModal from "./onboarding-modal";
 import { useListUserProjectByOrganizationId } from "@/queries/project/hooks";
-import { Plus, Play } from "lucide-react";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const Dashboard = () => {
@@ -98,20 +98,29 @@ const Dashboard = () => {
 
         {selectedOrg && !isOnboardingOpen && (
           <div className="flex items-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={() => setActiveSprintOnly((prev) => !prev)}
-              className={cn(
-                "rounded-md border py-1 px-2 text-sm font-medium inline-flex items-center gap-1.5 transition-colors",
-                activeSprintOnly
-                  ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
-                  : "bg-white border-border text-muted-foreground hover:bg-muted/40",
-              )}
-              aria-pressed={activeSprintOnly}
-            >
-              <Play className={cn("size-4", activeSprintOnly && "fill-current")} aria-hidden />
-              Active Sprint
-            </button>
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={activeSprintOnly}
+                onClick={() => setActiveSprintOnly((prev) => !prev)}
+                className={cn(
+                  "relative inline-flex h-[26px] w-[46px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400",
+                  activeSprintOnly ? "bg-green-500" : "bg-zinc-300",
+                )}
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    "pointer-events-none inline-block h-[22px] w-[22px] transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out",
+                    activeSprintOnly ? "translate-x-5" : "translate-x-0",
+                  )}
+                />
+              </button>
+              <span className={cn("text-sm font-medium", activeSprintOnly ? "text-green-700" : "text-muted-foreground")}>
+                Active Sprint
+              </span>
+            </label>
 
             {appRole === "admin" && (
               <>
