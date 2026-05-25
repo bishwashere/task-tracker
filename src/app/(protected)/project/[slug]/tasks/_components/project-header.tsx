@@ -22,7 +22,7 @@ export const ProjectHeader = ({
   const isAdmin = role.toLowerCase() === "admin";
   return (
     <div className="relative z-50 flex justify-between items-center mb-5 flex-col sm:flex-row">
-      <div>
+      <div className="hidden sm:block">
         <h1 className="text-2xl font-bold">{projectName}: Task List</h1>
       </div>
       <div className="flex flex-row justify-center items-center gap-5">
