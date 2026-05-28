@@ -14,6 +14,7 @@ import OnboardingModal from "./onboarding-modal";
 import { useListUserProjectByOrganizationId } from "@/queries/project/hooks";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { isOnboardingDismissedForSession } from "@/lib/onboarding-session";
 
 const Dashboard = () => {
   const { selectedOrg, guidedMode } = useDashboardContext();
@@ -34,7 +35,12 @@ const Dashboard = () => {
   // Check if onboarding should be shown
   useEffect(() => {
     if (org.isLoading) return;
-    
+
+    if (isOnboardingDismissedForSession()) {
+      setIsOnboardingOpen(false);
+      return;
+    }
+
     // Show onboarding if no organizations exist
     const hasNoOrganizations = !org.data || org.data.length === 0;
     

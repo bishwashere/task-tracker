@@ -16,6 +16,7 @@ import { AddProjectProps } from '@/queries/project/action';
 import { useCreateOrganization, useListUserOrganizations } from '@/queries/organizations/hooks';
 import { CreateOrganizationProps } from '@/queries/organizations/action';
 import { signOut } from "next-auth/react";
+import { dismissOnboardingForSession } from "@/lib/onboarding-session";
 
 type Props = {
     isOpen: boolean;
@@ -290,14 +291,23 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
         await signOut();
     };
 
+    const handleDismiss = () => {
+        dismissOnboardingForSession();
+        onOpenChange(false);
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        if (!open) handleDismiss();
+    };
+
     const currentQuestion = getCurrentQuestion();
     const isRequiredField = currentQuestion.name === 'name' || currentQuestion.name === 'projectName';
 
     return (
-        <Dialog open={isOpen} onOpenChange={() => {}}>
-            <DialogContent className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10 max-h-[90vh] overflow-y-auto [&>button]:hidden">
-                <DialogHeader className="relative">
-                    <DialogTitle className="text-2xl mb-2">
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+            <DialogContent className="w-[100%] md:w-[80%] xl:w-[50%] px-10 py-10 max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="relative pr-28">
+                    <DialogTitle className="text-2xl mb-2 pr-4">
                         {getTitle()}
                     </DialogTitle>
                     {currentPhase === 'organization' && !orgSubmitted && (
@@ -310,14 +320,23 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                             Step {projectStep + 1} of {projectFormData.length} - Project Setup
                         </p>
                     )}
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleLogout}
-                        className="absolute right-0 top-0 bg-red-500 text-white hover:bg-red-600 border-red-500"
-                    >
-                        Logout
-                    </Button>
+                    <div className="absolute right-0 top-0 flex gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleDismiss}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleLogout}
+                            className="bg-red-500 text-white hover:bg-red-600 border-red-500"
+                        >
+                            Logout
+                        </Button>
+                    </div>
                 </DialogHeader>
 
                 {!isSubmitted ? (

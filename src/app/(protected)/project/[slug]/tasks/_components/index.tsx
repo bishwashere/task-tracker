@@ -15,6 +15,7 @@ import Loading from "@/components/ui/loading";
 import Link from "next/link";
 import SprintControl from "./sprint-control";
 import SprintProgress from "./sprint-progress";
+import { EditModeHint } from "./edit-mode-hint";
 
 const Project = () => {
   const {
@@ -53,6 +54,13 @@ const Project = () => {
     );
   }
 
+  const isAdmin = data.role?.toLowerCase() === "admin";
+  const hasNoTasksInProject = !data.tasks?.length;
+  const hasNoFilteredTasks = !filteredTasks?.length;
+  const showAddTaskControl = isAdmin && editMode;
+  const aiSuggestionsVisible =
+    ai.isPending || mockLoading || (ai.data?.length ?? 0) > 0;
+
   return (
       <>
         <SuperHeader path="/dashboard" label={`${data.project?.name}: Task List`} />
@@ -76,9 +84,14 @@ const Project = () => {
             }
           />
 
+          {isAdmin && !editMode && !hasNoTasksInProject && (
+            <EditModeHint variant="compact" />
+          )}
+
           <div className="flex justify-end">
-            {data.role?.toLowerCase() === "admin" && editMode && (
+            {showAddTaskControl && (
               <button
+                type="button"
                 className="text-blue-500 font-semibold cursor-pointer flex flex-row items-center gap-2"
                 onClick={() => setAddTaskModalOpen(true)}
               >
@@ -102,7 +115,23 @@ const Project = () => {
             }}
           />
 
-          {!isProjectLoading && filteredTasks?.length === 0 ? (
+          {!isProjectLoading && hasNoTasksInProject ? (
+            isAdmin ? (
+              <EditModeHint
+                variant="steps"
+                showAiHint={aiSuggestionsVisible}
+                onEnableEdit={() => setEditMode(true)}
+              />
+            ) : (
+              <div className="mt-10 flex flex-col items-center justify-center gap-2 text-center max-w-lg mx-auto px-4">
+                <p className="text-lg font-semibold text-gray-900">No tasks yet</p>
+                <p className="text-sm text-muted-foreground">
+                  There are no tasks in this project yet. Your team admin can add
+                  tasks when they are ready.
+                </p>
+              </div>
+            )
+          ) : !isProjectLoading && hasNoFilteredTasks ? (
             <div className="mt-10 flex flex-row items-center justify-center gap-1">
               <p>No task found.</p>
             </div>
