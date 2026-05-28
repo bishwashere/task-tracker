@@ -30,14 +30,19 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
     <>
       {selectedOrg && visibleProjects.length ? (
         <DashboardDraggableProjectList
-          projects={visibleProjects.map((p) => ({
-            ...p,
-            projectSummary:
+          projects={visibleProjects.map((p) => {
+            const useSprintScope =
               activeSprintOnly &&
-              (isAdmin ? p.hasActiveSprint : p.isInActiveSprint)
+              (isAdmin ? p.hasActiveSprint : p.isInActiveSprint);
+
+            return {
+              ...p,
+              tasksCount: useSprintScope ? p.sprintSubtasksCount : p.tasksCount,
+              projectSummary: useSprintScope
                 ? { done: p.sprintDone, pending: p.sprintPending }
                 : p.projectSummary[0] ?? null,
-          }))}
+            };
+          })}
         />
       ) : (
         <div className="h-48 flex flex-col items-center justify-center gap-2 text-muted-foreground">

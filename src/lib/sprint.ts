@@ -164,3 +164,28 @@ export function buildSprintDonePending(
 
   return { done, pending };
 }
+
+/** Subtasks on sprint tasks (optional assignee filter for members). */
+export function countSprintSubtasks(
+  tasks: SprintSummaryTask[],
+  sprintTaskIds: string[],
+  assignedUserId?: string,
+) {
+  if (sprintTaskIds.length === 0) return 0;
+
+  const sprintTaskIdSet = new Set(sprintTaskIds);
+  let count = 0;
+
+  for (const task of tasks) {
+    if (!sprintTaskIdSet.has(task.id)) continue;
+
+    for (const subtask of task.subtasks) {
+      if (assignedUserId && subtask.assignedUserId !== assignedUserId) {
+        continue;
+      }
+      count++;
+    }
+  }
+
+  return count;
+}
