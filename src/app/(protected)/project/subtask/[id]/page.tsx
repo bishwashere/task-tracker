@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/cn";
 import { confirm } from "@/components/ui/alert-dialog";
-import { useFetchSubtaskData, useResolveComment, useSaveComment, useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
+import { useEditComment, useFetchSubtaskData, useResolveComment, useSaveComment, useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
 import { getProjectTasksPath } from "@/lib/project-slug";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -17,11 +17,44 @@ const Subtask = () => {
     id: string
   }
   const [comment, setComment] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
   const { data: subtask, isLoading } = useFetchSubtaskData(id)
   const save = useSaveComment()
+  const editCommentMutation = useEditComment()
   const [commentType, setCommentType] = useState("comment");
   const r = useResolveComment()
   const closeSubtask = useUpdateSubtaskStatus()
+
+  const startEditing = (commentId: string, text: string) => {
+    setEditingCommentId(commentId);
+    setEditText(text);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditText("");
+  };
+
+  const onSaveEdit = async (commentId: string) => {
+    if (!editText.trim()) {
+      toast.error("Comment cannot be empty");
+      return;
+    }
+
+    try {
+      await editCommentMutation.mutateAsync({
+        commentId,
+        subtaskId: id,
+        projectId: subtask.task.project.id,
+        userComment: editText,
+      });
+      cancelEditing();
+      toast.success("Comment updated.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update comment.");
+    }
+  };
 
   const onSubmit = async (issue: boolean) => {
 
@@ -188,18 +221,19 @@ const Subtask = () => {
                   return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                 })
                 .
-                map((c: any, _id: any) => {
+                map((c: any) => {
+                  const isEditing = editingCommentId === c.id;
+
                   return (
                     <li
-                      key={_id}
+                      key={c.id}
                       className={cn(
-                        "border-b pb-2 border-gray-200 flex justify-between",
+                        "border-b pb-2 border-gray-200 flex justify-between gap-4",
                         c.commentType === "issue" ? "text-red-500" : "",
                       )}
                     >
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <p className="font-medium">
-                          {" "}
                           {c.user.name}{" "}
                           {c.commentType === "issue" && (
                             <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-500">
@@ -207,15 +241,55 @@ const Subtask = () => {
                             </span>
                           )}
                         </p>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">
-                          {c.comment}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {new Date(c.createdAt).toLocaleString()}
-                        </p>
+                        {isEditing ? (
+                          <div className="mt-2 space-y-2">
+                            <textarea
+                              className="border p-2 w-full rounded min-h-20 resize-y text-gray-900"
+                              rows={3}
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                variant="blue"
+                                size="sm"
+                                loading={editCommentMutation.isPending}
+                                disabled={editCommentMutation.isPending}
+                                onClick={() => onSaveEdit(c.id)}
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={editCommentMutation.isPending}
+                                onClick={cancelEditing}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">
+                              {c.comment}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(c.createdAt).toLocaleString()}
+                            </p>
+                          </>
+                        )}
                       </div>
-                      {/* badge */}
-                      <div className="flex gap-2 items-center justify-center flex-col">
+                      <div className="flex gap-2 items-start shrink-0 flex-col">
+                        {subtask.canManageComments && !isEditing && (
+                          <button
+                            type="button"
+                            onClick={() => startEditing(c.id, c.comment)}
+                            className="px-2 py-1 text-sm bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100"
+                          >
+                            Edit
+                          </button>
+                        )}
                         {c.commentType === "issue" &&
                           (!c.resolved ? (
                             <button
@@ -229,13 +303,11 @@ const Subtask = () => {
                               Resolve
                             </button>
                           ) : (
-                            //badge
                             <span className="px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded-md">
                               Resolved
                             </span>
                           ))}
                       </div>
-                      {/* resolve button */}
                     </li>
                   );
                 })

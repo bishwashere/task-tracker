@@ -511,11 +511,14 @@ export const fetchSubtaskData = async (subtaskId: string) => {
       };
     }
 
+    const canManageComments = isAdmin || isAssignedUser;
+
     return {
       success: true,
       subtask: {
         ...subtask,
         role: effective.role,
+        canManageComments,
       },
       comments: subtask.comments,
     };
@@ -607,6 +610,94 @@ export const saveComment = async ({
     return { success: true, message: "Success", comment };
   } catch (error) {
     console.error("Error while commenting", error);
+    return { success: false, message: "An error occurred." };
+  }
+};
+
+export type EditCommentProps = {
+  commentId: string;
+  subtaskId: string;
+  projectId: string;
+  userComment: string;
+};
+
+export const editComment = async ({
+  commentId,
+  subtaskId,
+  projectId,
+  userComment,
+}: EditCommentProps) => {
+  const user = await auth();
+  if (!user || !user.user || !user.user.id) {
+    return { success: false, message: "Unauthorized !" };
+  }
+
+  const trimmed = userComment.trim();
+  if (!trimmed) {
+    return { success: false, message: "Comment cannot be empty" };
+  }
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { organization: { include: { members: true } } },
+    });
+    if (!project) {
+      return { success: false, message: "Project not found" };
+    }
+
+    const effective = await getEffectiveUser(project.organizationId);
+    if ("error" in effective) {
+      return { success: false, message: effective.error };
+    }
+
+    const userId = effective.effectiveUserId;
+
+    const userOrg = project.organization.members.find(
+      (member) => member.userId === userId
+    );
+    if (!userOrg) {
+      return { success: false, message: "Permission denied" };
+    }
+
+    const existingComment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: {
+        subtaskId: true,
+        subtask: { select: { assignedUserId: true } },
+      },
+    });
+
+    if (!existingComment || existingComment.subtaskId !== subtaskId) {
+      return { success: false, message: "Comment not found" };
+    }
+
+    if (!effective.isAdmin && existingComment.subtask.assignedUserId !== userId) {
+      return { success: false, message: "Permission denied" };
+    }
+
+    const comment = await prisma.comment.update({
+      where: { id: commentId },
+      data: { comment: trimmed },
+      select: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+        commentType: true,
+        resolved: true,
+        id: true,
+      },
+    });
+
+    return { success: true, message: "Success", comment };
+  } catch (error) {
+    console.error("Error while editing comment", error);
     return { success: false, message: "An error occurred." };
   }
 };

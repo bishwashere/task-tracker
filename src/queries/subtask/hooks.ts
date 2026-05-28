@@ -10,6 +10,8 @@ import {
   editSubTask,
   EditSubTaskProps,
   fetchSubtaskData,
+  editComment,
+  EditCommentProps,
   resolveComment,
   saveComment,
   SaveCommentProps,
@@ -507,6 +509,25 @@ export const useResolveComment = () => {
       } else {
         return [];
       }
+    },
+  });
+};
+
+export const useEditComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (props: EditCommentProps) => {
+      const res = await editComment(props);
+      if (res.success) {
+        await queryClient.invalidateQueries({
+          queryKey: ["subtask", props.subtaskId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["project", props.projectId],
+        });
+        return res.comment as any;
+      }
+      throw new Error(res.message ?? "Could not update comment");
     },
   });
 };
