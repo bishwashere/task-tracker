@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { getEffectiveUser } from "@/lib/effective-user";
+import { getEffectiveUser, getProjectAccessContext } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 
 export type SaveSubtaskProps = {
@@ -138,33 +138,15 @@ export const editSubTask = async ({
   points,
   assignedUserId,
 }: EditSubTaskProps) => {
-  const user = await auth();
-  if (!user || !user.user || !user.user.id) {
-    return { success: false, message: "Unauthorized !" };
-  }
-  const userId = user.user.id;
-
   try {
-    // Fetch project and organization
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: { organization: { include: { members: true } } },
-    });
-
-    if (!project) {
-      return { success: false, message: "Project not found" };
+    const access = await getProjectAccessContext(projectId);
+    if ("error" in access) {
+      return { success: false, message: access.error };
+    }
+    if (!access.isAdmin) {
+      return { success: false, message: "Only admins can edit subtasks." };
     }
 
-    // Check if the user is an admin in the organization
-    const userOrg = project.organization.members.find(
-      (member) => member.userId === userId
-    );
-
-    if (!userOrg || userOrg.role !== "ADMIN") {
-      return { success: false, message: "Permission denied" };
-    }
-
-    // Create a new task
     const subTask = await prisma.subtask.update({
       where: { id: subTaskId },
       data: {

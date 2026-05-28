@@ -192,6 +192,9 @@ export const useEditSubtask = () => {
         throw new Error(res.message);
       }
     },
+    onSuccess: (_message, props) => {
+      queryClient.invalidateQueries({ queryKey: ["subtask", props.subTaskId] });
+    },
     onError: () => {
       queryClient.setQueryData(
         ["project", old.id],

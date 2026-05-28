@@ -1,5 +1,5 @@
 import { useGetProjectById } from "@/queries/project/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,16 +14,20 @@ const EditSubtaskDialog = ({
   projectId,
   defaultValue,
   taskId,
+  trigger,
+  canEdit,
 }: {
   subtaskId: string;
   projectId: string;
   taskId: string;
+  canEdit: boolean;
   defaultValue: {
     subtaskName: string;
     dueDate: string;
     points: number;
     assignedUserId: string;
-  }
+  };
+  trigger?: ReactNode;
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -62,15 +66,19 @@ const EditSubtaskDialog = ({
     } catch { }
   };
 
+  if (!canEdit) return null;
+
   return (
     <Dialog
       open={modalIsOpen}
       onOpenChange={setModalIsOpen}
     >
       <DialogTrigger asChild>
-        <button className="p-1" onClick={() => setModalIsOpen(true)}>
-          <BiEditAlt className="text-red-600" />
-        </button>
+        {trigger ?? (
+          <button type="button" className="p-1" aria-label="Edit subtask">
+            <BiEditAlt className="text-red-600" />
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent
         className="w-[100%] md:w-96 px-10 py-10"
@@ -78,7 +86,7 @@ const EditSubtaskDialog = ({
       >
 
         <div className="w-full flex">
-          <h3 className="text-2xl font-semibold">Add Subtask</h3>
+          <h3 className="text-2xl font-semibold">Edit Subtask</h3>
         </div>
         {/* <hr className='border border-gray-300 my-6' /> */}
         <form className="mt-8" onSubmit={onSubmit}>

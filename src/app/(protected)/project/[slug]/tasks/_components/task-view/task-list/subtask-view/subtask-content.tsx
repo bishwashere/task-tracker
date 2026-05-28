@@ -107,6 +107,7 @@ export const SubTaskContent = ({
           )}
           {isAdmin && editMode && (
             <EditSubtaskDialog
+              canEdit={isAdmin && editMode}
               projectId={projectId}
               taskId={taskId}
               subtaskId={subtask.id}

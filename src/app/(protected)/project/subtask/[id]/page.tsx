@@ -6,6 +6,7 @@ import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/cn";
 import { confirm } from "@/components/ui/alert-dialog";
 import { useEditComment, useFetchSubtaskData, useResolveComment, useSaveComment, useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
+import EditSubtaskDialog from "@/app/(protected)/project/[slug]/tasks/_components/task-view/task-list/subtask-view/edit-subtask-dialog";
 import { getProjectTasksPath } from "@/lib/project-slug";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -138,16 +139,39 @@ const Subtask = () => {
         <div className="bg-gray-100 p-6 rounded shadow-md">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-4">
             <h2 className="text-2xl font-bold">{subtask.name}</h2>
-            {subtask.role !== "admin" && subtask.status !== "done" && (
-              <Button
-                variant="blue"
-                loading={closeSubtask.isPending}
-                disabled={closeSubtask.isPending}
-                onClick={onCloseSubtask}
-              >
-                Close
-              </Button>
-            )}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              {subtask.role === "admin" && (
+                <EditSubtaskDialog
+                  canEdit={subtask.role === "admin"}
+                  projectId={subtask.task.project.id}
+                  taskId={subtask.task.id}
+                  subtaskId={subtask.id}
+                  defaultValue={{
+                    subtaskName: subtask.name,
+                    dueDate: subtask.dueDate
+                      ? new Date(subtask.dueDate).toISOString().split("T")[0]
+                      : "",
+                    points: subtask.points,
+                    assignedUserId: subtask.assignedUserId || "",
+                  }}
+                  trigger={
+                    <Button type="button" variant="outline">
+                      Edit
+                    </Button>
+                  }
+                />
+              )}
+              {subtask.role !== "admin" && subtask.status !== "done" && (
+                <Button
+                  variant="blue"
+                  loading={closeSubtask.isPending}
+                  disabled={closeSubtask.isPending}
+                  onClick={onCloseSubtask}
+                >
+                  Close
+                </Button>
+              )}
+            </div>
           </div>
           <p className="text-sm text-gray-600 mb-2">
             Task: <span className="font-semibold">{subtask.task?.name}</span>
