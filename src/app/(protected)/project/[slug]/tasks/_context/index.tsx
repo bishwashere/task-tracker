@@ -104,7 +104,6 @@ export const ProjectContextProvider = ({
   useEffect(() => {
     if (isPending) return;
 
-    const isAdmin = data?.role?.toLowerCase() === "admin";
     const activeSprint = sprintData?.sprint;
 
     const now = new Date();
@@ -221,7 +220,8 @@ export const ProjectContextProvider = ({
 
     let result = filteredByTab.filter((task) => task !== undefined);
 
-    if (!isAdmin && tab === "pending") {
+    // Pending and done: active sprint only. All: entire project.
+    if (tab === "pending" || tab === "done") {
       if (!activeSprint) {
         result = [];
       } else {
