@@ -12,6 +12,11 @@ import {
   userIsInActiveSprint,
 } from "@/lib/sprint";
 import { cleanupStaleEmptyTasks } from "@/queries/tasks/actions";
+import {
+  createActiveSprintForProject,
+  getDefaultInitialSprintConfig,
+  InitialSprintConfig,
+} from "@/queries/sprint/action";
 import { z } from "zod";
 
 async function generateUniqueProjectSlug(name: string) {
@@ -42,6 +47,7 @@ export type AddProjectProps = {
   goal?: string;
   focusArea?: string;
   mainGoal?: string;
+  sprint?: InitialSprintConfig;
 };
 
 // todo non admin are able to add project
@@ -52,6 +58,7 @@ export const addProject = async ({
   goal,
   focusArea,
   mainGoal,
+  sprint,
 }: AddProjectProps) => {
   try {
     const user = await auth();
@@ -103,6 +110,14 @@ export const addProject = async ({
         projectSortIndex: true,
       },
     });
+
+    const sprintConfig =
+      sprint ??
+      getDefaultInitialSprintConfig({
+        primaryGoal: mainGoal || goal,
+      });
+
+    await createActiveSprintForProject(project.id, sprintConfig);
 
     return { success: true, message: "Project added !", project };
   } catch (error) {

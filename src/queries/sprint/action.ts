@@ -2,7 +2,12 @@
 
 import { getProjectAccessContext } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
-import { MAX_ACTIVE_SPRINT_TASKS, SPRINT_TYPE_VALUES } from "@/lib/sprint";
+import {
+  getSprintDefaultName,
+  MAX_ACTIVE_SPRINT_TASKS,
+  SPRINT_TYPE_VALUES,
+  SprintTypeValue,
+} from "@/lib/sprint";
 import { Sprint, SprintType } from "@prisma/client";
 import { z } from "zod";
 
@@ -59,6 +64,57 @@ async function expireSprintIfNeeded(sprint: Sprint): Promise<Sprint | null> {
   });
 
   return null;
+}
+
+export type InitialSprintConfig = {
+  name: string;
+  sprintType: SprintTypeValue;
+  durationDays: 7 | 14 | 30;
+  primaryGoal?: string;
+  targetMetric?: string;
+  taskIds?: string[];
+};
+
+export async function createActiveSprintForProject(
+  projectId: string,
+  config: InitialSprintConfig,
+) {
+  const sprintCount = await prisma.sprint.count({
+    where: { projectId },
+  });
+  const startDate = new Date();
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + config.durationDays);
+
+  return prisma.sprint.create({
+    data: {
+      projectId,
+      name: config.name,
+      sprintType: config.sprintType as SprintType,
+      weekNumber: sprintCount + 1,
+      durationDays: config.durationDays,
+      primaryGoal: config.primaryGoal || null,
+      targetMetric: config.targetMetric || null,
+      taskIds: config.taskIds ?? [],
+      startDate,
+      endDate,
+      status: "ACTIVE",
+    },
+  });
+}
+
+export function getDefaultInitialSprintConfig(options?: {
+  primaryGoal?: string;
+  targetMetric?: string;
+}): InitialSprintConfig {
+  return {
+    name: getSprintDefaultName("LAUNCH", 1),
+    sprintType: "LAUNCH",
+    durationDays: 7,
+    primaryGoal: options?.primaryGoal,
+    targetMetric: options?.targetMetric,
+    taskIds: [],
+  };
 }
 
 export async function autoAssignTaskToActiveSprint(projectId: string, taskId: string) {
@@ -179,27 +235,13 @@ export const startSprint = async (input: StartSprintInput) => {
       }
     }
 
-    const sprintCount = await prisma.sprint.count({
-      where: { projectId: parsed.projectId },
-    });
-    const startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + parsed.durationDays);
-
-    const sprint = await prisma.sprint.create({
-      data: {
-        projectId: parsed.projectId,
-        name: parsed.name,
-        sprintType: parsed.sprintType as SprintType,
-        weekNumber: sprintCount + 1,
-        durationDays: parsed.durationDays,
-        primaryGoal: parsed.primaryGoal || null,
-        targetMetric: parsed.targetMetric || null,
-        taskIds: parsed.taskIds,
-        startDate,
-        endDate,
-        status: "ACTIVE",
-      },
+    const sprint = await createActiveSprintForProject(parsed.projectId, {
+      name: parsed.name,
+      sprintType: parsed.sprintType,
+      durationDays: parsed.durationDays,
+      primaryGoal: parsed.primaryGoal,
+      targetMetric: parsed.targetMetric,
+      taskIds: parsed.taskIds,
     });
 
     return { success: true, sprint, message: "Sprint started!" };

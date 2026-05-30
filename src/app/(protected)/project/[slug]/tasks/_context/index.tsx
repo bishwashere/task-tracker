@@ -132,10 +132,12 @@ export const ProjectContextProvider = ({
       return date.getFullYear() === today.getFullYear();
     };
 
-    const shouldShowEmptyTask = () => {
+    const shouldShowEmptyTask = (taskId: string) => {
       if (filterByDate !== "all") return false;
       if (userFilter !== "all" && userFilter !== "unassigned") return false;
-      return tab === "all";
+      if (tab === "all") return true;
+      if (tab === "pending" && activeSprint?.taskIds.includes(taskId)) return true;
+      return false;
     };
 
     // Apply all filters to tasks
@@ -143,7 +145,7 @@ export const ProjectContextProvider = ({
       if (!task) return task;
 
       const isEmptyTask = task.subtasks.length === 0;
-      if (isEmptyTask && shouldShowEmptyTask()) {
+      if (isEmptyTask && shouldShowEmptyTask(task.id)) {
         return task;
       }
 
@@ -186,7 +188,7 @@ export const ProjectContextProvider = ({
       if (!task) return false;
 
       const isEmptyTask = task.subtasks.length === 0;
-      if (isEmptyTask && shouldShowEmptyTask()) {
+      if (isEmptyTask && shouldShowEmptyTask(task.id)) {
         return true;
       }
 
@@ -196,7 +198,7 @@ export const ProjectContextProvider = ({
     // Apply tab filter (all, pending, done)
     const filteredByTab = filteredTasks?.map(task => {
       const isEmptyTask = task.subtasks.length === 0;
-      if (isEmptyTask && shouldShowEmptyTask()) return task;
+      if (isEmptyTask && shouldShowEmptyTask(task.id)) return task;
 
       if (tab === "all") return task;
       if (tab === "done") return {
@@ -211,7 +213,7 @@ export const ProjectContextProvider = ({
       if (!task) return false;
 
       const isEmptyTask = task.subtasks.length === 0;
-      if (isEmptyTask && shouldShowEmptyTask()) return true;
+      if (isEmptyTask && shouldShowEmptyTask(task.id)) return true;
 
       if (tab === "done" && task.subtasks.length === 0) return false;
       if (tab === "pending" && task.subtasks.length === 0) return false;
