@@ -2,12 +2,7 @@
 
 import { getProjectAccessContext } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
-import {
-  getSprintDefaultName,
-  MAX_ACTIVE_SPRINT_TASKS,
-  SPRINT_TYPE_VALUES,
-  SprintTypeValue,
-} from "@/lib/sprint";
+import { MAX_ACTIVE_SPRINT_TASKS, SPRINT_TYPE_VALUES, SprintTypeValue } from "@/lib/sprint";
 import { Sprint, SprintType } from "@prisma/client";
 import { z } from "zod";
 
@@ -103,19 +98,6 @@ export async function createActiveSprintForProject(
   });
 }
 
-export function getDefaultInitialSprintConfig(options?: {
-  primaryGoal?: string;
-  targetMetric?: string;
-}): InitialSprintConfig {
-  return {
-    name: getSprintDefaultName("LAUNCH", 1),
-    sprintType: "LAUNCH",
-    durationDays: 7,
-    primaryGoal: options?.primaryGoal,
-    targetMetric: options?.targetMetric,
-    taskIds: [],
-  };
-}
 
 export async function autoAssignTaskToActiveSprint(projectId: string, taskId: string) {
   const sprint = await prisma.sprint.findFirst({

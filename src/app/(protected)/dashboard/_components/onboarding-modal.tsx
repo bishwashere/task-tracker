@@ -17,6 +17,12 @@ import { useCreateOrganization, useListUserOrganizations } from '@/queries/organ
 import { CreateOrganizationProps } from '@/queries/organizations/action';
 import { signOut } from "next-auth/react";
 import { dismissOnboardingForSession } from "@/lib/onboarding-session";
+import {
+    createInitialSprintConfig,
+    isSprintConfigValid,
+    ProjectSprintFields,
+} from '@/components/common/project-sprint-fields';
+import { InitialSprintConfig } from '@/queries/sprint/action';
 
 type Props = {
     isOpen: boolean;
@@ -34,6 +40,13 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
     const [orgSubmitted, setOrgSubmitted] = useState(false);
     const [projectSubmitted, setProjectSubmitted] = useState(false);
     const [direction, setDirection] = useState(1);
+    const [sprintConfig, setSprintConfig] = useState<InitialSprintConfig>(
+        createInitialSprintConfig,
+    );
+
+    const projectSprintStepIndex = projectFormData.length;
+    const isProjectSprintStep =
+        currentPhase === 'project' && projectStep === projectSprintStepIndex;
 
     const { selectedOrg, setSelectedOrg } = useDashboardContext();
     const createOrg = useCreateOrganization();
@@ -68,6 +81,7 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                 setProjectSubmitted(false);
                 setOrgFormData(guidedOrganizationQuestions.map(q => ({ ...q, answer: '' })));
                 setProjectFormData(guidedProjectQuestions.map(q => ({ ...q, answer: '' })));
+                setSprintConfig(createInitialSprintConfig());
             }, 2000);
         }
     }, [projectSubmitted, onOpenChange]);
@@ -115,6 +129,10 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
             toast.error("Please create an organization first.");
             return;
         }
+        if (!isSprintConfigValid(sprintConfig)) {
+            toast.error("Complete all required sprint fields.");
+            return;
+        }
 
         const allowedKeys = ['projectName', 'goal', 'focusArea', 'mainGoal'] as const;
         type AllowedKey = typeof allowedKeys[number];
@@ -132,6 +150,12 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
             goal: result.goal,
             focusArea: result.focusArea,
             mainGoal: result.mainGoal,
+            sprint: {
+                ...sprintConfig,
+                name: sprintConfig.name.trim(),
+                primaryGoal: sprintConfig.primaryGoal?.trim() || undefined,
+                targetMetric: sprintConfig.targetMetric?.trim() || undefined,
+            },
         };
 
         try {
@@ -166,6 +190,11 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
 
     const handleProjectNext = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isProjectSprintStep) {
+            submitProject();
+            return;
+        }
+
         const currentItem = projectFormData[projectStep];
         if (currentItem.name === 'projectName' && !currentItem.answer.trim()) {
             toast.error("Project name is required.");
@@ -175,11 +204,18 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
             setDirection(1);
             setProjectStep(projectStep + 1);
         } else {
-            submitProject();
+            setDirection(1);
+            setSprintConfig(createInitialSprintConfig());
+            setProjectStep(projectSprintStepIndex);
         }
     };
 
     const handleProjectBack = () => {
+        if (isProjectSprintStep) {
+            setDirection(-1);
+            setProjectStep(projectFormData.length - 1);
+            return;
+        }
         if (projectStep > 0) {
             setDirection(-1);
             setProjectStep(projectStep - 1);
@@ -193,7 +229,7 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
         if (contentRef.current) {
             setContentHeight(contentRef.current.offsetHeight);
         }
-    }, [orgStep, projectStep, orgFormData, projectFormData, currentPhase]);
+    }, [orgStep, projectStep, orgFormData, projectFormData, currentPhase, sprintConfig, isProjectSprintStep]);
 
     const variants = {
         enter: (dir: number) => ({
@@ -228,9 +264,8 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
     const getCurrentQuestion = () => {
         if (currentPhase === 'organization') {
             return orgFormData[orgStep];
-        } else {
-            return projectFormData[projectStep];
         }
+        return projectFormData[projectStep];
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -278,11 +313,14 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                 submitOrganization();
             }
         } else {
+            if (isProjectSprintStep) return;
             if (projectStep < projectFormData.length - 1) {
                 setDirection(1);
                 setProjectStep(projectStep + 1);
             } else {
-                submitProject();
+                setDirection(1);
+                setSprintConfig(createInitialSprintConfig());
+                setProjectStep(projectSprintStepIndex);
             }
         }
     };
@@ -300,8 +338,10 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
         if (!open) handleDismiss();
     };
 
-    const currentQuestion = getCurrentQuestion();
-    const isRequiredField = currentQuestion.name === 'name' || currentQuestion.name === 'projectName';
+    const currentQuestion = isProjectSprintStep ? null : getCurrentQuestion();
+    const isRequiredField =
+        currentQuestion?.name === 'name' || currentQuestion?.name === 'projectName';
+    const projectTotalSteps = projectFormData.length + 1;
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -317,7 +357,9 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                     )}
                     {currentPhase === 'project' && !projectSubmitted && (
                         <p className="text-sm text-gray-500 mb-4">
-                            Step {projectStep + 1} of {projectFormData.length} - Project Setup
+                            {isProjectSprintStep
+                                ? `Step ${projectTotalSteps} of ${projectTotalSteps} — Start sprint (required)`
+                                : `Step ${projectStep + 1} of ${projectTotalSteps} — Project details`}
                         </p>
                     )}
                     <div className="absolute right-0 top-0 flex gap-2">
@@ -342,12 +384,18 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                 {!isSubmitted ? (
                     <form onSubmit={handleNext}>
                         <div
-                            style={{ height: contentHeight, transition: 'height 0.3s ease' }}
-                            className="relative overflow-hidden"
+                            style={
+                                isProjectSprintStep
+                                    ? undefined
+                                    : { height: contentHeight, transition: "height 0.3s ease" }
+                            }
+                            className={
+                                isProjectSprintStep ? "relative" : "relative overflow-hidden"
+                            }
                         >
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.div
-                                    key={`${currentPhase}-${currentStep}`}
+                                    key={`${currentPhase}-${isProjectSprintStep ? 'sprint' : currentStep}`}
                                     custom={direction}
                                     variants={variants}
                                     initial="enter"
@@ -356,51 +404,70 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                                     transition={{ duration: 0.3 }}
                                     ref={contentRef}
                                 >
-                                    <p className="text-lg mb-4">{currentQuestion.question}</p>
-                                    <input
-                                        type="text"
-                                        placeholder={
-                                            currentQuestion.examples.length
-                                                ? `eg. ${currentQuestion.examples.join(", ")}`
-                                                : 'Your answer here'
-                                        }
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                                        value={currentQuestion.answer}
-                                        onChange={handleChange}
-                                        required={isRequiredField}
-                                        autoFocus
-                                    />
-                                    {currentQuestion.examples.length > 0 && currentQuestion.name !== 'name' && (
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            {currentQuestion.examples.map((example, index) => (
-                                                <button
-                                                    key={index}
-                                                    type="button"
-                                                    onClick={() => handleOptionClick(example)}
-                                                    className={`px-4 py-2 rounded-md border transition-colors ${
-                                                        currentQuestion.answer === example
-                                                            ? 'bg-blue-500 text-white border-blue-500'
-                                                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                                                    }`}
-                                                >
-                                                    {example}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                    {isProjectSprintStep ? (
+                                        <>
+                                            <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm mb-4">
+                                                <p className="font-medium text-green-800">Start Sprint</p>
+                                                <p className="text-green-700 text-xs mt-0.5">
+                                                    Required — your project won&apos;t appear in Sprint View without one.
+                                                </p>
+                                            </div>
+                                            <ProjectSprintFields
+                                                value={sprintConfig}
+                                                onChange={setSprintConfig}
+                                                idPrefix="onboarding-project"
+                                                showPostCreateHint
+                                            />
+                                        </>
+                                    ) : currentQuestion ? (
+                                        <>
+                                            <p className="text-lg mb-4">{currentQuestion.question}</p>
+                                            <input
+                                                type="text"
+                                                placeholder={
+                                                    currentQuestion.examples.length
+                                                        ? `eg. ${currentQuestion.examples.join(", ")}`
+                                                        : 'Your answer here'
+                                                }
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                                                value={currentQuestion.answer}
+                                                onChange={handleChange}
+                                                required={isRequiredField}
+                                                autoFocus
+                                            />
+                                            {currentQuestion.examples.length > 0 && currentQuestion.name !== 'name' && (
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {currentQuestion.examples.map((example, index) => (
+                                                        <button
+                                                            key={index}
+                                                            type="button"
+                                                            onClick={() => handleOptionClick(example)}
+                                                            className={`px-4 py-2 rounded-md border transition-colors ${
+                                                                currentQuestion.answer === example
+                                                                    ? 'bg-blue-500 text-white border-blue-500'
+                                                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                                                            }`}
+                                                        >
+                                                            {example}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : null}
 
                                     <div className="flex justify-between mt-16 gap-2">
                                         <Button
                                             type="button"
                                             variant="outline"
                                             onClick={handleBack}
-                                            disabled={currentStep === 0}
+                                            disabled={currentStep === 0 && !isProjectSprintStep}
                                         >
                                             Back
                                         </Button>
 
                                         <div className="flex gap-2 ml-auto">
-                                            {currentPhase === 'organization' && currentQuestion.name === 'need' && (
+                                            {currentPhase === 'organization' && currentQuestion?.name === 'need' && (
                                                 <Button
                                                     type="button"
                                                     variant="outline"
@@ -413,9 +480,15 @@ export const OnboardingModal = ({ isOpen, onOpenChange }: Props) => {
                                             <Button type="submit" className="min-w-28" disabled={isLoading}>
                                                 {isLoading
                                                     ? "Saving..."
-                                                    : currentStep === currentFormData.length - 1
-                                                    ? "Submit"
-                                                    : "Next"}
+                                                    : isProjectSprintStep
+                                                      ? "Create & Start Sprint"
+                                                      : currentPhase === "organization" &&
+                                                          orgStep === orgFormData.length - 1
+                                                        ? "Submit"
+                                                        : currentPhase === "project" &&
+                                                            projectStep === projectFormData.length - 1
+                                                          ? "Next: Start Sprint"
+                                                          : "Next"}
                                             </Button>
                                         </div>
                                     </div>

@@ -14,7 +14,6 @@ import {
 import { cleanupStaleEmptyTasks } from "@/queries/tasks/actions";
 import {
   createActiveSprintForProject,
-  getDefaultInitialSprintConfig,
   InitialSprintConfig,
 } from "@/queries/sprint/action";
 import { z } from "zod";
@@ -47,7 +46,7 @@ export type AddProjectProps = {
   goal?: string;
   focusArea?: string;
   mainGoal?: string;
-  sprint?: InitialSprintConfig;
+  sprint: InitialSprintConfig;
 };
 
 // todo non admin are able to add project
@@ -85,6 +84,13 @@ export const addProject = async ({
       };
     }
 
+    if (!sprint?.name?.trim() || !sprint.sprintType || !sprint.durationDays) {
+      return {
+        success: false,
+        message: "Sprint configuration is required.",
+      };
+    }
+
     const totalProjects = await prisma.project.count({
       where: { organizationId },
     });
@@ -111,13 +117,12 @@ export const addProject = async ({
       },
     });
 
-    const sprintConfig =
-      sprint ??
-      getDefaultInitialSprintConfig({
-        primaryGoal: mainGoal || goal,
-      });
-
-    await createActiveSprintForProject(project.id, sprintConfig);
+    await createActiveSprintForProject(project.id, {
+      ...sprint,
+      name: sprint.name.trim(),
+      primaryGoal: sprint.primaryGoal?.trim() || undefined,
+      targetMetric: sprint.targetMetric?.trim() || undefined,
+    });
 
     return { success: true, message: "Project added !", project };
   } catch (error) {
