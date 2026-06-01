@@ -208,6 +208,32 @@ export const listAllUserProjectByOrganizationId = async (
       activeSprints.map((sprint) => [sprint.projectId, sprint.taskIds]),
     );
 
+    const projectIdsWithoutActive = projectIds.filter(
+      (id) => !activeSprintTaskIdsByProjectId.has(id),
+    );
+    const completedSprints = projectIdsWithoutActive.length
+      ? await prisma.sprint.findMany({
+          where: {
+            projectId: { in: projectIdsWithoutActive },
+            status: "COMPLETED",
+          },
+          orderBy: { endDate: "desc" },
+          select: { projectId: true, taskIds: true, name: true },
+        })
+      : [];
+    const recentlyEndedSprintByProjectId = new Map<
+      string,
+      { taskIds: string[]; name: string }
+    >();
+    for (const sprint of completedSprints) {
+      if (!recentlyEndedSprintByProjectId.has(sprint.projectId)) {
+        recentlyEndedSprintByProjectId.set(sprint.projectId, {
+          taskIds: sprint.taskIds,
+          name: sprint.name,
+        });
+      }
+    }
+
     const projectWithProgress = projects.map(({ tasks, ...project }) => {
       const sprintTaskIds = activeSprintTaskIdsByProjectId.get(project.id) ?? [];
       const sprintAssigneeFilter = isAdmin ? undefined : effectiveUserId;
@@ -220,6 +246,23 @@ export const listAllUserProjectByOrganizationId = async (
       const sprintSubtasksCount = countSprintSubtasks(
         tasks,
         sprintTaskIds,
+        sprintAssigneeFilter,
+      );
+
+      const recentlyEndedSprint = recentlyEndedSprintByProjectId.get(project.id);
+      const recentlyEndedSprintTaskIds = recentlyEndedSprint?.taskIds ?? [];
+      const {
+        done: recentlyEndedSprintDone,
+        pending: recentlyEndedSprintPending,
+      } = buildSprintDonePending(
+        tasks,
+        recentlyEndedSprintTaskIds,
+        3,
+        sprintAssigneeFilter,
+      );
+      const recentlyEndedSprintSubtasksCount = countSprintSubtasks(
+        tasks,
+        recentlyEndedSprintTaskIds,
         sprintAssigneeFilter,
       );
 
@@ -236,6 +279,16 @@ export const listAllUserProjectByOrganizationId = async (
         ),
         sprintDone,
         sprintPending,
+        hasRecentlyEndedSprint: recentlyEndedSprintByProjectId.has(project.id),
+        isInRecentlyEndedSprint: userIsInActiveSprint(
+          tasks,
+          recentlyEndedSprintTaskIds,
+          effectiveUserId,
+        ),
+        recentlyEndedSprintName: recentlyEndedSprint?.name ?? null,
+        recentlyEndedSprintDone,
+        recentlyEndedSprintPending,
+        recentlyEndedSprintSubtasksCount,
       };
     });
 
