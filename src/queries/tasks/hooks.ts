@@ -10,7 +10,10 @@ import {
 } from "./actions";
 import { Project, Task } from "@prisma/client";
 
-export const useGetAISuggestedTasks = (projectId: string) => {
+export const useGetAISuggestedTasks = (
+  projectId: string,
+  options?: { enabled?: boolean },
+) => {
   return useQuery({
     queryKey: ["ai-suggested-tasks", projectId],
     queryFn: async () => {
@@ -21,7 +24,7 @@ export const useGetAISuggestedTasks = (projectId: string) => {
         return [];
       }
     },
-    enabled: !!projectId,
+    enabled: options?.enabled ?? !!projectId,
   });
 };
 

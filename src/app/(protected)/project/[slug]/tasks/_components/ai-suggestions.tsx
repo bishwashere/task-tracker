@@ -18,8 +18,6 @@ const AiSuggestions = ({ loading, completed, tasks, showGenerationLoader }: Prop
   const { projectId } = useProjectContext();
   const [active, setActive] = React.useState([""])
 
-  console.log(loading, showGenerationLoader)
-
   if (loading && showGenerationLoader)
     return (
       <TaskGenerationLoader

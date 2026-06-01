@@ -1,6 +1,6 @@
 "use client";
 import SuperHeader from "@/components/common/block/super-header";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProjectHeader } from "./project-header";
 import { useProjectContext } from "../_context";
 import ProjectFilters from "./project-filters";
@@ -17,6 +17,13 @@ import SprintControl from "./sprint-control";
 import SprintProgress from "./sprint-progress";
 import { EditModeHint } from "./edit-mode-hint";
 
+function projectHasNoTasksOrSubtasks(
+  tasks: Array<{ subtasks?: Array<unknown> }> | undefined,
+): boolean {
+  if (!tasks?.length) return true;
+  return !tasks.some((task) => (task.subtasks?.length ?? 0) > 0);
+}
+
 const Project = () => {
   const {
     slug,
@@ -29,8 +36,21 @@ const Project = () => {
     isProjectLoading,
   } = useProjectContext();
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
-  const ai = useGetAISuggestedTasks(projectId);
-  const [mockLoading, setMockLoading] = useState(true);
+  const isProjectWithoutWork = projectHasNoTasksOrSubtasks(data?.tasks);
+  const shouldFetchAiSuggestions =
+    Boolean(projectId && !isProjectLoading && data && isProjectWithoutWork);
+  const ai = useGetAISuggestedTasks(projectId, {
+    enabled: shouldFetchAiSuggestions,
+  });
+  const [mockLoading, setMockLoading] = useState(false);
+  const showAiGenerationLoader =
+    isProjectWithoutWork && !!data?.project && !data.project.hasAiSuggestTasks;
+
+  useEffect(() => {
+    if (showAiGenerationLoader) {
+      setMockLoading(true);
+    }
+  }, [showAiGenerationLoader]);
 
   if (isProjectLoading) {
     return <Loading />;
@@ -59,7 +79,8 @@ const Project = () => {
   const hasNoFilteredTasks = !filteredTasks?.length;
   const showAddTaskControl = isAdmin && editMode;
   const aiSuggestionsVisible =
-    ai.isPending || mockLoading || (ai.data?.length ?? 0) > 0;
+    isProjectWithoutWork &&
+    (ai.isPending || mockLoading || (ai.data?.length ?? 0) > 0);
 
   return (
       <>
@@ -106,14 +127,16 @@ const Project = () => {
               setModalIsOpen={setAddTaskModalOpen}
             />
           </div>
-          <AiSuggestions
-            showGenerationLoader={!data.project?.hasAiSuggestTasks}
-            loading={ai.isPending || mockLoading}
-            tasks={ai.data || []}
-            completed={() => {
-              setMockLoading(false);
-            }}
-          />
+          {isProjectWithoutWork && (
+            <AiSuggestions
+              showGenerationLoader={showAiGenerationLoader}
+              loading={ai.isPending || mockLoading}
+              tasks={ai.data || []}
+              completed={() => {
+                setMockLoading(false);
+              }}
+            />
+          )}
 
           {!isProjectLoading && hasNoTasksInProject ? (
             isAdmin ? (
