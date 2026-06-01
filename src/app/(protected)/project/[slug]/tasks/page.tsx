@@ -8,10 +8,10 @@ import { getProjectById } from "@/queries/project/action";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Pending tasks and subtasks | taskmentor.io",
+    title: "Tasks and subtasks | taskmentor.io",
     description: "",
     openGraph: {
-      title: "Pending tasks and subtasks | taskmentor.io",
+      title: "Tasks and subtasks | taskmentor.io",
       description: "",
       images: [
         {
@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Pending tasks and subtasks | taskmentor.io",
+      title: "Tasks and subtasks | taskmentor.io",
       description: "",
       images: [
         {

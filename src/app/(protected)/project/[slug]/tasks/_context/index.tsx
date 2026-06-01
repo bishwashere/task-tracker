@@ -71,7 +71,7 @@ export const ProjectContextProvider = ({
   const { data: sprintData } = useGetActiveSprint(projectId);
   const [editMode, setEditMode] =
     useState<ProjectContextType["editMode"]>(false);
-  const [tab, setTab] = useState<ProjectContextType["tab"]>("pending");
+  const [tab, setTab] = useState<ProjectContextType["tab"]>("all");
   const [userFilter, setUserFilter] =
     useState<ProjectContextType["userFilter"]>("all");
   const [filterByDate, setFilterByDate] = useState<ProjectContextType["filterByDate"]>("all");
