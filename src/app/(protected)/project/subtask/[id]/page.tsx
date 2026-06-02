@@ -142,7 +142,7 @@ const Subtask = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>Subtask is blocked</AlertDialogTitle>
               <AlertDialogDescription className="text-base text-foreground">
-                This subtask depends on "{subtask.blockedByDependency.name}".
+                This subtask depends on &quot;{subtask.blockedByDependency.name}&quot;.
                 Complete that subtask before starting this one.
               </AlertDialogDescription>
             </AlertDialogHeader>
