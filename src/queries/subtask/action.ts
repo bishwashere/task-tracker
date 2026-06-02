@@ -94,17 +94,23 @@ export const deleteSubtask = async (subtaskId: string) => {
 
     // Delete in correct order to maintain referential integrity
 
-    // 1. Delete all comments associated with the subtask
+    // 1. Clear dependencies pointing at this subtask
+    await prisma.subtask.updateMany({
+      where: { dependsOnSubtaskId: subtaskId },
+      data: { dependsOnSubtaskId: null },
+    });
+
+    // 2. Delete all comments associated with the subtask
     await prisma.comment.deleteMany({
       where: { subtaskId },
     });
 
-    // 2. Delete all sort indices associated with the subtask
+    // 3. Delete all sort indices associated with the subtask
     await prisma.subtaskSortIndex.deleteMany({
       where: { subtaskId },
     });
 
-    // 3. Finally delete the subtask itself
+    // 4. Finally delete the subtask itself
     await prisma.subtask.delete({
       where: { id: subtaskId },
     });
@@ -127,6 +133,84 @@ export type EditSubTaskProps = {
   dueDate: Date;
   points: number;
   assignedUserId: string | null;
+  dependsOnSubtaskId?: string | null;
+};
+
+const validateSubtaskDependency = async ({
+  subTaskId,
+  taskId,
+  dependsOnSubtaskId,
+}: {
+  subTaskId: string;
+  taskId: string;
+  dependsOnSubtaskId?: string | null;
+}) => {
+  if (!dependsOnSubtaskId) return { success: true as const };
+
+  if (dependsOnSubtaskId === subTaskId) {
+    return {
+      success: false as const,
+      message: "A subtask cannot depend on itself.",
+    };
+  }
+
+  const dependency = await prisma.subtask.findFirst({
+    where: { id: dependsOnSubtaskId, taskId },
+    select: { id: true, dependsOnSubtaskId: true },
+  });
+
+  if (!dependency) {
+    return {
+      success: false as const,
+      message: "Dependency must be another subtask in the same task.",
+    };
+  }
+
+  let nextDependencyId = dependency.dependsOnSubtaskId;
+  const visited = new Set<string>([dependsOnSubtaskId]);
+
+  while (nextDependencyId) {
+    if (nextDependencyId === subTaskId) {
+      return {
+        success: false as const,
+        message: "This dependency would create a cycle.",
+      };
+    }
+
+    if (visited.has(nextDependencyId)) break;
+    visited.add(nextDependencyId);
+
+    const nextDependency = await prisma.subtask.findFirst({
+      where: { id: nextDependencyId, taskId },
+      select: { dependsOnSubtaskId: true },
+    });
+
+    nextDependencyId = nextDependency?.dependsOnSubtaskId ?? null;
+  }
+
+  return { success: true as const };
+};
+
+const getIncompleteDependency = async (subtaskId: string) => {
+  const subtask = await prisma.subtask.findUnique({
+    where: { id: subtaskId },
+    select: {
+      dependsOnSubtaskId: true,
+      dependsOnSubtask: {
+        select: {
+          id: true,
+          name: true,
+          status: true,
+        },
+      },
+    },
+  });
+
+  if (!subtask?.dependsOnSubtaskId || !subtask.dependsOnSubtask) return null;
+
+  if (subtask.dependsOnSubtask.status === "done") return null;
+
+  return subtask.dependsOnSubtask;
 };
 
 export const editSubTask = async ({
@@ -137,6 +221,7 @@ export const editSubTask = async ({
   dueDate,
   points,
   assignedUserId,
+  dependsOnSubtaskId,
 }: EditSubTaskProps) => {
   try {
     const access = await getProjectAccessContext(projectId);
@@ -147,6 +232,16 @@ export const editSubTask = async ({
       return { success: false, message: "Only admins can edit subtasks." };
     }
 
+    const dependencyValidation = await validateSubtaskDependency({
+      subTaskId,
+      taskId,
+      dependsOnSubtaskId,
+    });
+
+    if (!dependencyValidation.success) {
+      return { success: false, message: dependencyValidation.message };
+    }
+
     const subTask = await prisma.subtask.update({
       where: { id: subTaskId },
       data: {
@@ -154,10 +249,12 @@ export const editSubTask = async ({
         dueDate,
         points,
         assignedUserId: assignedUserId === "" ? null : assignedUserId,
+        dependsOnSubtaskId: dependsOnSubtaskId || null,
         taskId,
       },
       include: {
         assignedUser: true,
+        subtaskSortIndex: true,
       },
     });
 
@@ -303,6 +400,13 @@ export const updateSubtaskStatus = async ({
       return {
         success: false,
         message: "Forbidden: You do not have permission to update this subtask",
+      };
+    }
+    const incompleteDependency = await getIncompleteDependency(subtaskId);
+    if (incompleteDependency && status !== "pending") {
+      return {
+        success: false,
+        message: `Complete "${incompleteDependency.name}" before starting this subtask.`,
       };
     }
     if (!isAdmin && status === "done" && subtask.comments.length === 0) {
@@ -464,6 +568,13 @@ export const fetchSubtaskData = async (subtaskId: string) => {
             name: true,
           },
         },
+        dependsOnSubtask: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+          },
+        },
       },
     });
 
@@ -494,6 +605,7 @@ export const fetchSubtaskData = async (subtaskId: string) => {
     }
 
     const canManageComments = isAdmin || isAssignedUser;
+    const incompleteDependency = await getIncompleteDependency(subtaskId);
 
     return {
       success: true,
@@ -501,6 +613,8 @@ export const fetchSubtaskData = async (subtaskId: string) => {
         ...subtask,
         role: effective.role,
         canManageComments,
+        isBlockedByDependency: Boolean(incompleteDependency),
+        blockedByDependency: incompleteDependency,
       },
       comments: subtask.comments,
     };
@@ -561,6 +675,14 @@ export const saveComment = async ({
 
     if (!subtask) {
       return { success: false, message: "Subtask not found" };
+    }
+
+    const incompleteDependency = await getIncompleteDependency(subtaskId);
+    if (incompleteDependency) {
+      return {
+        success: false,
+        message: `Complete "${incompleteDependency.name}" before starting this subtask.`,
+      };
     }
 
     if (!effective.isAdmin && subtask.assignedUserId !== userId) {
@@ -652,6 +774,14 @@ export const editComment = async ({
 
     if (!existingComment || existingComment.subtaskId !== subtaskId) {
       return { success: false, message: "Comment not found" };
+    }
+
+    const incompleteDependency = await getIncompleteDependency(subtaskId);
+    if (incompleteDependency) {
+      return {
+        success: false,
+        message: `Complete "${incompleteDependency.name}" before starting this subtask.`,
+      };
     }
 
     if (!effective.isAdmin && existingComment.subtask.assignedUserId !== userId) {

@@ -413,6 +413,13 @@ export const getProjectById = async (
                   image: true,
                 },
               },
+              dependsOnSubtask: {
+                select: {
+                  id: true,
+                  name: true,
+                  status: true,
+                },
+              },
               comments: {
                 where: {
                   commentType: "issue",
@@ -495,6 +502,13 @@ export const getProjectById = async (
                   assignedUser: {
                     select: {
                       name: true,
+                    },
+                  },
+                  dependsOnSubtask: {
+                    select: {
+                      id: true,
+                      name: true,
+                      status: true,
                     },
                   },
                   subtaskSortIndex: {

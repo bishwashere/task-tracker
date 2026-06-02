@@ -4,7 +4,16 @@ import ProfileMenu from "@/components/common/profile-menu";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/cn";
-import { confirm } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  confirm,
+} from "@/components/ui/alert-dialog";
 import { useEditComment, useFetchSubtaskData, useResolveComment, useSaveComment, useUpdateSubtaskStatus } from "@/queries/subtask/hooks";
 import EditSubtaskDialog from "@/app/(protected)/project/[slug]/tasks/_components/task-view/task-list/subtask-view/edit-subtask-dialog";
 import { getProjectTasksPath } from "@/lib/project-slug";
@@ -122,6 +131,34 @@ const Subtask = () => {
       </div>
     );
 
+  if (subtask.isBlockedByDependency && subtask.blockedByDependency) {
+    return (
+      <>
+        <div>
+          <SuperHeader path={getProjectTasksPath(subtask.task.project.slug)} />
+        </div>
+        <AlertDialog open>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Subtask is blocked</AlertDialogTitle>
+              <AlertDialogDescription className="text-base text-foreground">
+                This subtask depends on "{subtask.blockedByDependency.name}".
+                Complete that subtask before starting this one.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction asChild>
+                <Link href={getProjectTasksPath(subtask.task.project.slug)}>
+                  Back to task
+                </Link>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
+    );
+  }
+
   return (
     <>
       <div>
@@ -153,6 +190,7 @@ const Subtask = () => {
                       : "",
                     points: subtask.points,
                     assignedUserId: subtask.assignedUserId || "",
+                    dependsOnSubtaskId: subtask.dependsOnSubtaskId || "",
                   }}
                   trigger={
                     <Button type="button" variant="outline">
@@ -204,6 +242,14 @@ const Subtask = () => {
           <p className="text-sm text-gray-600">
             Status: <span className="font-semibold">{subtask.status}</span>
           </p>
+          {subtask.dependsOnSubtask && (
+            <p className="text-sm text-gray-600 mt-2">
+              Depends on:{" "}
+              <span className="font-semibold">
+                {subtask.dependsOnSubtask.name} ({subtask.dependsOnSubtask.status})
+              </span>
+            </p>
+          )}
         </div>
 
         <div className="bg-white p-4 rounded shadow-md">

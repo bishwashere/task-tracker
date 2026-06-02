@@ -26,6 +26,7 @@ const EditSubtaskDialog = ({
     dueDate: string;
     points: number;
     assignedUserId: string;
+    dependsOnSubtaskId?: string;
   };
   trigger?: ReactNode;
 }) => {
@@ -35,9 +36,12 @@ const EditSubtaskDialog = ({
     dueDate: defaultValue?.dueDate || "",
     points: defaultValue?.points || 1,
     assignedUserId: defaultValue?.assignedUserId || "",
+    dependsOnSubtaskId: defaultValue?.dependsOnSubtaskId || "",
   });
   const edit = useEditSubtask()
   const { data } = useGetProjectById(projectId);
+  const sameTaskSubtasks =
+    data?.tasks?.find((task: any) => task.id === taskId)?.subtasks ?? [];
 
   useEffect(() => {
     setFormData({
@@ -45,6 +49,7 @@ const EditSubtaskDialog = ({
       dueDate: defaultValue?.dueDate || "",
       points: defaultValue?.points || 1,
       assignedUserId: defaultValue?.assignedUserId || "",
+      dependsOnSubtaskId: defaultValue?.dependsOnSubtaskId || "",
     });
   }, [defaultValue]);
 
@@ -58,11 +63,18 @@ const EditSubtaskDialog = ({
         dueDate: new Date(formData.dueDate),
         points: formData.points,
         assignedUserId: formData.assignedUserId,
+        dependsOnSubtaskId: formData.dependsOnSubtaskId,
         taskId,
         subTaskId: subtaskId,
       })
       setModalIsOpen(false);
-      setFormData({ subtaskName: "", dueDate: "", points: 1, assignedUserId: "" });
+      setFormData({
+        subtaskName: "",
+        dueDate: "",
+        points: 1,
+        assignedUserId: "",
+        dependsOnSubtaskId: "",
+      });
     } catch { }
   };
 
@@ -135,6 +147,24 @@ const EditSubtaskDialog = ({
                 {user.name} ({user.email})
               </option>
             ))}
+          </select>
+          <select
+            id="dependsOnSubtaskId"
+            name="dependsOnSubtaskId"
+            className="border p-2 rounded w-full mb-4"
+            value={formData.dependsOnSubtaskId}
+            onChange={(e) =>
+              setFormData({ ...formData, dependsOnSubtaskId: e.target.value })
+            }
+          >
+            <option value="">No dependency</option>
+            {sameTaskSubtasks
+              .filter((subtask: any) => subtask.id !== subtaskId)
+              .map((subtask: any) => (
+                <option key={subtask.id} value={subtask.id}>
+                  Depends on: {subtask.name}
+                </option>
+              ))}
           </select>
           <div className="flex justify-end mt-5">
             <Button

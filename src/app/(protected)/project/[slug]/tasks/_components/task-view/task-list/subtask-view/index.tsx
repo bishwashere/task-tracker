@@ -13,6 +13,11 @@ export interface SubTaskViewProps {
       name: string | null
       image: string | null
     } | null
+    dependsOnSubtask?: {
+      id: string
+      name: string
+      status: string
+    } | null
     issueCount: number;
   };
   isNew: (createdAt: string | Date) => boolean;

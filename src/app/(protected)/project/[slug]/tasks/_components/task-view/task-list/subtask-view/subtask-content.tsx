@@ -8,7 +8,7 @@ import { confirm } from "@/components/ui/alert-dialog";
 import { MdDelete } from "react-icons/md";
 import EditSubtaskDialog from "./edit-subtask-dialog";
 import AddTagPopup from "./add-tag-dialog";
-import { Calendar, Check, Circle, CircleCheck, Coins, MessageSquare, Star, UserRound } from "lucide-react";
+import { Calendar, Check, Circle, CircleCheck, Coins, Lock, MessageSquare, Star, UserRound } from "lucide-react";
 
 interface SubTaskContentProps extends SubTaskViewProps {
   isDragging?: boolean;
@@ -54,6 +54,24 @@ export const SubTaskContent = ({
   const update = useUpdateSubtaskStatus()
 
   const togglePriority = useToggleSubtaskPriority()
+  const blockingSubtask =
+    subtask.dependsOnSubtask && subtask.dependsOnSubtask.status !== "done"
+      ? subtask.dependsOnSubtask
+      : null;
+
+  const onOpenSubtask = async () => {
+    if (blockingSubtask) {
+      await confirm({
+        title: "Subtask is blocked",
+        description: `This subtask depends on "${blockingSubtask.name}". Complete that subtask before starting this one.`,
+        confirm: "Got it",
+        showCancel: false,
+      });
+      return;
+    }
+
+    router.push(`/project/subtask/${subtask.id}`);
+  };
 
   const onDelete = async () => {
     const should = await confirm({
@@ -85,7 +103,7 @@ export const SubTaskContent = ({
         <div className="flex flex-row gap-2 items-center">
           <span
             className="cursor-pointer hover:underline text-lg font-semibold"
-            onClick={() => router.push(`/project/subtask/${subtask.id}`)}
+            onClick={onOpenSubtask}
           >
             {subtask.name}
           </span>
@@ -105,6 +123,12 @@ export const SubTaskContent = ({
               {subtask.issueCount}
             </span>
           )}
+          {blockingSubtask && (
+            <span className="text-xs text-amber-700 bg-amber-100 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
+              <Lock className="size-3" aria-hidden />
+              Blocked by {blockingSubtask.name}
+            </span>
+          )}
           {isAdmin && editMode && (
             <EditSubtaskDialog
               canEdit={isAdmin && editMode}
@@ -116,6 +140,7 @@ export const SubTaskContent = ({
                 dueDate: subtask.dueDate?.toISOString().split("T")[0] || "",
                 points: subtask.points,
                 assignedUserId: subtask.assignedUserId || "",
+                dependsOnSubtaskId: subtask.dependsOnSubtaskId || "",
               }}
             />
           )}
@@ -200,7 +225,19 @@ export const SubTaskContent = ({
           </button>
           {isAdmin && subtask.status !== "done" && (
             <button
-              onClick={() => update.mutate({ subtaskId: subtask.id, status: "done", projectId, taskId })}
+              onClick={async () => {
+                if (blockingSubtask) {
+                  await confirm({
+                    title: "Subtask is blocked",
+                    description: `This subtask depends on "${blockingSubtask.name}". Complete that subtask before closing this one.`,
+                    confirm: "Got it",
+                    showCancel: false,
+                  });
+                  return;
+                }
+
+                update.mutate({ subtaskId: subtask.id, status: "done", projectId, taskId });
+              }}
               className="p-1.5 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-75"
               aria-label="Mark as done"
             >

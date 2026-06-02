@@ -168,23 +168,26 @@ model TaskSortIndex {
 }
 
 model Subtask {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  taskId           String             @db.ObjectId
-  task             Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  assignedUser     User?              @relation("AssignedSubtasks", fields: [assignedUserId], references: [id])
-  assignedUserId   String?            @db.ObjectId
-  dueDate          DateTime?
-  points           Float              @default(10)
-  status           String             @default("pending")
-  priority         Int                @default(0)
-  tagName          String?
-  tagColor         String?
-  comments         Comment[]
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  subtaskSortIndex SubtaskSortIndex[]
-  completedAt      DateTime?
+  id                 String             @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  taskId             String             @db.ObjectId
+  task               Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assignedUser       User?              @relation("AssignedSubtasks", fields: [assignedUserId], references: [id])
+  assignedUserId     String?            @db.ObjectId
+  dueDate            DateTime?
+  points             Float              @default(10)
+  status             String             @default("pending")
+  priority           Int                @default(0)
+  tagName            String?
+  tagColor           String?
+  dependsOnSubtaskId String?            @db.ObjectId
+  dependsOnSubtask   Subtask?           @relation("SubtaskDependencies", fields: [dependsOnSubtaskId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dependentSubtasks  Subtask[]          @relation("SubtaskDependencies")
+  comments           Comment[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  subtaskSortIndex   SubtaskSortIndex[]
+  completedAt        DateTime?
 }
 
 model SubtaskSortIndex {

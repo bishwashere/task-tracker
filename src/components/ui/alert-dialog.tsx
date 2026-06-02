@@ -147,12 +147,14 @@ type ConfirmOptions = {
   description: string;
   cancel?: string;
   confirm?: string;
+  showCancel?: boolean;
 };
 
 /** Shows a confirmation dialog and returns a promise that resolves with the user's choice */
 export function confirm({
   cancel = "Cancel",
   confirm = "Yeah, Sure!",
+  showCancel = true,
   title,
   description,
 }: ConfirmOptions): Promise<boolean> {
@@ -181,9 +183,11 @@ export function confirm({
             <AlertDialogAction onClick={() => handleClose(true)}>
               {confirm}
             </AlertDialogAction>
-            <AlertDialogCancel onClick={() => handleClose(false)}>
-              {cancel}
-            </AlertDialogCancel>
+            {showCancel && (
+              <AlertDialogCancel onClick={() => handleClose(false)}>
+                {cancel}
+              </AlertDialogCancel>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
