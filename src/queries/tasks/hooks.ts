@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import {
   deleteAISuggestedTask,
   deleteTask,
   editTask,
   EditTaskProps,
+  generateSprintBriefing,
   getAISuggestedTasksByProjectId,
   saveTask,
   SaveTaskProps,
@@ -25,6 +27,25 @@ export const useGetAISuggestedTasks = (
       }
     },
     enabled: options?.enabled ?? !!projectId,
+  });
+};
+
+export const useGenerateSprintBriefing = () => {
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const res = await generateSprintBriefing(projectId);
+      if (res.success && res.briefing) {
+        return res.briefing;
+      }
+      throw new Error(res.message || "Failed to generate briefing");
+    },
+    onSuccess: async (briefing) => {
+      await navigator.clipboard.writeText(briefing);
+      toast.success("Sprint briefing copied to clipboard");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
   });
 };
 

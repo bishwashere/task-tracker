@@ -2,8 +2,27 @@
 
 import { ai } from "@/lib/ai";
 import { auth } from "@/lib/auth";
+import { getProjectAccessContext } from "@/lib/effective-user";
 import { prisma } from "@/lib/prisma";
 import { autoAssignTaskToActiveSprint } from "@/queries/sprint/action";
+
+const SPRINT_BRIEFING_PREFIX = "Next, we're focusing on:";
+
+function normalizeSprintBriefing(text: string): string {
+  const withoutEmDash = text.replace(/\u2014|—/g, ",");
+  const trimmed = withoutEmDash.trim().replace(/^["']|["']$/g, "");
+
+  if (trimmed.startsWith(SPRINT_BRIEFING_PREFIX)) {
+    return trimmed;
+  }
+
+  const withoutDuplicatePrefix = trimmed.replace(
+    /^Next,?\s*we(?:'re| are) focusing on:?\s*/i,
+    "",
+  );
+
+  return `${SPRINT_BRIEFING_PREFIX} ${withoutDuplicatePrefix}`.trim();
+}
 
 /**
  * First find the project
@@ -82,6 +101,84 @@ export const deleteAISuggestedTask = async (taskId: string) => {
     return { success: true, message: "Task deleted !" };
   } catch (error) {
     console.error("Error deleting AI suggested task:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export const generateSprintBriefing = async (projectId: string) => {
+  try {
+    const access = await getProjectAccessContext(projectId);
+    if ("error" in access) {
+      return { success: false, message: access.error };
+    }
+
+    if (!access.isRealAdmin) {
+      return { success: false, message: "Only admins can generate sprint briefings." };
+    }
+
+    const sprint = await prisma.sprint.findFirst({
+      where: { projectId, status: "ACTIVE" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!sprint) {
+      return { success: false, message: "No active sprint found." };
+    }
+
+    if (sprint.taskIds.length === 0) {
+      return { success: false, message: "No tasks in the active sprint." };
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { name: true },
+    });
+
+    if (!project) {
+      return { success: false, message: "Project not found." };
+    }
+
+    const subtasks = await prisma.subtask.findMany({
+      where: {
+        task: {
+          projectId,
+          id: { in: sprint.taskIds },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: {
+        assignedUser: { select: { name: true } },
+        task: { select: { name: true } },
+      },
+    });
+
+    if (subtasks.length === 0) {
+      return { success: false, message: "No subtasks in the active sprint." };
+    }
+
+    const briefing = await ai.generateSprintBriefing({
+      projectName: project.name,
+      sprintName: sprint.name,
+      subtasks: subtasks.map((subtask) => ({
+        name: subtask.name,
+        taskName: subtask.task.name,
+        assignee: subtask.assignedUser?.name ?? null,
+        status: subtask.status,
+        dueDate: subtask.dueDate?.toISOString() ?? null,
+        points: subtask.points,
+      })),
+    });
+
+    return {
+      success: true,
+      briefing: normalizeSprintBriefing(briefing),
+    };
+  } catch (error) {
+    console.error("Error generating sprint briefing:", error);
     return {
       success: false,
       message: "Something went wrong. Please try again.",

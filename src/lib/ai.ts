@@ -1,5 +1,10 @@
 import OpenAI from "openai";
-import { suggestProjectTaskPrompt, suggestSubtaskPrompt } from "./prompt";
+import {
+  sprintBriefingPrompt,
+  SprintBriefingSubtask,
+  suggestProjectTaskPrompt,
+  suggestSubtaskPrompt,
+} from "./prompt";
 import { z } from "zod";
 
 /**
@@ -102,6 +107,21 @@ class AI {
     const res = await this.chat(prompt);
 
     return JSON.parse(this.extractJSON(res || "") || "");
+  }
+
+  async generateSprintBriefing({
+    projectName,
+    sprintName,
+    subtasks,
+  }: {
+    projectName: string;
+    sprintName: string;
+    subtasks: SprintBriefingSubtask[];
+  }): Promise<string> {
+    const res = await this.chat(
+      sprintBriefingPrompt({ projectName, sprintName, subtasks }),
+    );
+    return res.trim();
   }
 }
 

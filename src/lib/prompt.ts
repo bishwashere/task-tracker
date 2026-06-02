@@ -48,3 +48,37 @@ type ProjectInsightsPromptProps = {
 export const projectInsightsPrompt = ({ data }: ProjectInsightsPromptProps) => `
 Project Information: ${JSON.stringify(data)}
 `;
+
+export type SprintBriefingSubtask = {
+  name: string;
+  taskName: string;
+  assignee: string | null;
+  status: string;
+  dueDate: string | null;
+  points: number;
+};
+
+export const sprintBriefingPrompt = ({
+  projectName,
+  sprintName,
+  subtasks,
+}: {
+  projectName: string;
+  sprintName: string;
+  subtasks: SprintBriefingSubtask[];
+}) => `
+Write a short update message an admin will paste to their team (Slack, email, etc.).
+
+Context:
+- Project: ${projectName}
+- Sprint: ${sprintName}
+- Recently added subtasks (newest first): ${JSON.stringify(subtasks)}
+
+Rules:
+- MUST begin with exactly: "Next, we're focusing on:"
+- Do NOT use em dashes. Use commas, periods, or colons instead.
+- Keep it concise (2-4 sentences).
+- Mention assignees by first name when assigned.
+- Reference parent task names when helpful.
+- Return ONLY the message text. No quotes, markdown, or extra formatting.
+`;
