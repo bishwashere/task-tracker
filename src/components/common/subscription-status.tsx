@@ -24,12 +24,12 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Calendar1Icon, CreditCardIcon, ShieldCheckIcon } from "lucide-react";
+import { Calendar1Icon, ShieldCheckIcon } from "lucide-react";
 import { formatDate } from "@/lib/format-date";
 import { MdSubscriptions } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 
-const SubscriptionStatus = () => {
+export function useSubscriptionStatus() {
   const { data, isLoading, isFetching } = useQuery({
     queryFn: () => getUserSubscription(),
     queryKey: ["subscription"],
@@ -38,22 +38,62 @@ const SubscriptionStatus = () => {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
-  const [isSubModalOpen, setIsSubModalOpen] = React.useState(false);
-  const router = useRouter();
   const periodEnd = getPeriodEnd(data);
   const { isExpired } = isSubscriptionExpired(periodEnd);
   const isPaid = hasPaidAccess(data);
   const showUpgradeFlow = shouldShowUpgradeFlow(data);
   const isBlocking = isExpired && !isPaid;
   const subscriptionReady = !isLoading && !isFetching;
+  const label = showUpgradeFlow ? "Trial" : "Manage Subscription";
+
+  return {
+    data,
+    periodEnd,
+    isExpired,
+    isPaid,
+    showUpgradeFlow,
+    isBlocking,
+    subscriptionReady,
+    label,
+  };
+}
+
+type SubscriptionStatusProps = {
+  showTrigger?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+const SubscriptionStatus = ({
+  showTrigger = true,
+  open: controlledOpen,
+  onOpenChange,
+}: SubscriptionStatusProps) => {
+  const {
+    data,
+    periodEnd,
+    isExpired,
+    isPaid,
+    showUpgradeFlow,
+    isBlocking,
+    subscriptionReady,
+    label,
+  } = useSubscriptionStatus();
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const isSubModalOpen = isControlled ? controlledOpen : internalOpen;
+  const setIsSubModalOpen = (open: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
+  const router = useRouter();
 
   useEffect(() => {
     if (!subscriptionReady) return;
-
-    if (isPaid) {
-      setIsSubModalOpen(false);
-      return;
-    }
+    if (isPaid) return;
 
     if (isExpired) {
       setIsSubModalOpen(true);
@@ -80,22 +120,23 @@ const SubscriptionStatus = () => {
 
   return (
     <>
-      <Button
-        onClick={() => setIsSubModalOpen(true)}
-        size={"sm"}
-        loading={!subscriptionReady}
-        variant={"outline"}
-        className={cn(
-          showUpgradeFlow ? "border-destructive text-destructive" : "",
-          "capitalize",
-        )}
-      >
-        {showUpgradeFlow ? "trial" : "Manage Subscription"}
-      </Button>
+      {showTrigger && (
+        <Button
+          onClick={() => setIsSubModalOpen(true)}
+          size={"sm"}
+          loading={!subscriptionReady}
+          variant={"outline"}
+          className={cn(
+            showUpgradeFlow ? "border-destructive text-destructive" : "",
+            "capitalize",
+          )}
+        >
+          {label}
+        </Button>
+      )}
       <Dialog
-        open={isSubModalOpen && subscriptionReady && !isPaid}
+        open={isSubModalOpen && subscriptionReady}
         onOpenChange={(open) => {
-          if (isPaid) return;
           if (isBlocking && !open) return;
           setIsSubModalOpen(open);
         }}
@@ -119,13 +160,13 @@ const SubscriptionStatus = () => {
                 plans={PLANS}
               />
               {showUpgradeFlow && !isExpired && (
-                  <button
-                    className="text-black px-4 py-2 rounded underline"
-                    onClick={() => setIsSubModalOpen(false)}
-                  >
-                    Continue with Free Trial!
-                  </button>
-                )}
+                <button
+                  className="text-black px-4 py-2 rounded underline"
+                  onClick={() => setIsSubModalOpen(false)}
+                >
+                  Continue with Free Trial!
+                </button>
+              )}
               {isBlocking && (
                 <Button
                   variant="outline"
@@ -237,24 +278,24 @@ const SubscriptionStatus = () => {
                     Manage Subscription
                   </Button>
                   {isExpired && (
-                      <Button
-                        onClick={async (e) => {
-                          e.currentTarget.disabled = true;
+                    <Button
+                      onClick={async (e) => {
+                        e.currentTarget.disabled = true;
 
-                          if (data?.status === "trial") {
-                            const res = await createStripeSession("plan:1");
-                            if (res) router.push(res);
-                          } else {
-                            const res = await createCustomerPortal();
-                            if (res) router.push(res);
-                          }
-                        }}
-                        className="w-full sm:w-auto"
-                      >
-                        <MdSubscriptions className="mr-2 h-4 w-4" />
-                        Renew
-                      </Button>
-                    )}
+                        if (data?.status === "trial") {
+                          const res = await createStripeSession("plan:1");
+                          if (res) router.push(res);
+                        } else {
+                          const res = await createCustomerPortal();
+                          if (res) router.push(res);
+                        }
+                      }}
+                      className="w-full sm:w-auto"
+                    >
+                      <MdSubscriptions className="mr-2 h-4 w-4" />
+                      Renew
+                    </Button>
+                  )}
                   {isBlocking && (
                     <Button
                       variant="outline"
@@ -273,5 +314,28 @@ const SubscriptionStatus = () => {
     </>
   );
 };
+
+export function SubscriptionMenuItem({
+  onSelect,
+}: {
+  onSelect: () => void;
+}) {
+  const { showUpgradeFlow, subscriptionReady, label } = useSubscriptionStatus();
+
+  return (
+    <button
+      type="button"
+      disabled={!subscriptionReady}
+      onClick={onSelect}
+      className={cn(
+        "flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md disabled:opacity-50",
+        showUpgradeFlow && "text-destructive",
+      )}
+    >
+      <MdSubscriptions className="size-4 shrink-0" />
+      {label}
+    </button>
+  );
+}
 
 export default SubscriptionStatus;

@@ -89,7 +89,6 @@ const Project = () => {
             projectName={data.project?.name || ""}
             projectId={projectId}
             points={data.pointsEarned}
-            showPoints={true}
             onEditButtonClick={() => setEditMode((prev) => !prev)}
           />
           <SprintProgress projectId={projectId} tasks={data.tasks || []} />
