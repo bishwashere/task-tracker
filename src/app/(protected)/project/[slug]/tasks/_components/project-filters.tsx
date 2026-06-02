@@ -77,6 +77,51 @@ const UserFilterSelect = ({
   </select>
 );
 
+type SubtaskToggleProps = {
+  showSubtasks: boolean;
+  setShowSubtasks: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const SubtaskToggle = ({ showSubtasks, setShowSubtasks }: SubtaskToggleProps) => (
+  <button
+    type="button"
+    className="cursor-pointer text-left text-blue-500 hover:underline w-fit text-sm sm:text-base"
+    onClick={() => setShowSubtasks((prev) => !prev)}
+  >
+    {showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
+  </button>
+);
+
+type DateFilterSelectProps = {
+  dateFilters: ProjectContextType["dateFilters"];
+  filterByDate: ProjectContextType["filterByDate"];
+  setFilterByDate: React.Dispatch<
+    React.SetStateAction<ProjectContextType["filterByDate"]>
+  >;
+  className?: string;
+};
+
+const DateFilterSelect = ({
+  dateFilters,
+  filterByDate,
+  setFilterByDate,
+  className = "",
+}: DateFilterSelectProps) => (
+  <select
+    className={`border rounded px-2 py-1 text-sm w-full sm:w-auto ${className}`}
+    value={filterByDate}
+    onChange={(e) => {
+      setFilterByDate(e.target.value as ProjectContextType["filterByDate"]);
+    }}
+  >
+    {dateFilters.map((filter) => (
+      <option key={filter.value} value={filter.value}>
+        {filter.label}
+      </option>
+    ))}
+  </select>
+);
+
 const ProjectFilters = ({ hideUserFilter, members, toolbarExtra }: Props) => {
   const {
     tabs,
@@ -93,7 +138,11 @@ const ProjectFilters = ({ hideUserFilter, members, toolbarExtra }: Props) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const showUserFilter = !hideUserFilter && members.length > 0;
-  const hasActiveFilters = tab !== "all" || userFilter !== "all";
+  const hasActiveFilters =
+    tab !== "all" ||
+    userFilter !== "all" ||
+    filterByDate !== "all" ||
+    !showSubtasks;
 
   return (
     <>
@@ -158,6 +207,25 @@ const ProjectFilters = ({ hideUserFilter, members, toolbarExtra }: Props) => {
                       />
                     </div>
                   )}
+                  <div>
+                    <p className="mb-2 text-sm font-medium text-gray-600">
+                      Subtasks
+                    </p>
+                    <SubtaskToggle
+                      showSubtasks={showSubtasks}
+                      setShowSubtasks={setShowSubtasks}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-2 text-sm font-medium text-gray-600">
+                      Time range
+                    </p>
+                    <DateFilterSelect
+                      dateFilters={dateFilters}
+                      filterByDate={filterByDate}
+                      setFilterByDate={setFilterByDate}
+                    />
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
@@ -170,29 +238,17 @@ const ProjectFilters = ({ hideUserFilter, members, toolbarExtra }: Props) => {
           </div>
         )}
       </div>
-      <div className="mb-4 flex flex-row gap-4">
-        <p
-          className="cursor-pointer text-blue-500 hover:underline w-fit text-sm sm:text-base"
-          onClick={() => setShowSubtasks((prev) => !prev)}
-        >
-          {showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
-        </p>
+      <div className="mb-4 hidden sm:flex flex-row gap-4">
+        <SubtaskToggle
+          showSubtasks={showSubtasks}
+          setShowSubtasks={setShowSubtasks}
+        />
         <Separator orientation="vertical" className="h-5" />
-        <select
-          className="border rounded px-2 py-1 text-sm"
-          value={filterByDate}
-          onChange={(e) => {
-            setFilterByDate(
-              e.target.value as ProjectContextType["filterByDate"],
-            );
-          }}
-        >
-          {dateFilters.map((filter) => (
-            <option key={filter.value} value={filter.value}>
-              {filter.label}
-            </option>
-          ))}
-        </select>
+        <DateFilterSelect
+          dateFilters={dateFilters}
+          filterByDate={filterByDate}
+          setFilterByDate={setFilterByDate}
+        />
       </div>
     </>
   );
