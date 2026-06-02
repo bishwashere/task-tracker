@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import { suggestProjectTaskPrompt, suggestSubtaskPrompt } from "./prompt";
 import { z } from "zod";
 
@@ -6,22 +6,25 @@ import { z } from "zod";
  * Utilities related to ai
  */
 class AI {
-  private genAI: GoogleGenerativeAI;
-  private maxRetries = 3;
-  private apiKeys: string[];
+  private client: OpenAI;
+  private model: string;
 
   constructor() {
-    this.apiKeys = [
-      process.env.GEMINI_API_KEY || "",
-      process.env.GEMINI_API_KEY_1 || "",
-      process.env.GEMINI_API_KEY_2 || "",
-    ];
-    this.genAI = new GoogleGenerativeAI(this.apiKeys[0]);
+    this.client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || "",
+    });
+    this.model = process.env.OPENAI_MODEL || "gpt-4o-mini";
   }
 
-  private isErrorWithStatus(error: unknown): error is { status: number } {
-    return typeof error === "object" && error !== null && "status" in error;
+  private async chat(prompt: string): Promise<string> {
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    return response.choices[0]?.message?.content?.trim() ?? "";
   }
+
   /**
    * Gives the name of the chat from ai
    */
@@ -34,19 +37,13 @@ class AI {
       description: string;
     }[]
   > {
-    const model = this.genAI.getGenerativeModel({
-      model: "models/gemini-2.0-flash-001",
-    });
-
-    const result = await model.generateContent(
-      suggestProjectTaskPrompt(projectName, projectDescription)
+    const res = await this.chat(
+      suggestProjectTaskPrompt(projectName, projectDescription),
     );
-
-    const res = result.response.text().trim();
 
     try {
       const json = this.suggestedJSONParserSchema.parse(
-        JSON.parse(this.extractJSON(res) || "")
+        JSON.parse(this.extractJSON(res) || ""),
       );
       console.log("json", json);
       return json;
@@ -65,13 +62,13 @@ class AI {
     z.object({
       title: z.string(),
       description: z.string().optional().default(""),
-    })
+    }),
   );
 
   private suggestedSubtaskJSONParserSchema = z.array(
     z.object({
       title: z.string(),
-    })
+    }),
   );
 
   async suggestProjectSubtasks({
@@ -80,24 +77,18 @@ class AI {
     taskDescription,
     projectDescription,
   }: SuggestProjectSubtasks): Promise<string[]> {
-    const model = this.genAI.getGenerativeModel({
-      model: "models/gemini-2.0-flash-001",
-    });
-
-    const result = await model.generateContent(
+    const res = await this.chat(
       suggestSubtaskPrompt({
         projectName,
         taskTitle,
         taskDescription,
         projectDescription,
-      })
+      }),
     );
-
-    const res = result.response.text().trim();
 
     try {
       const json = this.suggestedSubtaskJSONParserSchema.parse(
-        JSON.parse(this.extractJSON(res) || "")
+        JSON.parse(this.extractJSON(res) || ""),
       );
       console.log("json", json);
       return json.map((item) => item.title);
@@ -106,14 +97,9 @@ class AI {
       return [];
     }
   }
+
   async generate(prompt: string) {
-    const model = this.genAI.getGenerativeModel({
-      model: "models/gemini-2.0-flash-001",
-    });
-
-    const result = await model.generateContent(prompt);
-
-    const res = result.response.text().trim();
+    const res = await this.chat(prompt);
 
     return JSON.parse(this.extractJSON(res || "") || "");
   }
