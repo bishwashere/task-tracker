@@ -13,7 +13,6 @@ import { TaskGrid } from "./task-view/task-grid";
 import { ProjectInsights } from "./project-insights";
 import Loading from "@/components/ui/loading";
 import Link from "next/link";
-import SprintControl from "./sprint-control";
 import SprintProgress from "./sprint-progress";
 import { EditModeHint } from "./edit-mode-hint";
 
@@ -97,12 +96,7 @@ const Project = () => {
           <ProjectFilters
             hideUserFilter={data.role !== "admin"}
             members={data.members || []}
-            toolbarExtra={
-              <>
-                <SprintControl projectId={projectId} />
-                <ViewToggle />
-              </>
-            }
+            toolbarExtra={<ViewToggle />}
           />
 
           {isAdmin && !editMode && !hasNoTasksInProject && (

@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 export const MAX_ACTIVE_SPRINT_TASKS = 8;
 
 export const SPRINT_TYPES = [
@@ -82,6 +84,16 @@ export function getSprintDefaultName(type: SprintTypeValue, weekNumber: number) 
 
 export function formatSprintName(name: string) {
   return name.replace(/\s Sprint$/i, "").trim();
+}
+
+export function formatSprintDateRange(startDate: Date, endDate: Date) {
+  const start = format(startDate, "MMM d");
+  const end =
+    startDate.getFullYear() === endDate.getFullYear()
+      ? format(endDate, "MMM d")
+      : format(endDate, "MMM d, yyyy");
+
+  return `${start} - ${end}`;
 }
 
 type SprintTaskRef = {
