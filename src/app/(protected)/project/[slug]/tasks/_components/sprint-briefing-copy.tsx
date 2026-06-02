@@ -28,28 +28,3 @@ export function SprintBriefingCopy({ projectId }: Props) {
   );
 }
 
-export function SprintBriefingMenuItem({
-  projectId,
-  onSelect,
-}: Props & { onSelect?: () => void }) {
-  const { mutate, isPending } = useGenerateSprintBriefing();
-
-  return (
-    <button
-      type="button"
-      disabled={isPending}
-      onClick={() => {
-        mutate(projectId);
-        onSelect?.();
-      }}
-      className="flex flex-row gap-3 items-center w-full px-3 py-1 text-left hover:bg-gray-100 text-md disabled:opacity-50"
-    >
-      {isPending ? (
-        <Loader2 className="size-4 animate-spin shrink-0" aria-hidden />
-      ) : (
-        <Copy className="size-4 shrink-0" aria-hidden />
-      )}
-      Copy sprint briefing
-    </button>
-  );
-}

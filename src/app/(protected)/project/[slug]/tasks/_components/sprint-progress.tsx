@@ -11,6 +11,7 @@ import EditSprintDialog from "./dialogs/edit-sprint-dialog";
 import StartSprintDialog from "./dialogs/start-sprint-dialog";
 import { cn } from "@/lib/cn";
 import { Play } from "lucide-react";
+import { SprintBriefingCopy } from "./sprint-briefing-copy";
 
 type Props = {
   projectId: string;
@@ -66,10 +67,16 @@ const SprintProgress = ({ projectId, tasks }: Props) => {
           )}
           <div>
             <h3 className="text-lg font-semibold text-gray-800">Sprint Progress</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {formatSprintName(sprint.name)} •{" "}
-              {formatSprintDateRange(new Date(sprint.startDate), new Date(sprint.endDate))}
-            </p>
+            <div className="flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-muted-foreground">
+                {formatSprintName(sprint.name)} •{" "}
+                {formatSprintDateRange(
+                  new Date(sprint.startDate),
+                  new Date(sprint.endDate),
+                )}
+              </p>
+              {isAdmin && <SprintBriefingCopy projectId={projectId} />}
+            </div>
           </div>
         </div>
         <span className="text-2xl font-bold text-green-600">

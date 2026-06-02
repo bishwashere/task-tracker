@@ -27,7 +27,6 @@ export const ProjectHeader = ({
         showInsightsOption={isAdmin}
         organizationId={projectData?.project?.organizationId}
         points={points}
-        projectId={projectId}
       />
     </div>
   );

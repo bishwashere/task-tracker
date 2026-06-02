@@ -15,7 +15,6 @@ import { Avatar } from "@/components/ui/avatar";
 import { IoSettingsOutline } from "react-icons/io5";
 import DesiredOutcomeDialog from "@/app/(protected)/project/[slug]/tasks/_components/dialogs/desired-outcome-dialog";
 import { ViewAsDialog, ViewAsMenuButton } from "./view-as-menu";
-import { SprintBriefingMenuItem } from "@/app/(protected)/project/[slug]/tasks/_components/sprint-briefing-copy";
 import { useGetPoints } from "@/queries/points/hooks";
 import Link from "next/link";
 
@@ -26,7 +25,6 @@ const ProfileMenu = ({
   organizationId,
   points: pointsProp,
   pointsHref: pointsHrefProp,
-  projectId,
 }: {
   showSettings: boolean;
   onEditButtonClick?: () => void;
@@ -35,8 +33,6 @@ const ProfileMenu = ({
   /** Project-specific or total points to display in the menu */
   points?: number;
   pointsHref?: string;
-  /** When set, admins see "Copy sprint briefing" in the menu */
-  projectId?: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
@@ -153,15 +149,6 @@ const ProfileMenu = ({
               <span className="font-semibold tabular-nums">{displayPoints}</span>
             </span>
           </Link>
-          {projectId && isRealAdmin && (
-            <>
-              <hr className="border border-gray-300 my-1" />
-              <SprintBriefingMenuItem
-                projectId={projectId}
-                onSelect={() => setIsOpen(false)}
-              />
-            </>
-          )}
           <hr className="border border-gray-300 my-1" />
           <SubscriptionMenuItem
             onSelect={() => {
