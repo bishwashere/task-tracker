@@ -612,6 +612,7 @@ export const fetchSubtaskData = async (subtaskId: string) => {
       subtask: {
         ...subtask,
         role: effective.role,
+        effectiveUserId: userId,
         canManageComments,
         isBlockedByDependency: Boolean(incompleteDependency),
         blockedByDependency: incompleteDependency,

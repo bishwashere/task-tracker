@@ -131,6 +131,11 @@ const Subtask = () => {
       </div>
     );
 
+  const isAssignedToCurrentUser = subtask.assignedUserId === subtask.effectiveUserId;
+  const canCloseSubtask =
+    subtask.status !== "done" &&
+    (subtask.role !== "admin" || isAssignedToCurrentUser);
+
   if (subtask.isBlockedByDependency && subtask.blockedByDependency) {
     return (
       <>
@@ -199,7 +204,7 @@ const Subtask = () => {
                   }
                 />
               )}
-              {subtask.role !== "admin" && subtask.status !== "done" && (
+              {canCloseSubtask && (
                 <Button
                   variant="blue"
                   loading={closeSubtask.isPending}
