@@ -21,6 +21,16 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Avatar } from "@/components/ui/avatar";
+import {
+  Calendar,
+  Circle,
+  CircleCheck,
+  Coins,
+  ListTodo,
+  Lock,
+  UserRound,
+} from "lucide-react";
 
 const Subtask = () => {
   const { id } = useParams() as {
@@ -216,45 +226,61 @@ const Subtask = () => {
               )}
             </div>
           </div>
-          <p className="text-sm text-gray-600 mb-2">
-            Task: <span className="font-semibold">{subtask.task?.name}</span>
-          </p>
-          <p className="text-sm text-gray-600 mb-2">
-            Assigned To:{" "}
-            <span className="font-semibold">
-              {subtask.assignedUserId
-                ? subtask.assignedUser?.name
-                : "Unassigned"}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-gray-600">
+            <span className="inline-flex items-center gap-1">
+              <ListTodo className="size-3.5 shrink-0" aria-hidden />
+              {subtask.task?.name}
             </span>
-          </p>
-          <p className="text-sm text-gray-600 mb-2">
-            Points:{" "}
-            <span className="font-semibold">{subtask.points} points</span>
-          </p>
-          <p className="text-sm text-gray-600 mb-2">
-            Due Date:{" "}
-            <span className="font-semibold">
-              {subtask.dueDate
-                ? new Date(subtask.dueDate).toLocaleDateString("en-US", {
+            <span className="inline-flex items-center gap-1 capitalize">
+              {subtask.status === "done" ? (
+                <CircleCheck className="size-3.5 text-green-600 shrink-0" aria-hidden />
+              ) : (
+                <Circle className="size-3.5 shrink-0" aria-hidden />
+              )}
+              {subtask.status}
+            </span>
+            {subtask.assignedUserId && subtask.assignedUser ? (
+              <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 border border-gray-300 rounded-full text-gray-700 bg-white">
+                <Avatar
+                  className="border-foreground"
+                  src={subtask.assignedUser?.image || ""}
+                  alt={subtask.assignedUser?.name || ""}
+                  size="xs"
+                />
+                {subtask.assignedUser?.name}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1">
+                <UserRound className="size-3.5 shrink-0" aria-hidden />
+                Unassigned
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1">
+              <Coins className="size-3.5 shrink-0" aria-hidden />
+              {subtask.points} pts
+            </span>
+            {subtask.dueDate ? (
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="size-3.5 shrink-0" aria-hidden />
+                {new Date(subtask.dueDate).toLocaleDateString("en-US", {
                   month: "long",
                   day: "2-digit",
                   year: "numeric",
-                })
-                : "No due date"}
-            </span>
-          </p>
-
-          <p className="text-sm text-gray-600">
-            Status: <span className="font-semibold">{subtask.status}</span>
-          </p>
-          {subtask.dependsOnSubtask && (
-            <p className="text-sm text-gray-600 mt-2">
-              Depends on:{" "}
-              <span className="font-semibold">
-                {subtask.dependsOnSubtask.name} ({subtask.dependsOnSubtask.status})
+                })}
               </span>
-            </p>
-          )}
+            ) : (
+              <span className="inline-flex items-center gap-1 text-gray-500">
+                <Calendar className="size-3.5 shrink-0" aria-hidden />
+                No due date
+              </span>
+            )}
+            {subtask.dependsOnSubtask && (
+              <span className="text-xs text-amber-700 bg-amber-100 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
+                <Lock className="size-3" aria-hidden />
+                Depends on {subtask.dependsOnSubtask.name} ({subtask.dependsOnSubtask.status})
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="bg-white p-4 rounded shadow-md">
@@ -308,16 +334,8 @@ const Subtask = () => {
                       )}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium">
-                          {c.user.name}{" "}
-                          {c.commentType === "issue" && (
-                            <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-500">
-                              Issue
-                            </span>
-                          )}
-                        </p>
                         {isEditing ? (
-                          <div className="mt-2 space-y-2">
+                          <div className="space-y-2">
                             <textarea
                               className="border p-2 w-full rounded min-h-20 resize-y text-gray-900"
                               rows={3}
@@ -343,14 +361,22 @@ const Subtask = () => {
                                 Cancel
                               </Button>
                             </div>
+                            <p className="text-xs text-gray-400">
+                              {c.user.name} · {new Date(c.createdAt).toLocaleString()}
+                            </p>
                           </div>
                         ) : (
                           <>
+                            {c.commentType === "issue" && (
+                              <span className="inline-block mb-1 px-2 py-1 text-xs rounded-full bg-red-100 text-red-500">
+                                Issue
+                              </span>
+                            )}
                             <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">
                               {c.comment}
                             </p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(c.createdAt).toLocaleString()}
+                            <p className="text-xs text-gray-400 mt-1">
+                              {c.user.name} · {new Date(c.createdAt).toLocaleString()}
                             </p>
                           </>
                         )}

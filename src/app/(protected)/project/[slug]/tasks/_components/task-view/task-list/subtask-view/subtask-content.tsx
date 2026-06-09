@@ -92,42 +92,23 @@ export const SubTaskContent = ({
     <div
       key={subtask.id}
       className={cn(
-        "px-2.5 py-1.5 rounded-md border shadow-sm flex justify-between items-center transition-colors duration-150",
+        "px-2.5 py-1.5 rounded-md border shadow-sm flex justify-between items-start gap-2 transition-colors duration-150",
         subtask.status === "done"
           ? "bg-green-50 border-green-200/80 text-green-800 hover:bg-green-100"
           : "bg-white border-border hover:bg-muted/40",
         isDragging && "ring-2 ring-blue-400/40 border-blue-300 shadow-md",
       )}
     >
-      <div>
-        <div className="flex flex-row gap-2 items-center">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
           <span
             className="cursor-pointer hover:underline text-lg font-semibold"
             onClick={onOpenSubtask}
           >
             {subtask.name}
           </span>
-          {subtask.createdAt && (
-            <span className="text-xs text-white bg-transparent px-1 py-0.5 rounded inline-flex items-center">
-              {isNew(subtask.createdAt) ? (
-                <span className="w-2.5 h-2.5 bg-green-500 rounded-full mr-1"></span>
-              ) : (
-                ""
-              )}
-            </span>
-          )}
-          {/* //todo */}
-          {(subtask.issueCount || 0) > 0 && (
-            <span className="text-xs text-white bg-red-500 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
-              <MessageSquare className="size-3" aria-hidden />
-              {subtask.issueCount}
-            </span>
-          )}
-          {blockingSubtask && (
-            <span className="text-xs text-amber-700 bg-amber-100 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
-              <Lock className="size-3" aria-hidden />
-              Blocked by {blockingSubtask.name}
-            </span>
+          {subtask.createdAt && isNew(subtask.createdAt) && (
+            <span className="w-2.5 h-2.5 bg-green-500 rounded-full shrink-0" aria-label="New subtask" />
           )}
           {isAdmin && editMode && (
             <EditSubtaskDialog
@@ -150,7 +131,7 @@ export const SubTaskContent = ({
             </button>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mt-0.5">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mt-1">
           <span className="inline-flex items-center gap-1 capitalize">
             {subtask.status === "done" ? (
               <CircleCheck className="size-3.5 text-green-600 shrink-0" aria-hidden />
@@ -183,6 +164,18 @@ export const SubTaskContent = ({
             <span className="inline-flex items-center gap-1">
               <Calendar className="size-3.5 shrink-0" aria-hidden />
               {dueRemaining(subtask.dueDate)}
+            </span>
+          )}
+          {(subtask.issueCount || 0) > 0 && (
+            <span className="text-xs text-white bg-red-500 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
+              <MessageSquare className="size-3" aria-hidden />
+              {subtask.issueCount}
+            </span>
+          )}
+          {blockingSubtask && (
+            <span className="text-xs text-amber-700 bg-amber-100 px-1.5 py-0.5 inline-flex items-center gap-0.5 rounded-full">
+              <Lock className="size-3" aria-hidden />
+              Blocked by {blockingSubtask.name}
             </span>
           )}
         </div>
