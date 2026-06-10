@@ -150,7 +150,10 @@ const Subtask = () => {
     return (
       <>
         <div>
-          <SuperHeader path={getProjectTasksPath(subtask.task.project.slug)} />
+          <SuperHeader
+          path={getProjectTasksPath(subtask.task.project.slug)}
+          label="Subtask Details"
+        />
         </div>
         <AlertDialog open>
           <AlertDialogContent>
@@ -177,11 +180,14 @@ const Subtask = () => {
   return (
     <>
       <div>
-        <SuperHeader path={getProjectTasksPath(subtask.task.project.slug)} />
+        <SuperHeader
+          path={getProjectTasksPath(subtask.task.project.slug)}
+          label="Subtask Details"
+        />
       </div>
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="flex justify-between items-center mb-6 flex-col sm:flex-row">
-          <h1 className="text-3xl font-bold">Subtask Details</h1>
+          <h1 className="text-3xl font-bold hidden sm:block">Subtask Details</h1>
           <ProfileMenu
           showSettings={false}
           organizationId={subtask?.task?.project?.organizationId}
