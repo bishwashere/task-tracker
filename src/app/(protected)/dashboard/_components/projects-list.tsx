@@ -74,7 +74,7 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
         />
       )}
 
-      {hasActiveSection && hasEndedSection && (
+      {hasEndedSection && (
         <div className="my-6 flex items-center gap-3" role="separator">
           <div className="h-px flex-1 bg-border" />
           <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
