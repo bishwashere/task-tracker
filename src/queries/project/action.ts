@@ -211,11 +211,13 @@ export const listAllUserProjectByOrganizationId = async (
     const projectIdsWithoutActive = projectIds.filter(
       (id) => !activeSprintTaskIdsByProjectId.has(id),
     );
+    const recentlyEndedCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const completedSprints = projectIdsWithoutActive.length
       ? await prisma.sprint.findMany({
           where: {
             projectId: { in: projectIdsWithoutActive },
             status: "COMPLETED",
+            endDate: { gte: recentlyEndedCutoff },
           },
           orderBy: { endDate: "desc" },
           select: { projectId: true, taskIds: true, name: true },
