@@ -15,6 +15,8 @@ import { useListUserProjectByOrganizationId } from "@/queries/project/hooks";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { isOnboardingDismissedForSession } from "@/lib/onboarding-session";
+import CelebrationModal from "./celebration-modal";
+import { useCelebrationStats } from "@/queries/celebration/hooks";
 
 const Dashboard = () => {
   const { selectedOrg, guidedMode } = useDashboardContext();
@@ -31,6 +33,8 @@ const Dashboard = () => {
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
   const [isGuidedAddProjectModalOpen, setIsGuidedAddProjectModalOpen] = useState(false);
   const [activeSprintOnly, setActiveSprintOnly] = useState(true);
+
+  const celebration = useCelebrationStats(selectedOrg?.organization?.id ?? "");
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -83,6 +87,13 @@ const Dashboard = () => {
   return (
     <>
       <OnboardingModal isOpen={isOnboardingOpen} onOpenChange={setIsOnboardingOpen} />
+      {celebration.data?.userId && (
+        <CelebrationModal
+          subtasks14d={celebration.data.subtasks14d}
+          subtasks3d={celebration.data.subtasks3d}
+          userId={celebration.data.userId}
+        />
+      )}
       
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Top Bar */}

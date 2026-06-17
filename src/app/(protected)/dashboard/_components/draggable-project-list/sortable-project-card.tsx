@@ -5,11 +5,12 @@ import { Project } from "./index";
 import ProjectCard from "./project-card";
 import { ProjectSummary } from "@prisma/client";
 
-const SortableProjectCard = ({ project, isDragDisabled = false }: {
+const SortableProjectCard = ({ project, isDragDisabled = false, isRecentlyEnded }: {
   project: Project & {
     projectSummary: Pick<ProjectSummary, "done" | "pending"> | null;
   };
   isDragDisabled?: boolean;
+  isRecentlyEnded?: boolean;
 }) => {
   const {
     attributes,
@@ -38,7 +39,7 @@ const SortableProjectCard = ({ project, isDragDisabled = false }: {
       {...(isDragDisabled ? {} : listeners)}
       className={isDragDisabled ? "cursor-default" : "cursor-grab active:cursor-grabbing"}
     >
-      <ProjectCard project={project} isDragging={isDragging} />
+      <ProjectCard project={project} isDragging={isDragging} isRecentlyEnded={isRecentlyEnded} />
     </div>
   );
 };

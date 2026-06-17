@@ -87,6 +87,7 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
       {hasEndedSection && (
         <DashboardDraggableProjectList
           projects={recentlyEndedProjects.map(mapRecentlyEndedSprintProject)}
+          isRecentlyEnded
         />
       )}
 

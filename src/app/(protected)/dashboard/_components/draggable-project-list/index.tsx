@@ -40,9 +40,10 @@ type Props = {
   projects: (Project & {
     projectSummary: Pick<ProjectSummary, "done" | "pending"> | null;
   })[];
+  isRecentlyEnded?: boolean;
 };
 
-const DashboardDraggableProjectList = ({ projects: p }: Props) => {
+const DashboardDraggableProjectList = ({ projects: p, isRecentlyEnded }: Props) => {
   const [projects, setProjects] = useState(p);
   const [activeId, setActiveId] = useState<string | null>(null);
   const sort = useSortProjects();
@@ -133,7 +134,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
                   (a?.projectSortIndex?.[0]?.sortIndex || 0),
               ) // Reverse sort order
               .map((project) => (
-                <SortableProjectCard key={project.id} project={project} />
+                <SortableProjectCard key={project.id} project={project} isRecentlyEnded={isRecentlyEnded} />
               ))}
           </div>
         </SortableContext>
@@ -142,6 +143,7 @@ const DashboardDraggableProjectList = ({ projects: p }: Props) => {
             <ProjectCard
               project={projects.find((p) => p.id === activeId)!}
               isDragging={true}
+              isRecentlyEnded={isRecentlyEnded}
             />
           ) : null}
         </DragOverlay>
