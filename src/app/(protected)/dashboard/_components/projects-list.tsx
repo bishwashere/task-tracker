@@ -22,6 +22,13 @@ function mapActiveSprintProject(project: ProjectRow) {
   };
 }
 
+function mapDefaultProject(project: ProjectRow) {
+  return {
+    ...project,
+    projectSummary: project.projectSummary[0] ?? null,
+  };
+}
+
 function mapRecentlyEndedSprintProject(project: ProjectRow) {
   return {
     ...project,
@@ -71,7 +78,7 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
       {hasActiveSection && (
         <DashboardDraggableProjectList
           projects={activeProjects.map(
-            activeSprintOnly ? mapActiveSprintProject : (p) => p,
+            activeSprintOnly ? mapActiveSprintProject : mapDefaultProject,
           )}
         />
       )}
