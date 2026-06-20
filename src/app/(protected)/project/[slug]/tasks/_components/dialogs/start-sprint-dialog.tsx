@@ -21,7 +21,7 @@ type Props = {
   nextWeekNumber: number;
 };
 
-const DURATION_OPTIONS = [7, 14, 30] as const;
+const PRESET_DURATIONS = [7, 14, 30] as const;
 
 const StartSprintDialog = ({
   projectId,
@@ -32,7 +32,7 @@ const StartSprintDialog = ({
   const startSprint = useStartSprint(projectId);
   const [name, setName] = useState("");
   const [sprintType, setSprintType] = useState<SprintTypeValue>("LAUNCH");
-  const [durationDays, setDurationDays] = useState<7 | 14 | 30>(7);
+  const [durationDays, setDurationDays] = useState<number>(7);
   const [primaryGoal, setPrimaryGoal] = useState("");
   const [targetMetric, setTargetMetric] = useState("");
 
@@ -115,13 +115,17 @@ const StartSprintDialog = ({
           <div className="space-y-2">
             <Label>Duration</Label>
             <RadioGroup
-              value={String(durationDays)}
-              onValueChange={(value) =>
-                setDurationDays(Number(value) as 7 | 14 | 30)
-              }
-              className="flex flex-row gap-4"
+              value={PRESET_DURATIONS.includes(durationDays as 7 | 14 | 30) ? String(durationDays) : "custom"}
+              onValueChange={(value) => {
+                if (value === "custom") {
+                  setDurationDays(1);
+                } else {
+                  setDurationDays(Number(value));
+                }
+              }}
+              className="flex flex-row flex-wrap gap-4"
             >
-              {DURATION_OPTIONS.map((days) => (
+              {PRESET_DURATIONS.map((days) => (
                 <label
                   key={days}
                   htmlFor={`duration-${days}`}
@@ -131,7 +135,31 @@ const StartSprintDialog = ({
                   {days} days
                 </label>
               ))}
+              <label
+                htmlFor="duration-custom"
+                className="flex items-center gap-2 cursor-pointer text-sm"
+              >
+                <RadioGroupItem value="custom" id="duration-custom" />
+                Custom
+              </label>
             </RadioGroup>
+            {!PRESET_DURATIONS.includes(durationDays as 7 | 14 | 30) && (
+              <div className="flex items-center gap-2 mt-1.5">
+                <input
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={durationDays}
+                  onChange={(e) => {
+                    const num = Math.max(1, Math.min(365, Number(e.target.value)));
+                    setDurationDays(num);
+                  }}
+                  className="border rounded-md px-3 py-1.5 w-24 text-sm"
+                  placeholder="Days"
+                />
+                <span className="text-sm text-muted-foreground">days</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">

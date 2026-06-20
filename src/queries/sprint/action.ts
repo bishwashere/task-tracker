@@ -10,7 +10,7 @@ const startSprintSchema = z.object({
   projectId: z.string(),
   name: z.string().trim().min(1, "Sprint name is required"),
   sprintType: z.enum(SPRINT_TYPE_VALUES),
-  durationDays: z.union([z.literal(7), z.literal(14), z.literal(30)]),
+  durationDays: z.number().int().min(1).max(365),
   primaryGoal: z.string().trim().optional(),
   targetMetric: z.string().trim().optional(),
   taskIds: z
@@ -29,7 +29,7 @@ const updateSprintSchema = z.object({
   sprintId: z.string(),
   name: z.string().trim().min(1, "Sprint name is required"),
   sprintType: z.enum(SPRINT_TYPE_VALUES),
-  durationDays: z.union([z.literal(7), z.literal(14), z.literal(30)]),
+  durationDays: z.number().int().min(1).max(365),
   primaryGoal: z.string().trim().optional(),
   targetMetric: z.string().trim().optional(),
 });
@@ -64,7 +64,7 @@ async function expireSprintIfNeeded(sprint: Sprint): Promise<Sprint | null> {
 export type InitialSprintConfig = {
   name: string;
   sprintType: SprintTypeValue;
-  durationDays: 7 | 14 | 30;
+  durationDays: number;
   primaryGoal?: string;
   targetMetric?: string;
   taskIds?: string[];

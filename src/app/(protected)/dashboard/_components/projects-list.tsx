@@ -70,7 +70,9 @@ const ProjectsList = ({ activeSprintOnly = true }: Props) => {
     <>
       {hasActiveSection && (
         <DashboardDraggableProjectList
-          projects={activeProjects.map(mapActiveSprintProject)}
+          projects={activeProjects.map(
+            activeSprintOnly ? mapActiveSprintProject : (p) => p,
+          )}
         />
       )}
 

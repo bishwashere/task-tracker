@@ -22,12 +22,7 @@ type Props = {
   sprint: Sprint;
 };
 
-const DURATION_OPTIONS = [7, 14, 30] as const;
-
-function normalizeDuration(days: number): 7 | 14 | 30 {
-  if (days === 14 || days === 30) return days;
-  return 7;
-}
+const PRESET_DURATIONS = [7, 14, 30] as const;
 
 const EditSprintDialog = ({ projectId, sprint }: Props) => {
   const [open, setOpen] = useState(false);
@@ -36,9 +31,7 @@ const EditSprintDialog = ({ projectId, sprint }: Props) => {
   const [sprintType, setSprintType] = useState<SprintTypeValue>(
     sprint.sprintType as SprintTypeValue,
   );
-  const [durationDays, setDurationDays] = useState<7 | 14 | 30>(
-    normalizeDuration(sprint.durationDays),
-  );
+  const [durationDays, setDurationDays] = useState<number>(sprint.durationDays);
   const [primaryGoal, setPrimaryGoal] = useState(sprint.primaryGoal || "");
   const [targetMetric, setTargetMetric] = useState(sprint.targetMetric || "");
 
@@ -46,7 +39,7 @@ const EditSprintDialog = ({ projectId, sprint }: Props) => {
     if (!open) return;
     setName(sprint.name);
     setSprintType(sprint.sprintType as SprintTypeValue);
-    setDurationDays(normalizeDuration(sprint.durationDays));
+    setDurationDays(sprint.durationDays);
     setPrimaryGoal(sprint.primaryGoal || "");
     setTargetMetric(sprint.targetMetric || "");
   }, [open, sprint]);
@@ -120,13 +113,17 @@ const EditSprintDialog = ({ projectId, sprint }: Props) => {
           <div className="space-y-2">
             <Label>Duration</Label>
             <RadioGroup
-              value={String(durationDays)}
-              onValueChange={(value) =>
-                setDurationDays(Number(value) as 7 | 14 | 30)
-              }
-              className="flex flex-row gap-4"
+              value={PRESET_DURATIONS.includes(durationDays as 7 | 14 | 30) ? String(durationDays) : "custom"}
+              onValueChange={(value) => {
+                if (value === "custom") {
+                  setDurationDays(1);
+                } else {
+                  setDurationDays(Number(value));
+                }
+              }}
+              className="flex flex-row flex-wrap gap-4"
             >
-              {DURATION_OPTIONS.map((days) => (
+              {PRESET_DURATIONS.map((days) => (
                 <label
                   key={days}
                   htmlFor={`edit-duration-${days}`}
@@ -136,7 +133,31 @@ const EditSprintDialog = ({ projectId, sprint }: Props) => {
                   {days} days
                 </label>
               ))}
+              <label
+                htmlFor="edit-duration-custom"
+                className="flex items-center gap-2 cursor-pointer text-sm"
+              >
+                <RadioGroupItem value="custom" id="edit-duration-custom" />
+                Custom
+              </label>
             </RadioGroup>
+            {!PRESET_DURATIONS.includes(durationDays as 7 | 14 | 30) && (
+              <div className="flex items-center gap-2 mt-1.5">
+                <input
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={durationDays}
+                  onChange={(e) => {
+                    const num = Math.max(1, Math.min(365, Number(e.target.value)));
+                    setDurationDays(num);
+                  }}
+                  className="border rounded-md px-3 py-1.5 w-24 text-sm"
+                  placeholder="Days"
+                />
+                <span className="text-sm text-muted-foreground">days</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
