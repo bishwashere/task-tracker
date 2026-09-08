@@ -232,23 +232,24 @@ const ProjectFilters = ({ hideUserFilter, members, toolbarExtra }: Props) => {
           </div>
         </div>
 
+        <div className="hidden sm:flex items-center gap-4 ml-auto shrink-0">
+          <SubtaskToggle
+            showSubtasks={showSubtasks}
+            setShowSubtasks={setShowSubtasks}
+          />
+          <Separator orientation="vertical" className="h-5" />
+          <DateFilterSelect
+            dateFilters={dateFilters}
+            filterByDate={filterByDate}
+            setFilterByDate={setFilterByDate}
+          />
+        </div>
+
         {toolbarExtra && (
-          <div className="flex items-center gap-3 ml-auto shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             {toolbarExtra}
           </div>
         )}
-      </div>
-      <div className="mb-4 hidden sm:flex flex-row gap-4">
-        <SubtaskToggle
-          showSubtasks={showSubtasks}
-          setShowSubtasks={setShowSubtasks}
-        />
-        <Separator orientation="vertical" className="h-5" />
-        <DateFilterSelect
-          dateFilters={dateFilters}
-          filterByDate={filterByDate}
-          setFilterByDate={setFilterByDate}
-        />
       </div>
     </>
   );

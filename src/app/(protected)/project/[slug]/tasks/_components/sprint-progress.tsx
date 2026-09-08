@@ -65,9 +65,9 @@ const SprintProgress = ({ projectId, tasks }: Props) => {
           {isAdmin && editMode && (
             <EditSprintDialog projectId={projectId} sprint={sprint} />
           )}
-          <div>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <h3 className="text-lg font-semibold text-gray-800">Sprint Progress</h3>
-            <div className="flex items-center gap-1 mt-0.5">
+            <div className="flex items-center gap-1">
               <p className="text-xs text-muted-foreground">
                 {formatSprintName(sprint.name)} •{" "}
                 {formatSprintDateRange(

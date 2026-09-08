@@ -20,7 +20,7 @@ export function EditModeHint({
           className="inline size-4 align-text-bottom mr-1"
           aria-hidden
         />
-        To add or edit tasks, open the{" "}
+        Admins can add or edit tasks from the{" "}
         <span className="font-medium text-gray-800">gear menu</span> (top right)
         and tap <span className="font-medium text-gray-800">Edit</span>.
       </p>
@@ -31,7 +31,7 @@ export function EditModeHint({
     <div className="mt-10 flex flex-col items-center gap-4 rounded-lg border border-dashed border-gray-300 bg-gray-50/80 px-6 py-10 text-center max-w-lg mx-auto">
       <p className="text-lg font-semibold text-gray-900">No tasks yet</p>
       <div className="text-sm text-muted-foreground leading-relaxed text-left w-full space-y-3">
-        <p>To add and manage tasks:</p>
+        <p>Admins can add and manage tasks:</p>
         <ol className="list-decimal list-inside space-y-2 pl-1">
           <li>
             Tap the{" "}
