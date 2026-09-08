@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-const tabs = ["all", "pending", "done"] as const;
+const tabs = ["pending", "done", "all"] as const;
 const dateFilters = [{
   label: "All Time",
   value: "all",
@@ -71,7 +71,7 @@ export const ProjectContextProvider = ({
   const { data: sprintData } = useGetActiveSprint(projectId);
   const [editMode, setEditMode] =
     useState<ProjectContextType["editMode"]>(false);
-  const [tab, setTab] = useState<ProjectContextType["tab"]>("all");
+  const [tab, setTab] = useState<ProjectContextType["tab"]>("pending");
   const [userFilter, setUserFilter] =
     useState<ProjectContextType["userFilter"]>("all");
   const [filterByDate, setFilterByDate] = useState<ProjectContextType["filterByDate"]>("all");
@@ -286,6 +286,4 @@ export const useProjectContext = () => {
   }
   return context;
 };
-
-
 
