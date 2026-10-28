@@ -2,10 +2,7 @@
   "name": "task-tracker",
   "version": "0.1.0",
   "private": true,
-  "author": {
-    "name": "Binit KC",
-    "email": "binitkc220@gmail.com"
-  },
+  "author": "Bishwas Mishra",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
