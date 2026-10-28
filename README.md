@@ -1,3 +1,11 @@
+# Task Tracker: projects and tasks for small teams
+
+Task Tracker is a web app for organizing work: create an organization, start projects, break them into tasks and subtasks, assign them to people, set due dates and priorities, and follow the progress.
+
+It is a complete product, not a demo: accounts and sign in, drag and drop boards, comments, AI suggestions for breaking work down, and paid subscriptions are all built in. The front end is a Next.js web app; the back end uses a MongoDB database through Prisma, Gemini for the AI features, and Stripe for payments. The technical documentation follows below.
+
+---
+
 # Task Tracker
 
 A full-stack project and task management web app built with Next.js. Supports team organizations, hierarchical projects → tasks → subtasks, drag-and-drop reordering, AI-powered task generation via Gemini, a gamified points system, and Stripe-based subscriptions.
